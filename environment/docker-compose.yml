@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  python-csv-ingest:
+    image: ${MAIN_IMAGE_NAME}
+    build:
+      context: ..
+      dockerfile: environment/Dockerfile
+    container_name: python-csv
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true
+    command: bash
