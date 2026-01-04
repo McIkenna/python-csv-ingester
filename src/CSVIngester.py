@@ -78,7 +78,7 @@ class CSVIngester:
                 try:
                     parser.parse(str(val), dayfirst=True)
                     date_count += 1
-                except:
+                except (ValueError, TypeError):
                     pass
             
             # If more than 50% of values parse as dates, classify as date
@@ -260,7 +260,7 @@ class CSVIngester:
         with open(log_file, 'w') as f:
             json.dump(self.data_cleaning_log, f, indent=2)
         
-        print(f"\nComplete!")
+        print(" Completed")
         print(f"  Processed: {len(cleaned_dfs)} file(s)")
         print(f"  Output rows: {len(final_df)}")
         print(f"  Output columns: {len(final_df.columns)}")

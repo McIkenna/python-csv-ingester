@@ -1,20 +1,13 @@
 import os
-from sys import stdout
 import pytest
 import json
 import subprocess
-import shlex
-from unittest.mock import patch
 import csv
-from pathlib import Path
 
 
 def extract_json_from_output(output):
     """Extract JSON from output that may contain other text"""
-    # Try to find JSON object or array
-    # Look for balanced braces or brackets
     try:
-        # First, try parsing the whole thing
         return json.loads(output)
     except json.JSONDecodeError:
         pass
@@ -23,7 +16,6 @@ def extract_json_from_output(output):
     for start_char in ['{', '[']:
         start_idx = output.find(start_char)
         if start_idx != -1:
-            # Find the matching closing brace/bracket
             depth = 0
             end_char = '}' if start_char == '{' else ']'
             
@@ -33,15 +25,13 @@ def extract_json_from_output(output):
                 elif output[i] == end_char:
                     depth -= 1
                     if depth == 0:
-                        # Found complete JSON
                         json_str = output[start_idx:i+1]
                         try:
                             return json.loads(json_str)
                         except json.JSONDecodeError:
                             continue
-    
-    # If all else fails, raise error
-    raise json.JSONDecodeError(f"No valid JSON found in output", output, 0)
+
+    raise json.JSONDecodeError("No valid JSON found in output", output, 0)
 
 @pytest.fixture
 def mock_latin1_data():
@@ -182,6 +172,9 @@ def test_should_detect_latin_encoding(mock_latin1_data, solve_sh_path):
         )
     assert returncode == 0
     assert "latin" in stdout.lower() or "latin-1" in stdout.lower()
+    cleanup_file = mock_latin1_data
+    if os.path.exists(cleanup_file):
+        os.remove(cleanup_file)
 
 def test_should_detect_encoding_nonexistent_file(solve_sh_path):
     """Test with non-existent file"""
@@ -338,8 +331,6 @@ def test_clean_single_dataframe(mock_test_data, solve_sh_path):
     )
     assert returncode == 0
     assert os.path.exists(output_file)
-    
-    # Basic check on cleaned file
     with open(output_file, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
         headers = next(reader)
@@ -390,7 +381,6 @@ def test_consolidate_dataframes(mock_test_data, mock_test_data_two, mock_test_da
     assert "input_files_count" in result
     assert "total_rows" in result
     
-    # Should have combined rows from both files each having at least 10 rows
     assert result["total_rows"] >= 30 
     
    

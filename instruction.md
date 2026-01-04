@@ -281,7 +281,7 @@ pytest tests/test_outputs.py --cov=csv_cleaner --cov-report=html
 
 ### Test Suite Overview
 
-**Total Tests:** 24
+**Total Tests:** 26
 ## Test Cases
 
 ### Test Case 1: Column Name Standardization
