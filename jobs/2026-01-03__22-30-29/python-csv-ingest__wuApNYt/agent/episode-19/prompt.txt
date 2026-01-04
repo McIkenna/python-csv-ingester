@@ -1,0 +1,27 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@9449aaacef4f:/app# file-processing tests/final_output.csv tests/final_log.json tests/test_data.csv tests/test2_data.csv
+Processing 2 CSV file(s)...
+  Loading test_data.csv...
+  Loading test2_data.csv...
+Consolidating datasets...
+Writing cleaned data to tests/final_output.csv...
+Writing cleaning log to tests/final_log.json...
+
+Complete!
+  Processed: 2 file(s)
+  Output rows: 20
+  Output columns: 16
+root@9449aaacef4f:/app# ls -lh tests/final_*
+-rw-r--r-- 1 root root 5.3K Jan  4 04:35 tests/final_log.json
+-rw-r--r-- 1 root root 1.6K Jan  4 04:35 tests/final_output.csv
+root@9449aaacef4f:/app# head -3 tests/final_output.csv
+annual_salary,customer_name,department_code,employee_id,employment_status,full_name,hire_date,last_review,order_date,order_id,performance_score,product_price,qu
+antity,ship_date,status,total_amount
+,John Doe,,,,,,,2025-01-01,1001.09,,99.99,2.0,2025-05-01,Active,199.98
+,Unknown,,,,,,,2025-01-15,1002.0,,150.5,2.5,2025-01-20,Pending,300.0
+root@9449aaacef4f:/app#

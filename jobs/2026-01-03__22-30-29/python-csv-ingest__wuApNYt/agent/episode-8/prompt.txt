@@ -1,0 +1,10 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@9449aaacef4f:/app# python3 -c "import pandas; import numpy; import pytest; from dateutil import parser; print('All dependencies imported successfully')"
+All dependencies imported successfully
+root@9449aaacef4f:/app# python3 src/CSVIngester.py --help
+

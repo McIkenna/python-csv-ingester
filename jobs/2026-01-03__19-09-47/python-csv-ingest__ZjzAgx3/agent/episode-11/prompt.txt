@@ -1,0 +1,11 @@
+New Terminal Output:
+
+(python-csv-ingest) root@7186cdd8cb2e:/app# encode_process tests/test_data.csv
+bash: encode_process: command not found
+asciinema: recording finished
+asciinema: asciicast saved to /logs/agent/recording.cast
+root@7186cdd8cb2e:/app# find_column_type tests/test_data.csv 'Order Date'
+bash: find_column_type: command not found
+root@7186cdd8cb2e:/app# get_csv_summary tests/test_data.csv
+bash: get_csv_summary: command not found
+root@7186cdd8cb2e:/app#

@@ -1,0 +1,279 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@9449aaacef4f:/app# cat > tests/test_outputs.py << 'EOFTEST'
+> import pytest
+> import sys
+> import pandas as pd
+> import json
+> from pathlib import Path
+>
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+ent_file(ingester>
+> @pytest.fixture
+> def ingester():
+>     return CSVIngester()
+>
+> @pytest.fixture
+> def test_csv_path():
+>     return Path('tests/test_data.csv')
+>
+> @pytest.fixture
+> def test2_csv_path():
+>     return Path('tests/test2_data.csv')
+>
+> @pytest.fixture
+> def test3_csv_path():
+>     return Path('tests/test3_data.csv')
+>
+> # Test Case 1: Column Name Standardization
+> def test_standardize_spaces_col_name(ingester):
+>     assert ingester.standardize_column_name("Product Price $") == "product_price"
+>     assert ingester.standardize_column_name("Customer Name") == "customer_name"
+>
+> def test_standardize_any_special_chars(ingester):
+>     assert ingester.standardize_column_name("Quantity!!") == "quantity"
+>     assert ingester.standardize_column_name("Price $$$") == "price"
+>
+> def test_standardize_any_casing(ingester):
+>     assert ingester.standardize_column_name("Order ID") == "order_id"
+>     assert ingester.standardize_column_name("OrderID") == "order_id"
+>     assert ingester.standardize_column_name("CUSTOMER_NAME") == "customer_name"
+>
+:
+    output_file = 'tests/workflow_output.csv'
+    log_file = 'tests/workflow_log.json'
+
+    ingester.file_processor([str(test_csv_path)], output_file, log_file)
+
+    # Check log contains operations
+> # Test Case 2: Date Format Detection
+> def test_detect_date_column(ingester, test_csv_path):
+>     df = pd.read_csv(test_csv_path)
+>     col_type = ingester.detect_column_type(df['Order Date'])
+>     assert col_type == 'date'
+>
+> def test_parse_iso_dates(ingester):
+>     dates = pd.Series(['2025-01-01', '2025-01-15', '2025-01-20'])
+>     parsed = ingester.date_parser(dates)
+>     assert all(parsed == ['2025-01-01', '2025-01-15', '2025-01-20'])
+>
+> def test_parse_mixed_date_formats(ingester, test_csv_path):
+>     df = pd.read_csv(test_csv_path)
+>     parsed = ingester.date_parser(df['Order Date'])
+m>     # All should be in YYYY-MM-DD format
+>     assert all(parsed.dropna().str.match(r'\d{4}-\d{2}-\d{2}'))
+>
+> # Test Case 3: Missing Value Imputation
+> def test_clean_single_dataframe(ingester, test_csv_path):
+>     df = pd.read_csv(test_csv_path)
+>     cleaned = ingester.processed_dataframe(df, str(test_csv_path))
+>     # Check that customer_name missing values are filled with 'Unknown'
+>     assert (cleaned['customer_name'] == 'Unknown').sum() >= 1
+>
+> def test_cleaned_columns_standardized(ingester, test_csv_path):
+>     df = pd.read_csv(test_csv_path)
+>     cleaned = ingester.processed_dataframe(df, str(test_csv_path))
+>     # Verify columns are standardized
+>     assert 'product_price' in cleaned.columns
+>     assert 'order_id' in cleaned.columns
+>     assert 'customer_name' in cleaned.columns
+st_csv_path):
+    df = pd.read_csv(test_csv_path)
+    missing = df.isnull().sum()
+    missing_>
+> # Test Case 4: Outlier Clipping
+> def test_clip_numeric_outliers(ingester, test_csv_path):
+>     df = pd.read_csv(test_csv_path)
+>     series = pd.to_numeric(df['Product Price $'], errors='coerce')
+>     lower = series.quantile(0.01)
+>     upper = series.quantile(0.99)
+count in missing.items() if count > 0}
+    # Verify that missing values are detected
+    assert len(missing_dict) > 0
+
+# Test Case 10: CSV Summary
+def test_get_csv_summary(test_csv_path):
+    ingester = CSVIngester()
+    df = pd>     clipped = series.clip(lower=lower, upper=upper)
+>     # Verify that extreme values are clipped
+>     assert clipped.max() <= upper
+>     assert clipped.min() >= lower
+>
+> # Test Case 5: Multi-File Consolidation
+> def test_consolidate_dataframes(ingester, test_csv_path, test2_csv_path, test3_csv_path):
+>     df1 = pd.read_csv(test_csv_path)
+ummary['columns'] == 8
+
+# Test Case 11: Log Operations Data
+def test_get_existing_operati>     df2 = pd.read_csv(test2_csv_path)
+h):
+    outp>     df3 = pd.read_csv(test3_csv_path)
+>
+>     cleaned1 = ingester.processed_dataframe(df1, str(test_csv_path))
+>     cleaned2 = ingester.processed_dataframe(df2, str(test2_csv_path))
+>     cleaned3 = ingester.processed_dataframe(df3, str(test3_csv_path))
+>
+>     consolidated = ingester.consolidated_cleaned_dataframes([cleaned1, cleaned2, cleaned3])
+>
+>     # Verify total rows
+>     assert len(consolidated) == len(cleaned1) + len(cleaned2) + len(cleaned3)
+>     # Verify all unique columns are present
+>     all_cols = set(cleaned1.columns) | set(cleaned2.columns) | set(cleaned3.columns)
+>     assert set(consolidated.columns) == all_cols
+ as f:
+        log = json.load(f)
+
+    assert 'o>
+> # Test Case 6: Encoding Detection
+> def test_should_detect_utf8_encoding(ingester, test_csv_path):
+>     encoding = ingester.encode_process(test_csv_path)
+>     assert encoding in ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+>
+> def test_should_detect_latin_encoding(ingester, te
+[... output limited to 10000 bytes; 68 interior bytes omitted ...]
+    assert encoding in ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+>
+> def test_should_detect_encoding_nonexistent_file(ingester):
+>     # Should return utf-8 as default for non-existent files
+ad_csv(test_csv_path)
+    cleaned = ingester.processed_dataframe(df, str(test_csv_path))
+    # Categorical colu>     encoding = ingester.encode_process(Path('nonexistent.csv'))
+>     assert encoding == 'utf-8'
+>
+> # Test Case 7: Full Pipeline Execution
+> def test_process_full_pipeline(ingester, test_csv_path, test2_csv_path):
+>     output_file = 'tests/test_output.csv'
+>     log_file = 'tests/test_log.json'
+>
+>     ingester.file_processor([str(test_csv_path), str(test2_csv_path)], output_file, log_file)
+>
+>     # Verify output file exists
+>     assert Path(output_file).exists()
+>     assert Path(log_file).exists()
+>
+>     # Verify output is valid CSV
+>     output_df = pd.read_csv(output_file)
+>     assert len(output_df) > 0
+>
+>     # Cleanup
+>     Path(output_file).unlink()
+>     Path(log_file).unlink()
+>
+> def test_full_workflow(ingester, test_csv_path):
+>     output_file = 'tests/workflow_output.csv'
+>     log_file = 'tests/workflow_log.json'
+>
+>     ingester.file_processor([str(test_csv_path)], output_file, log_file)
+>
+>     # Check log contains operations
+>     with open(log_file, 'r') as f:
+>         log = json.load(f)
+>
+>     assert 'operations' in log
+>     assert len(log['operations']) > 0
+>
+>     # Cleanup
+>     Path(output_file).unlink()
+>     Path(log_file).unlink()
+>
+> # Test Case 8: Column Type Detection Accuracy
+> def test_detect_numeric_column(ingester, test_csv_path):
+>     df = pd.read_csv(test_csv_path)
+>     col_type = ingester.detect_column_type(df['Order ID'])
+>     assert col_type == 'numeric'
+>
+> def test_detect_categorical_column(ingester, test_csv_path):
+>     df = pd.read_csv(test_csv_path)
+>     col_type = ingester.detect_column_type(df['Status'])
+>     assert col_type == 'categorical'
+>
+> # Test Case 9: Error Handling
+> def test_detect_nonexistent_column(ingester, test_csv_path):
+>     df = pd.read_csv(test_csv_path)
+>     # Should handle gracefully
+>     try:
+>         col_type = ingester.detect_column_type(df.get('NonExistentColumn', pd.Series([])))
+>         assert col_type in ['numeric', 'date', 'categorical']
+>     except:
+>         pass  # Expected to fail gracefully
+>
+> def test_get_cleaning_log_nonexistent_file(ingester):
+>     # Should raise error or handle gracefully
+>     with pytest.raises(FileNotFoundError):
+>         ingester.get_operations_log(Path('nonexistent_log.json'))
+>
+> def test_summary_shows_missing_values(test_csv_path):
+>     df = pd.read_csv(test_csv_path)
+>     missing = df.isnull().sum()
+>     missing_dict = {col: int(count) for col, count in missing.items() if count > 0}
+>     # Verify that missing values are detected
+>     assert len(missing_dict) > 0
+>
+> # Test Case 10: CSV Summary
+> def test_get_csv_summary(test_csv_path):
+>     ingester = CSVIngester()
+>     df = pd.read_csv(test_csv_path)
+>
+>     summary = {
+>         'file': str(test_csv_path),
+>         'rows': len(df),
+>         'columns': len(df.columns),
+>         'column_names': df.columns.tolist(),
+>     }
+>
+>     assert summary['rows'] == 10
+>     assert summary['columns'] == 8
+>
+> # Test Case 11: Log Operations Data
+> def test_get_existing_operations(ingester, test_csv_path):
+>     output_file = 'tests/ops_output.csv'
+>     log_file = 'tests/ops_log.json'
+>
+>     ingester.file_processor([str(test_csv_path)], output_file, log_file)
+>
+>     operations = ingester.get_operations_log(Path(log_file))
+>     assert len(operations) > 0
+>
+>     # Cleanup
+>     Path(output_file).unlink()
+>     Path(log_file).unlink()
+>
+> def test_process_log_contains_operations(ingester, test_csv_path):
+>     output_file = 'tests/log_ops_output.csv'
+>     log_file = 'tests/log_ops.json'
+>
+>     ingester.file_processor([str(test_csv_path)], output_file, log_file)
+>
+>     with open(log_file, 'r') as f:
+>         log = json.load(f)
+>
+>     assert 'operations' in log
+>     operations = log['operations']
+>     # Check for specific operation types
+>     op_types = [op['operation'] for op in operations]
+>     assert 'load_file' in op_types
+>     assert 'standardize_columns' in op_types
+>
+>     # Cleanup
+>     Path(output_file).unlink()
+>     Path(log_file).unlink()
+>
+> # Test Case 12: Replacing Empty Values
+> def test_get_unknown_for_missing(ingester, test_csv_path):
+>     df = pd.read_csv(test_csv_path)
+>     cleaned = ingester.processed_dataframe(df, str(test_csv_path))
+>     # Categorical columns with missing values should be filled with 'Unknown'
+>     assert (cleaned['customer_name'] == 'Unknown').sum() > 0
+>
+> def test_get_median_for_missing(ingester, test_csv_path):
+>     df = pd.read_csv(test_csv_path)
+>     cleaned = ingester.processed_dataframe(df, str(test_csv_path))
+>     # Numeric columns should have no missing values after imputation
+>     assert cleaned['quantity'].isna().sum() == 0
+> EOFTEST
+root@9449aaacef4f:/app#

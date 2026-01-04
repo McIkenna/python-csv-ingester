@@ -1,0 +1,21 @@
+```json
+{
+  "analysis": "The sed command created duplicate methods instead of replacing. Need to restore from backup and use a proper method to fix the encode_process function to handle FileNotFoundError.",
+  "plan": "Restore the backup file, then use Python to properly modify the encode_process method to catch FileNotFoundError and return 'utf-8' as default.",
+  "commands": [
+    {
+      "keystrokes": "mv src/CSVIngester.py.bak src/CSVIngester.py\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "python3 << 'EOFPY'\nwith open('src/CSVIngester.py', 'r') as f:\n    content = f.read()\n\n# Replace the encode_process method to handle FileNotFoundError\nold_except = \"except UnicodeDecodeError:\"\nnew_except = \"except (UnicodeDecodeError, FileNotFoundError):\"\n\ncontent = content.replace(old_except, new_except)\n\nwith open('src/CSVIngester.py', 'w') as f:\n    f.write(content)\n\nprint(\"Fixed encode_process method to handle FileNotFoundError\")\nEOFPY\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "grep -A 10 'def encode_process' src/CSVIngester.py\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}
+```

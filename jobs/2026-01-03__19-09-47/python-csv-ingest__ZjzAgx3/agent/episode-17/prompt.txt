@@ -1,0 +1,28 @@
+New Terminal Output:
+
+root@7186cdd8cb2e:/app# detect_column_type tests/test_data.csv 'Order Date'
+date
+root@7186cdd8cb2e:/app# detect_column_type tests/test_data.csv 'Product Price $'
+numeric
+root@7186cdd8cb2e:/app# get_csv_summary tests/test_data.csv | python -m json.tool | head -n 20
+{
+    "file": "tests/test_data.csv",
+    "rows": 10,
+    "columns": 8,
+    "column_names": [
+        "Order ID",
+        "Customer Name",
+        "Order Date",
+        "Product Price $",
+        "Quantity!!",
+        "Total Amount",
+        "Ship Date",
+        "Status"
+    ],
+    "dtypes": {
+        "Order ID": "object",
+        "Customer Name": "object",
+        "Order Date": "object",
+        "Product Price $": "float64",
+        "Quantity!!": "int64",
+root@7186cdd8cb2e:/app#

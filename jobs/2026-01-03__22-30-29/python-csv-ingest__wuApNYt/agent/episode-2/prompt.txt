@@ -1,0 +1,39 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@9449aaacef4f:/app# ls -la src/
+total 24
+drwxr-xr-x 3 root root  4096 Jan  4 02:24 .
+drwxr-xr-x 1 root root  4096 Jan  4 04:28 ..
+-rw-r--r-- 1 root root 10125 Jan  4 01:40 CSVIngester.py
+drwxr-xr-x 2 root root  4096 Jan  4 02:24 __pycache__
+root@9449aaacef4f:/app# find . -type f -name '*.py' -o -name '*.sh' -o -name '*.csv' -o -name '*.json' -o -name '*.toml' -o -name '*.md'
+./src/CSVIngester.py
+root@9449aaacef4f:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

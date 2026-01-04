@@ -1,11 +1,11 @@
 ## Overview
 
-Implement a Python CLI that ingests multiple CSV inputs with inconsistent schemas (varying names, encodings, date formats), standardizes column names, ISO-formats dates, imputes missing numericals by median and categoricals as 'Unknown', clips numeric outliers at the 1st/99th percentiles, and outputs a consolidated cleaned dataset and a JSON log of applied cleaning operations.
+Implement a Python CLI that ingests multiple CSV inputs with inconsistent schemas (varying names, encodings, date formats), standardized column names, ISO-formats dates, imputes missing numericals by median and categoricals as 'Unknown', clips numeric outliers at the 1st/99th percentiles, and outputs a consolidated cleaned dataset and a JSON log of applied cleaning operations.
 
 ### Requirements
 - Python CLI that ingests multiple CSV inputs
 - Inputs must have inconsistent schemas (varying names, encodings, date formats)
-- Must have standardizes column names, ISO-formats dates
+- Must have standardized column names, ISO-formats dates
 - Inputs missing numericals by median and categoricals as 'Unknown'
 - Clip the numeric outliers at the 1st/99th percentiles
 - Should output a consolidated cleaned dataset
@@ -46,7 +46,7 @@ pip install pandas numpy pytest
 
 ### 3. Make Scripts Executable
 ```bash
-chmod +x solution/CSVIngester.py
+chmod +x src/CSVIngester.py
 chmod +x solution/solve.sh
 chmod +x tests/test.sh
 ```
@@ -57,9 +57,9 @@ chmod +x tests/test.sh
 
 ```
 python-csv-ingest/
-        
-├── solution
-|   |__ CSVIngester.py          # Main Python CLI application
+├── src
+|   |__ CSVIngester.py         # Main Python CLI application
+├── solution        
 |   |__ solve.sh                # Bash shell interface
 ├── tests
 |    |__ test.sh                # Bash shell to run test interface
@@ -70,8 +70,8 @@ python-csv-ingest/
 |   ├──cleaned_data.csv            # Output file (generated and removed after test case completion)
 |   └──cleaning_log.json           # Operation log (generated and removed after test case completion)
 |   └──final_log.json           # Comprehensive Operation log (generated and removed after test case completion)
-├── INSTRUCTIONS.md             # This file
-
+├── instruction.md             # This file contains the information about the app
+|__ task.toml                 # Contains configurations
 ```
 
 ---
@@ -85,11 +85,11 @@ python-csv-ingest/
 **Key Methods:**
 - `encode_process()` - Auto-detects file encoding (UTF-8, Latin-1, etc.)
 - `standardize_column_name()` - Converts columns to snake_case
-- `find_column_type()` - Identifies numeric/date/categorical columns
+- `detect_column_type()` - Identifies numeric/date/categorical columns
 - `date_parser()` - Converts various date formats to ISO-8601
 - `outlier_truncate()` - Clips values at 1st/99th percentiles
 - `logging_process()` - Output a json log of the cleaned process
-- `get_operations_log()` - Helper fucntion to output json logs
+- `get_operations_log()` - Helper functions to output json logs
 - `processed_dataframe()` - Cleans and process a single CSV file
 - `consolidated_cleaned_dataframes()` - Merges multiple cleaned CSV file 
 - `file_processor()` - Full pipeline execution
@@ -105,18 +105,18 @@ python-csv-ingest/
 
 ### 2. Shell Interface (`solution/solve.sh`)
 
-**Available Bash Functions:**
-- `encode_process <filepath>`
-- `standardize_column_name <column_name>`
-- `find_column_type <csv_file>findmn_name>`
-- `date_parser <csv_file> <column_name>`
-- `outlier_truncate <csv_file> <column_name>`
-- `processed_dataframe <csv_file> [output_file]`
-- `consolidated_cleaned_dataframes <output_file> <file1> <file2> ...`
-- `file_processor <output_file> <log_file> <file1> <file2> ...`
-- `logging_process [log_file]`
-- `get_csv_summary <csv_file>`
-- `operations_logs <output_file>`
+**Available Bash Commands:**
+- `encoding-detection <filepath>`
+- `name-standardization <column_name>`
+- `type-detection <csv_file> <column_name>`
+- `date-parsing <csv_file> <column_name>`
+- `outlier-truncate <csv_file> <column_name>`
+- `dataframe-cleaning <csv_file> [output_file]`
+- `dataframe-consolidation <output_file> <file1> <file2> ...`
+- `file-processing <output_file> <log_file> <file1> <file2> ...`
+- `cleaning_log [log_file]`
+- `csv-summary <csv_file>`
+- `get-operations <output_file>`
 
 ### 3. Test Data Generator (`generate_test_csvs.py`)
 
@@ -134,13 +134,13 @@ Three already generated messy CSV files for testing:
 #### 1. Clean Data Using Python CLI
 ```bash
 # Basic usage
-python solution/CSVIngester.py tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+python src/CSVIngester.py tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
 
 # Custom output paths
-python solution/CSVIngester.py tests/test_data.csv tests/test2_data.csv -o tests/cleaned.csv -l tests/log.json
+python src/CSVIngester.py tests/test_data.csv tests/test2_data.csv -o tests/cleaned.csv -l tests/log.json
 
 # View help
-python solution/CSVIngester.py --help
+python src/CSVIngester.py --help
 ```
 
 #### 3. Clean Data Using Bash Functions
@@ -148,13 +148,13 @@ python solution/CSVIngester.py --help
 # Source the shell script
 source solution/solve.sh
 
-# Use individual functions
-encode_process "tests/test_data.csv"
-standardize_column_name "Product Price $"
-find_column_type "tests/test_data.csv" "Order Date"
+# Use individual commands
+encoding-detection "tests/test_data.csv"
+name-standardization "Product Price $"
+type-detection "tests/test_data.csv" "Order Date"
 
 # Full pipeline
-file_processor "output.csv" "log.json" "tests/test_data.csv" "tests/test2_data.csv"
+file-processing "output.csv" "log.json" "tests/test_data.csv" "tests/test2_data.csv"
 ```
 
 ### Advanced Usage
@@ -162,7 +162,7 @@ file_processor "output.csv" "log.json" "tests/test_data.csv" "tests/test2_data.c
 #### Inspect CSV Before Cleaning
 ```bash
 source solution/solve.sh
-get_csv_summary "tests/test_data.csv"
+csv-summary "tests/test_data.csv"
 ```
 
 Output (JSON):
@@ -176,10 +176,10 @@ Output (JSON):
 }
 ```
 
-#### Check Column Typfindbash
-find_column_type "tests/test_data.csv" "Order Date"  # Returns: date
-find_column_type "tests/test_data.csv" "Product Price $"  # Returns: numeric
-find_column_type "tests/test_data.csv" "Status"  # Returns: categorical
+#### Check Column Type bash
+type-detection "tests/test_data.csv" "Order Date"  # Returns: date
+type-detection "tests/test_data.csv" "Product Price $"  # Returns: numeric
+type-detection "tests/test_data.csv" "Status"  # Returns: categorical
 ```
 
 #### Analyze Outliers
@@ -201,18 +201,18 @@ Output (JSON):
 
 #### Clean Single File
 ```bash
-processed_dataframe "tests/test_data.csv" "tests/cleaned_output.csv"
+dataframe-cleaning "tests/test_data.csv" "tests/cleaned_output.csv"
 ```
 
 #### Consolidate Multiple Files
 ```bash
-consolidated_cleaned_dataframes "consolidated_output.csv" "tests/test_data.csv" "tests/test2_data.csv" "tests/test3_data.csv"
+dataframe-consolidation "consolidated_output.csv" "tests/test_data.csv" "tests/test2_data.csv" "tests/test3_data.csv"
 ```
 
 #### View Cleaning Log
 ```bash
-process_files "output.csv" "log.json" "tests/test_data.csv"
-get_cleaning_log "log.json"
+file-processing "output.csv" "log.json" "tests/test_data.csv"
+cleaning_log "log.json"
 ```
 
 Output (JSON):
@@ -281,7 +281,7 @@ pytest tests/test_outputs.py --cov=csv_cleaner --cov-report=html
 
 ### Test Suite Overview
 
-**Total Tests:** 23
+**Total Tests:** 24
 ## Test Cases
 
 ### Test Case 1: Column Name Standardization
@@ -416,6 +416,7 @@ pytest tests/test_outputs.py::test_consolidate_dataframes -v
 
 **Input:**
 - `tests/test_data.csv` (UTF-8 encoding)
+- `tests/latin1_data.csv` (Latin-1 encoding)
 
 **Expected:**
 - UTF-8 detected for tests/test_data.csv
@@ -424,7 +425,8 @@ pytest tests/test_outputs.py::test_consolidate_dataframes -v
 
 **Test:**
 ```bash
-pytest tests/test_outputs.py::test_should_detect_encoding -v
+pytest tests/test_outputs.py::test_should_detect_utf8_encoding -v
+pytest tests/test_outputs.py::test_should_detect_latin_encoding -v
 pytest tests/test_outputs.py::test_should_detect_encoding_nonexistent_file -v
 ```
 
@@ -513,12 +515,12 @@ pytest tests/test_outputs.py::test_summary_shows_missing_values -v
 
 **Test:**
 ```bash
-pytest tests/test_solution.py::test_get_csv_summary -v
-pytest tests/test_solution.py::test_summary_shows_missing_values -v
+pytest tests/test_outputs.py::test_get_csv_summary -v
+pytest tests/test_outputs.py::test_summary_shows_missing_values -v
 ```
 --
 
-### Test Case 10: CSV Summary
+### Test Case 10: Log Operations Data
 
 **Input:**
 - CSV files
@@ -530,10 +532,24 @@ pytest tests/test_solution.py::test_summary_shows_missing_values -v
 
 **Test:**
 ```bash
-pytest tests/test_solution.py::test_get_existing_operations -v
-pytest tests/test_solution.py::test_process_log_contains_operations -v
+pytest tests/test_outputs.py::test_get_existing_operations -v
+pytest tests/test_outputs.py::test_process_log_contains_operations -v
 ```
 
+### Test Case 11: Replacing Empty Values
+**Input:**
+- CSV files
+
+**Expected Output:**
+1.Process data to replace empty categoricals with Unknown
+2.Process data to replace empty numerical with median
+
+
+**Test:**
+```bash
+pytest tests/test_outputs.py::test_get_unknown_for_missing -v
+pytest tests/test_outputs.py::test_get_median_for_missing -v
+```
 ## Additional Resources
 
 ### Supported Date Formats

@@ -1,0 +1,10 @@
+New Terminal Output:
+
+root@7186cdd8cb2e:/app# detect_encoding tests/test_data.csv
+bash: detect_encoding: command not found
+root@7186cdd8cb2e:/app# detect_column_type tests/test_data.csv 'Order Date'
+bash: detect_column_type: command not found
+root@7186cdd8cb2e:/app# get_csv_summary tests/test_data.csv | python -m json.tool
+bash: get_csv_summary: command not found
+Expecting value: line 1 column 1 (char 0)
+root@7186cdd8cb2e:/app#

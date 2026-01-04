@@ -6,7 +6,7 @@ set -e
 # Solution.sh - Shell interface for CSVIngester functions
 # This script wraps Python CSVIngester methods as bash functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PYTHON_SCRIPT="${SCRIPT_DIR}/CSVIngester.py"
+PYTHON_SCRIPT="${SCRIPT_DIR}/../src/CSVIngester.py"
 
 # Check if CSVIngester.py exists
 if [ ! -f "$PYTHON_SCRIPT" ]; then
@@ -18,7 +18,7 @@ detect_encoding() {
   local filepath="$1"
   detected_encoding=$(python3 -c "
 import sys
-sys.path.insert(0, '${SCRIPT_DIR}')
+sys.path.insert(0, '${SCRIPT_DIR}/../src')
 from CSVIngester import CSVIngester
 from pathlib import Path
 
@@ -35,7 +35,7 @@ standardize_column_name() {
    local column_name="$1"
      standardized_name=$(python3 -c "
 import sys
-sys.path.insert(0, '${SCRIPT_DIR}')
+sys.path.insert(0, '${SCRIPT_DIR}/../src')
 from CSVIngester import CSVIngester
 
 ingester = CSVIngester()
@@ -54,13 +54,13 @@ detect_column_type() {
   column_type=$(python3 -c "
 import sys
 import pandas as pd
-sys.path.insert(0, '${SCRIPT_DIR}')
+sys.path.insert(0, '${SCRIPT_DIR}/../src')
 from CSVIngester import CSVIngester
 
 ingester = CSVIngester()
 df = pd.read_csv('${csv_file}')
 if '${column_name}' in df.columns:
-    col_type = ingester.find_column_type(df['${column_name}'])
+    col_type = ingester.detect_column_type(df['${column_name}'])
     print(col_type)
 else:
     print('Column not found')
@@ -79,7 +79,7 @@ parse_dates() {
 import sys
 import pandas as pd
 import json
-sys.path.insert(0, '${SCRIPT_DIR}')
+sys.path.insert(0, '${SCRIPT_DIR}/../src')
 from CSVIngester import CSVIngester
 
 ingester = CSVIngester()
@@ -103,7 +103,7 @@ clip_outliers() {
 import sys
 import pandas as pd
 import json
-sys.path.insert(0, '${SCRIPT_DIR}')
+sys.path.insert(0, '${SCRIPT_DIR}/../src')
 from CSVIngester import CSVIngester
 
 ingester = CSVIngester()
@@ -140,7 +140,7 @@ clean_dataframe() {
 import sys
 import pandas as pd
 import json
-sys.path.insert(0, '${SCRIPT_DIR}')
+sys.path.insert(0, '${SCRIPT_DIR}/../src')
 from CSVIngester import CSVIngester
 
 ingester = CSVIngester()
@@ -178,7 +178,7 @@ consolidate_dataframes() {
 import sys
 import pandas as pd
 import json
-sys.path.insert(0, '${SCRIPT_DIR}')
+sys.path.insert(0, '${SCRIPT_DIR}/../src')
 from CSVIngester import CSVIngester
 
 ingester = CSVIngester()
@@ -213,7 +213,7 @@ else:
 
 
 # Process multiple files (full pipeline)
-process_files() {
+file_processor() {
   local output_file="${1:-cleaned_data.csv}"
   local log_file="${2:-cleaning_log.json}"
   shift 2
@@ -228,7 +228,7 @@ process_files() {
   processing_result=$(python3 -c "
 import sys
 import json
-sys.path.insert(0, '${SCRIPT_DIR}')
+sys.path.insert(0, '${SCRIPT_DIR}/../src')
 from CSVIngester import CSVIngester
 
 ingester = CSVIngester()
@@ -262,7 +262,7 @@ operations_logs() {
   operations_log=$(python3 -c "
 import sys
 import json
-sys.path.insert(0, '${SCRIPT_DIR}')
+sys.path.insert(0, '${SCRIPT_DIR}/../src')
 from CSVIngester import CSVIngester
 from pathlib import Path
 ingester = CSVIngester()
@@ -280,7 +280,7 @@ log_operation() {
   log_result=$(python3 -c "
 import sys
 import json
-sys.path.insert(0, '${SCRIPT_DIR}')
+sys.path.insert(0, '${SCRIPT_DIR}/../src')
 from CSVIngester import CSVIngester
 
 ingester = CSVIngester()
@@ -352,7 +352,7 @@ main() {
             consolidate_dataframes "$1" "${@:2}"
             ;;
         file-processing)
-            process_files "$1" "$2" "${@:3}"
+            file_processor "$1" "$2" "${@:3}"
             ;;
         cleaning_log)
             get_cleaning_log "$1" 

@@ -1,0 +1,6 @@
+New Terminal Output:
+
+root@7186cdd8cb2e:/app# pytest tests/test_outputs.py -v --tb=short 2>&1 | tail -n 10
+tree -L 2 -I '__pycache__|.pytest_cache|.venv|.git' 2>/dev/null || find . -maxdepth 2 -not -path '*/.*' -type f -o -type d | grep -E '(solution|tests)' | head -
+n 20
+

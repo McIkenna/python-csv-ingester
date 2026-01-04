@@ -1,0 +1,25 @@
+New Terminal Output:
+
+(python-csv-ingest) root@7186cdd8cb2e:/app# pytest tests/test_outputs.py -v
+===================================================================== test session starts ======================================================================
+platform linux -- Python 3.11.14, pytest-8.4.1, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+collected 23 items
+
+tests/test_outputs.py::test_should_detect_encoding PASSED                                                                                                [  4%]
+tests/test_outputs.py::test_should_detect_encoding_nonexistent_file PASSED                                                                               [  8%]
+tests/test_outputs.py::test_standardize_spaces_col_name PASSED                                                                                           [ 13%]
+tests/test_outputs.py::test_standardize_any_special_chars PASSED                                                                                         [ 17%]
+tests/test_outputs.py::test_standardize_any_casing PASSED                                                                                                [ 21%]
+tests/test_outputs.py::test_detect_numeric_column PASSED                                                                                                 [ 26%]
+tests/test_outputs.py::test_detect_date_column PASSED                                                                                                    [ 30%]
+tests/test_outputs.py::test_detect_categorical_column PASSED                                                                                             [ 34%]
+tests/test_outputs.py::test_detect_nonexistent_column PASSED                                                                                             [ 39%]
+tests/test_outputs.py::test_parse_iso_dates PASSED                                                                                                       [ 43%]
+tests/test_outputs.py::test_parse_mixed_date_formats PASSED                                                                                              [ 47%]
+tests/test_outputs.py::test_clip_numeric_outliers PASSED                                                                                                 [ 52%]
+tests/test_outputs.py::test_clean_single_dataframe PASSED                                                                                                [ 56%]
+tests/test_outputs.py::test_cleaned_columns_standardized PASSED                                                                                          [ 60%]
+tests/test_outputs.py::test_consolidate_dataframes PASSED                                                                                                [ 65%]
+tests/test_outputs.py::test_process_full_pipeline

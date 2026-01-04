@@ -1,0 +1,14 @@
+New Terminal Output:
+
+firoot@7186cdd8cb2e:/app# head -n 5 solution/CSVIngester.py
+
+import argparse
+import json
+from pathlib import Path
+from datetime import datetime
+root@7186cdd8cb2e:/app# chmod +x solution/CSVIngester.py tests/test.sh
+root@7186cdd8cb2e:/app# ls -la solution/*.sh solution/*.py tests/*.sh
+-rwxr-xr-x 1 root root 10121 Jan  3 15:08 solution/CSVIngester.py
+-rwxr-xr-x 1 root root  8798 Jan  3 15:41 solution/solve.sh
+-rwxr-xr-x 1 root root   779 Jan  2 01:34 tests/test.sh
+root@7186cdd8cb2e:/app#

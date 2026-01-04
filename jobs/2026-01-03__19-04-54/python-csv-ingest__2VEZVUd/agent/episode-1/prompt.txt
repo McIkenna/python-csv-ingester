@@ -1,0 +1,281 @@
+New Terminal Output:
+
+root@0bb1453c749f:/app# ls -la
+total 128
+drwxr-xr-x  1 root root  4096 Jan  4 00:13 .
+drwxr-xr-x  1 root root  4096 Jan  4 01:05 ..
+-rw-r--r--  1 root root 53248 Jan  3 17:41 .coverage
+-rw-r--r--  1 root root   156 Jan  4 00:12 .env
+drwxr-xr-x  7 root root  4096 Jan  3 23:58 .git
+drwxr-xr-x  3 root root  4096 Jan  3 01:37 .pytest_cache
+-rw-r--r--  1 root root     7 Jan  3 01:44 .python-version
+drwxr-xr-x  4 root root  4096 Jan  3 23:51 .venv
+drwxr-xr-x  2 root root  4096 Jan  2 16:59 .vscode
+drwxr-xr-x  2 root root  4096 Jan  2 03:20 dummy_data
+drwxr-xr-x  2 root root  4096 Jan  3 20:37 environment
+-rw-r--r--  1 root root 13113 Jan  3 18:35 instruction.md
+drwxr-xr-x 11 root root  4096 Jan  3 23:54 jobs
+-rw-r--r--  1 root root   102 Jan  3 18:51 requirements.txt
+drwxr-xr-x  3 root root  4096 Jan  3 03:44 solution
+-rw-r--r--  1 root root   375 Dec 11 18:56 task.toml
+drwxr-xr-x  3 root root  4096 Jan  3 17:41 tests
+root@0bb1453c749f:/app# ls -la solution || true
+total 36
+drwxr-xr-x 3 root root  4096 Jan  3 03:44 .
+drwxr-xr-x 1 root root  4096 Jan  4 00:13 ..
+-rw-r--r-- 1 root root 10121 Jan  3 15:08 CSVIngester.py
+drwxr-xr-x 2 root root  4096 Jan  3 15:08 __pycache__
+-rwxr-xr-x 1 root root  8798 Jan  3 15:41 solve.sh
+root@0bb1453c749f:/app# ls -la tests || true
+total 52
+drwxr-xr-x 3 root root  4096 Jan  3 17:41 .
+drwxr-xr-x 1 root root  4096 Jan  4 00:13 ..
+drwxr-xr-x 2 root root  4096 Jan  3 17:40 __pycache__
+-rw-r--r-- 1 root root  1927 Jan  3 17:15 cleaned.csv
+-rw-r--r-- 1 root root   779 Jan  2 01:34 test.sh
+-rw-r--r-- 1 root root   756 Jan  2 16:31 test2_data.csv
+-rw-r--r-- 1 root root   838 Jan  2 16:30 test3_data.csv
+-rw-r--r-- 1 root root   880 Jan  2 16:31 test_data.csv
+-rw-r--r-- 1 root root 18361 Jan  3 19:06 test_outputs.py
+root@0bb1453c749f:/app# python3 --version
+Python 3.11.14
+root@0bb1453c749f:/app# pip3 --version
+pip 24.0 from /usr/local/lib/python3.11/site-packages/pip (python 3.11)
+root@0bb1453c749f:/app# python3 -m pip install --upgrade pip setuptools wheel
+Requirement already satisfied: pip in /usr/local/lib/python3.11/site-packages (24.0)
+Collecting pip
+  Downloading pip-25.3-py3-none-any.whl.metadata (4.7 kB)
+Requirement already satisfied: setuptools in /usr/local/lib/python3.11/site-packages (79.0.1)
+Collecting setuptools
+  Downloading setuptools-80.9.0-py3-none-any.whl.metadata (6.6 kB)
+Requirement already satisfied: wheel in /usr/local/lib/python3.11/site-packages (0.45.1)
+Downloading pip-25.3-py3-none-any.whl (1.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 13.7 MB/s eta 0:00:00
+Downloading setuptools-80.9.0-py3-none-any.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 36.0 MB/s eta 0:00:00
+Installing collected packages: setuptools, pip
+  Attempting uninstall: setuptools
+    Found existing installation: setuptools 79.0.1
+    Uninstalling setuptools-79.0.1:
+      Successfully uninstalled setuptools-79.0.1
+  Attempting uninstall: pip
+    Found existing installation: pip 24.0
+    Uninstalling pip-24.0:
+      Successfully uninstalled pip-24.0
+Successfully installed pip-25.3 setuptools-80.9.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a v
+irtual environment instead: https://pip.pypa.io/warnings/venv
+root@0bb1453c749f:/app# python3 -m pip install pandas>=2.0.0 numpy>=1.24.0 pytest==8.4.1 argparse==1.4.0 datetime==5.5 pathlib==1.0.1 typing==3.10.0.0
+ERROR: Ignored the following versions that require a different python version: 3.10.0.0 Requires-Python !=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,<3.5,>=2.7; 3.7.4.2 Requ
+ires-Python !=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,<3.5,>=2.7
+ERROR: Could not find a version that satisfies the requirement typing==3.10.0.0 (from versions: 3.5.0b1, 3.5.0, 3.5.0.1, 3.5.1.0, 3.5.2.2, 3.5.3.0, 3.6.1, 3.6.2
+, 3.6.4, 3.6.6, 3.7.4, 3.7.4.1, 3.7.4.3)
+ERROR: No matching distribution found for typing==3.10.0.0
+root@0bb1453c749f:/app# sed -n '1,200p' tests/test_outputs.py
+import os
+from sys import stdout
+import pytest
+import json
+import subprocess
+import shlex
+from unittest.mock import patch
+import csv
+from pathlib import Path
+
+
+def extract_json_from_output(output):
+    """Extract JSON from output that may contain other text"""
+    # Try to find JSON object or array
+    # Look for balanced braces or brackets
+    try:
+        # First, try parsing the whole thing
+        return json.loads(output)
+    except json.JSONDecodeError:
+        pass
+
+    # Try to find JSON starting with { or [
+    for start_char in ['{', '[']:
+        start_idx = output.find(start_char)
+        if start_idx != -1:
+            # Find the matching closing brace/bracket
+            depth = 0
+            end_char = '}' if start_char == '{' else ']'
+
+            for i in range(start_idx, len(
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+ad = self.logging_process(log_file)
+> +        return {"output": output_file, "log": log_file, "rows": int(df.shape[0]), "columns": int(df.shape[1]), "log_payload": log_payload}
+> +
+> +
+> +def build_arg_parser() -> argparse.ArgumentParser:
+> +    p = argparse.ArgumentParser(description="CSV Ingester - clean and consolidate CSV files with inconsistent schemas.")
+> +    p.add_argument("inputs", nargs="+", help="Input CSV files")
+> +    p.add_argument("-o", "--output", default="tests/cleaned_data.csv", help="Output CSV path")
+> +    p.add_argument("-l", "--log", default="tests/cleaning_log.json", help="JSON log output path")
+> +    return p
+> +
+> +
+> +def main(argv: Optional[List[str]] = None) -> int:
+> +    args = build_arg_parser().parse_args(argv)
+> +    ingester = CSVIngester()
+> +    try:
+> +        ingester.file_processor(args.output, args.log, args.inputs)
+> +    except FileNotFoundError as e:
+> +        # Log and print friendly message
+> +        sys.stderr.write(f"Error: File not found - {e}\n")
+> +        return 2
+> +    except Exception as e:
+> +        sys.stderr.write(f"Error: {e}\n")
+> +        return 1
+> +    return 0
+> +
+> +
+> +if __name__ == "__main__":
+> +    raise SystemExit(main())
+> +
+> *** End Patch
+> PATCH
+bash: applypatch: command not found
+root@0bb1453c749f:/app# applypatch << 'PATCH'
+> *** Begin Patch
+> *** Add File: solution/solve.sh
+> +#!/usr/bin/env bash
+> +set -euo pipefail
+> +
+> +SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+> +PY="$SCRIPT_DIR/CSVIngester.py"
+> +
+> +encode_process() {
+> +  local file="$1"
+> +  python3 - <<PY
+> +from solution.CSVIngester import CSVIngester
+> +ing=CSVIngester()
+> +enc=ing.encode_process("$file")
+> +print(enc)
+> +PY
+> +}
+> +
+> +standardize_column_name() {
+> +  local col="$1"
+> +  python3 - <<PY
+> +from solution.CSVIngester import CSVIngester
+> +ing=CSVIngester()
+> +print(ing.standardize_column_name("$col"))
+> +PY
+> +}
+> +
+> +find_column_type() {
+> +  local file="$1"; local column="$2"
+> +  python3 - <<PY
+> +import pandas as pd
+> +from solution.CSVIngester import CSVIngester
+> +ing=CSVIngester()
+> +enc=ing.encode_process("$file")
+> +df=pd.read_csv("$file", encoding=enc)
+> +print(ing.find_column_type(df["$column"]))
+> +PY
+> +}
+> +
+> +date_parser() {
+> +  local file="$1"; local column="$2"
+> +  python3 - <<PY
+> +import pandas as pd, json
+> +from solution.CSVIngester import CSVIngester
+> +ing=CSVIngester()
+> +enc=ing.encode_process("$file")
+> +df=pd.read_csv("$file", encoding=enc)
+> +parsed=ing.date_parser(df["$column"]).tolist()
+> +print(json.dumps(parsed))
+> +PY
+> +}
+> +
+> +outlier_truncate() {
+> +  local file="$1"; local column="$2"
+> +  python3 - <<PY
+> +import pandas as pd, json
+> +from solution.CSVIngester import CSVIngester
+> +ing=CSVIngester()
+> +enc=ing.encode_process("$file")
+> +df=pd.read_csv("$file", encoding=enc)
+> +info=ing.outlier_truncate(df["$column"])
+> +print(json.dumps(info))
+> +PY
+> +}
+> +
+> +processed_dataframe() {
+> +  local file="$1"; local out="${2:-}"
+> +  python3 - <<PY
+> +from solution.CSVIngester import CSVIngester
+> +ing=CSVIngester()
+> +df=ing.processed_dataframe("$file")
+> +out_path = "$out"
+> +if out_path:
+> +    df.to_csv(out_path, index=False)
+> +print(df.shape[0])
+> +PY
+> +}
+> +
+> +consolidated_cleaned_dataframes() {
+> +  local out="$1"; shift
+> +  python3 - <<PY
+> +import sys
+> +from solution.CSVIngester import CSVIngester
+> +ing=CSVIngester()
+> +df=ing.consolidated_cleaned_dataframes(sys.argv[1:])
+> +df.to_csv("$out", index=False)
+> +print(df.shape[0])
+> +PY "$@"
+> +}
+> +
+> +file_processor() {
+> +  local out="$1"; local log="$2"; shift 2
+> +  python3 "$PY" "$@" -o "$out" -l "$log"
+> +}
+> +
+> +logging_process() {
+> +  local log="${1:-}"
+> +  python3 - <<PY
+> +from solution.CSVIngester import CSVIngester
+> +ing=CSVIngester()
+> +print(ing.logging_process("$log"))
+> +PY
+> +}
+> +
+> +get_csv_summary() {
+> +  local file="$1"
+> +  python3 - <<PY
+> +import json, pandas as pd
+> +from solution.CSVIngester import CSVIngester
+> +ing=CSVIngester()
+> +enc=ing.encode_process("$file")
+> +df=pd.read_csv("$file", encoding=enc)
+> +summary={
+> +  "file": "$file",
+> +  "rows": int(df.shape[0]),
+> +  "columns": int(df.shape[1]),
+> +  "column_names": list(df.columns),
+> +  "missing_values": {c: int(df[c].isna().sum()) for c in df.columns}
+> +}
+> +print(json.dumps(summary))
+> +PY
+> +}
+> +
+> +operations_logs() {
+> +  local output="$1"
+> +  python3 - <<PY
+> +import json
+> +from solution.CSVIngester import CSVIngester
+> +ing=CSVIngester()
+> +print(json.dumps({"timestamp": "" , "operations": ing.get_operations_log()}))
+> +PY
+> +}
+> +
+> *** End Patch
+> PATCH
+bash: applypatch: command not found
+root@0bb1453c749f:/app# chmod +x solution/CSVIngester.py
+root@0bb1453c749f:/app# chmod +x solution/solve.sh
+root@0bb1453c749f:/app# pytest -q
+.......................                                                                                                                                  [100%]
+23 passed in 8.77s
+root@0bb1453c749f:/app#

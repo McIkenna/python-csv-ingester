@@ -1,0 +1,18 @@
+New Terminal Output:
+
+root@7186cdd8cb2e:/app# cat requirements.txt
+argparse==1.4.0
+pathlib==1.0.1
+datetime==5.5
+typing==3.10.0.0
+pandas==2.3.3
+numpy==2.0.2
+pytest==8.4.1root@7186cdd8cb2e:/app# source .venv/bin/activate
+(python-csv-ingest) root@7186cdd8cb2e:/app# pip list | grep -E '(pandas|numpy|pytest)'
+numpy           2.0.2
+pandas          2.3.3
+pytest          8.4.1
+
+[notice] A new release of pip is available: 24.0 -> 25.3
+[notice] To update, run: pip install --upgrade pip
+(python-csv-ingest) root@7186cdd8cb2e:/app#

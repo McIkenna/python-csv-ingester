@@ -1,0 +1,6 @@
+New Terminal Output:
+
+(python-csv-ingest) root@7186cdd8cb2e:/app# source solution/solve.sh
+(python-csv-ingest) root@7186cdd8cb2e:/app# standardize_column_name 'Product Price $'
+product_price
+(python-csv-ingest) root@7186cdd8cb2e:/app#

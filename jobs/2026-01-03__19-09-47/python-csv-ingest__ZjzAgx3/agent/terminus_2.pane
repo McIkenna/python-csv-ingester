@@ -1,0 +1,763 @@
+[?2004hroot@7186cdd8cb2e:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@7186cdd8cb2e:/app# clear
+[?2004l[H[J[3J[?2004hroot@7186cdd8cb2e:/app# ls -la
+[?2004ltotal 128
+drwxr-xr-x  1 root root  4096 Jan  4 00:13 .
+drwxr-xr-x  1 root root  4096 Jan  4 01:09 ..
+-rw-r--r--  1 root root 53248 Jan  3 17:41 .coverage
+-rw-r--r--  1 root root   156 Jan  4 00:12 .env
+drwxr-xr-x  7 root root  4096 Jan  3 23:58 .git
+drwxr-xr-x  3 root root  4096 Jan  3 01:37 .pytest_cache
+-rw-r--r--  1 root root     7 Jan  3 01:44 .python-version
+drwxr-xr-x  4 root root  4096 Jan  3 23:51 .venv
+drwxr-xr-x  2 root root  4096 Jan  2 16:59 .vscode
+drwxr-xr-x  2 root root  4096 Jan  2 03:20 dummy_data
+drwxr-xr-x  2 root root  4096 Jan  3 20:37 environment
+-rw-r--r--  1 root root 13113 Jan  3 18:35 instruction.md
+drwxr-xr-x 11 root root  4096 Jan  3 23:54 jobs
+-rw-r--r--  1 root root   102 Jan  3 18:51 requirements.txt
+drwxr-xr-x  3 root root  4096 Jan  3 03:44 solution
+-rw-r--r--  1 root root   375 Dec 11 18:56 task.toml
+drwxr-xr-x  3 root root  4096 Jan  3 17:41 tests
+[?2004hroot@7186cdd8cb2e:/app# pwd
+[?2004l/app
+[?2004hroot@7186cdd8cb2e:/app# ls -la solution/
+[?2004ltotal 36
+drwxr-xr-x 3 root root  4096 Jan  3 03:44 .
+drwxr-xr-x 1 root root  4096 Jan  4 00:13 ..
+-rw-r--r-- 1 root root 10121 Jan  3 15:08 CSVIngester.py
+drwxr-xr-x 2 root root  4096 Jan  3 15:08 __pycache__
+-rwxr-xr-x 1 root root  8798 Jan  3 15:41 solve.sh
+[?2004hroot@7186cdd8cb2e:/app# ls -la tests/
+[?2004ltotal 52
+drwxr-xr-x 3 root root  4096 Jan  3 17:41 .
+drwxr-xr-x 1 root root  4096 Jan  4 00:13 ..
+drwxr-xr-x 2 root root  4096 Jan  3 17:40 __pycache__
+-rw-r--r-- 1 root root  1927 Jan  3 17:15 cleaned.csv
+-rw-r--r-- 1 root root   779 Jan  2 01:34 test.sh
+-rw-r--r-- 1 root root   756 Jan  2 16:31 test2_data.csv
+-rw-r--r-- 1 root root   838 Jan  2 16:30 test3_data.csv
+-rw-r--r-- 1 root root   880 Jan  2 16:31 test_data.csv
+-rw-r--r-- 1 root root 18361 Jan  3 19:06 test_outputs.py
+[?2004hroot@7186cdd8cb2e:/app# cat requirements.txt
+[?2004largparse==1.4.0
+pathlib==1.0.1
+datetime==5.5
+typing==3.10.0.0
+pandas==2.3.3
+numpy==2.0.2
+pytest==8.4.1[?2004hroot@7186cdd8cb2e:/app# source .venv/bin/activate
+[?2004l[?2004h(python-csv-ingest) root@7186cdd8cb2e:/app# pip list | grep -E '(pandas|numpy|pytest)'
+[?2004lnumpy           2.0.2
+pandas          2.3.3
+pytest          8.4.1
+
+[1m[[0m[34;49mnotice[0m[1;39;49m][0m[39;49m A new release of pip is available: [0m[31;49m24.0[0m[39;49m -> [0m[32;49m25.3[0m
+[1m[[0m[34;49mnotice[0m[1;39;49m][0m[39;49m To update, run: [0m[32;49mpip install --upgrade pip[0m
+[?2004h(python-csv-ingest) root@7186cdd8cb2e:/app# pytest tests/test_outputs.py -v
+[?2004l[1m===================================================================== test session starts ======================================================================[0m
+platform linux -- Python 3.11.14, pytest-8.4.1, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+[1mcollecting ... [0m[1mcollected 23 items                                                                                                                                             [0m
+
+tests/test_outputs.py::test_should_detect_encoding [32mPASSED[0m[32m                                                                                                [  4%][0m
+tests/test_outputs.py::test_should_detect_encoding_nonexistent_file [32mPASSED[0m[32m                                                                               [  8%][0m
+tests/test_outputs.py::test_standardize_spaces_col_name [32mPASSED[0m[32m                                                                                           [ 13%][0m
+tests/test_outputs.py::test_standardize_any_special_chars [32mPASSED[0m[32m                                                                                         [ 17%][0m
+tests/test_outputs.py::test_standardize_any_casing [32mPASSED[0m[32m                                                                                                [ 21%][0m
+tests/test_outputs.py::test_detect_numeric_column [32mPASSED[0m[32m                                                                                                 [ 26%][0m
+tests/test_outputs.py::test_detect_date_column [32mPASSED[0m[32m                                                                                                    [ 30%][0m
+tests/test_outputs.py::test_detect_categorical_column [32mPASSED[0m[32m                                                                                             [ 34%][0m
+tests/test_outputs.py::test_detect_nonexistent_column [32mPASSED[0m[32m                                                                                             [ 39%][0m
+tests/test_outputs.py::test_parse_iso_dates [32mPASSED[0m[32m                                                                                                       [ 43%][0m
+tests/test_outputs.py::test_parse_mixed_date_formats [32mPASSED[0m[32m                                                                                              [ 47%][0m
+tests/test_outputs.py::test_clip_numeric_outliers [32mPASSED[0m[32m                                                                                                 [ 52%][0m
+tests/test_outputs.py::test_clean_single_dataframe [32mPASSED[0m[32m                                                                                                [ 56%][0m
+tests/test_outputs.py::test_cleaned_columns_standardized [32mPASSED[0m[32m                                                                                          [ 60%][0m
+tests/test_outputs.py::test_consolidate_dataframes [32mPASSED[0m[32m                                                                                                [ 65%][0m
+tests/test_outputs.py::test_process_full_pipeline [32mPASSED[0m[32m                                                                                                 [ 69%][0m
+tests/test_outputs.py::test_process_log_contains_operations [32mPASSED[0m[32m                                                                                       [ 73%][0m
+tests/test_outputs.py::test_get_existing_operations [32mPASSED[0m[32m                                                                                               [ 78%][0m
+tests/test_outputs.py::test_get_cleaning_log [32mPASSED[0m[32m                                                                                                      [ 82%][0m
+tests/test_outputs.py::test_get_cleaning_log_nonexistent_file [32mPASSED[0m[32m                                                                                     [ 86%][0m
+tests/test_outputs.py::test_get_csv_summary [32mPASSED[0m[32m                                                                                                       [ 91%][0m
+tests/test_outputs.py::test_summary_shows_missing_values [32mPASSED[0m[32m                                                                                          [ 95%][0m
+tests/test_outputs.py::test_full_workflow [32mPASSED[0m[32m                                                                                                         [100%][0m
+
+[32m====================================================================== [32m[1m23 passed[0m[32m in 8.13s[0m[32m ======================================================================[0m
+[?2004h(python-csv-ingest) root@7186cdd8cb2e:/app# python solution/CSVIngester.py --help
+[?2004lusage: CSVIngester.py [-h] [-o OUTPUT] [-l LOG] input_files [input_files ...]
+
+Clean and consolidate multiple CSV files with inconsistent schemas
+
+positional arguments:
+  input_files           Input CSV file paths
+
+options:
+  -h, --help            show this help message and exit
+  -o OUTPUT, --output OUTPUT
+                        Output CSV file path (default: cleaned_data.csv)
+  -l LOG, --log LOG     Output log file path (default: data_cleaning_log.json)
+[?2004h(python-csv-ingest) root@7186cdd8cb2e:/app# python solution/CSVIngester.py tests/test_data.csv tests/test2_data.csv tests/test3_data.csv -o test_output.csv -l test_log.json
+[?2004lProcessing 3 CSV file(s)...
+  Loading test_data.csv...
+  Loading test2_data.csv...
+  Loading test3_data.csv...
+Consolidating datasets...
+Writing cleaned data to test_output.csv...
+Writing cleaning log to test_log.json...
+
+Complete!
+  Processed: 3 file(s)
+  Output rows: 30
+  Output columns: 22
+[?2004h(python-csv-ingest) root@7186cdd8cb2e:/app# ls -lh test_output.csv test_log.json
+[?2004l-rw-r--r-- 1 root root 6.5K Jan  4 01:11 test_log.json
+-rw-r--r-- 1 root root 3.1K Jan  4 01:11 test_output.csv
+[?2004h(python-csv-ingest) root@7186cdd8cb2e:/app# head -n 5 test_output.csv
+[?2004lannual_salary,category_type,customer_name,department_name,email_address,emp_id,full_name,hire_date,last_restock,order_date,order_id,performance_score,product_name,product_price,quantity,ship_date,sku,status,stock_qty,supplier,total_amount,unit_cost
+,,Unknown,,,,,,,2023-10-01,ORD1000,,,264.3134984759545,7.0,2023-10-09,,Unknown,,,1850.194489331681,
+,,Unknown,,,,,,,2023-02-04,ORD1001,,,171.54224088174146,17.0,,,Shipped,,,2916.2180949896047,
+,,Bob Johnson,,,,,,,2023-12-05,ORD1002,,,195.14190699425728,17.0,2023-11-12,,Unknown,,,3317.4124189023737,
+,,Alice Williams,,,,,,,2023-08-29,ORD1003,,,70.21586678937072,10.0,2023-07-09,,Unknown,,,702.1586678937072,
+[?2004h(python-csv-ingest) root@7186cdd8cb2e:/app# cat test_log.json | python -m json.tool | head -n 50
+[?2004l{
+    "timestamp": "2026-01-04T01:11:04.878268",
+    "operations": [
+        {
+            "operation": "load_file",
+            "details": {
+                "source": "tests/test_data.csv",
+                "rows": 10,
+                "columns": 8
+            },
+            "timestamp": "2026-01-04T01:11:04.880647"
+        },
+        {
+            "operation": "standardize_columns",
+            "details": {
+                "source": "tests/test_data.csv",
+                "mappings": {
+                    "Order ID": "order_id",
+                    "Customer Name": "customer_name",
+                    "Order Date": "order_date",
+                    "Product Price $": "product_price",
+                    "Quantity!!": "quantity",
+                    "Total Amount": "total_amount",
+                    "Ship Date": "ship_date",
+                    "Status": "status"
+                }
+            },
+            "timestamp": "2026-01-04T01:11:04.880932"
+        },
+        {
+            "operation": "fill_missing_categorical",
+            "details": {
+                "column": "customer_name",
+                "fill_value": "Unknown",
+                "missing_count": 3
+            },
+            "timestamp": "2026-01-04T01:11:04.882130"
+        },
+        {
+            "operation": "format_dates",
+            "details": {
+                "column": "order_date",
+                "format": "ISO-8601 (YYYY-MM-DD)"
+            },
+            "timestamp": "2026-01-04T01:11:04.882946"
+        },
+        {
+            "operation": "outlier_truncate",
+            "details": {
+                "column": "product_price",
+[?2004h(python-csv-ingest) root@7186cdd8cb2e:/app# source solution/solve.sh
+[?2004l[?2004h(python-csv-ingest) root@7186cdd8cb2e:/app# standardize_column_name 'Product Price $'
+[?2004lproduct_price
+[?2004h(python-csv-ingest) root@7186cdd8cb2e:/app# encode_process tests/test_data.csv
+[?2004lbash: encode_process: command not found
+[0;32masciinema: recording finished[0m
+[0;32masciinema: asciicast saved to /logs/agent/recording.cast[0m
+[?2004hroot@7186cdd8cb2e:/app# find_column_type tests/test_data.csv 'Order Date'
+[?2004lbash: find_column_type: command not found
+[?2004hroot@7186cdd8cb2e:/app# get_csv_summary tests/test_data.csv
+[?2004lbash: get_csv_summary: command not found
+[?2004hroot@7186cdd8cb2e:/app# head -n 50 solution/solve.sh
+[?2004lset -e
+# apt update && apt install -y vim
+# pip install pandas numpy argparse pathlib datetime typing
+# !/bin/bash
+
+# Solution.sh - Shell interface for CSVIngester functions
+# This script wraps Python CSVIngester methods as bash functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PYTHON_SCRIPT="${SCRIPT_DIR}/CSVIngester.py"
+
+# Check if CSVIngester.py exists
+if [ ! -f "$PYTHON_SCRIPT" ]; then
+    echo "Error: CSVIngester.py not found in $SCRIPT_DIR"
+    exit 1
+fi
+# Detect file encoding
+detect_encoding() {
+  local filepath="$1"
+  detected_encoding=$(python3 -c "
+import sys
+sys.path.insert(0, '${SCRIPT_DIR}')
+from CSVIngester import CSVIngester
+from pathlib import Path
+
+ingester = CSVIngester()
+encoding = ingester.encode_process(Path('${filepath}'))
+print(encoding)
+")
+  
+  echo "$detected_encoding"
+}
+
+# Standardize a column name
+standardize_column_name() {
+   local column_name="$1"
+     standardized_name=$(python3 -c "
+import sys
+sys.path.insert(0, '${SCRIPT_DIR}')
+from CSVIngester import CSVIngester
+
+ingester = CSVIngester()
+result = ingester.standardize_column_name('${column_name}')
+print(result)
+")
+  
+  echo "$standardized_name"
+}
+
+# Detect column type (numeric, date, or categorical)
+detect_column_type() {
+[?2004hroot@7186cdd8cb2e:/app# grep '^[a-z_]*()' solution/solve.sh
+[?2004ldetect_encoding() {
+standardize_column_name() {
+detect_column_type() {
+parse_dates() {
+clip_outliers() {
+clean_dataframe() {
+consolidate_dataframes() {
+process_files() {
+get_cleaning_log() {
+operations_logs() {
+log_operation() {
+get_csv_summary() {
+main() {
+[?2004hroot@7186cdd8cb2e:/app# detect_encoding tests/test_data.csv
+[?2004lbash: detect_encoding: command not found
+[?2004hroot@7186cdd8cb2e:/app# detect_column_type tests/test_data.csv 'Order Date'
+[?2004lbash: detect_column_type: command not found
+[?2004hroot@7186cdd8cb2e:/app# get_csv_summary tests/test_data.csv | python -m json.tool
+[?2004lbash: get_csv_summary: command not found
+Expecting value: line 1 column 1 (char 0)
+[?2004hroot@7186cdd8cb2e:/app# tail -n 20 solution/solve.sh
+[?2004l            get_cleaning_log "$1" 
+            ;;
+        get-operations)
+            operations_logs "$1"
+            ;;
+        csv-summary)
+            get_csv_summary "$1"
+            ;;
+        *)
+            echo -e "Error: Unknown command '$command'"
+            echo ""
+            exit 1
+            ;;
+    esac
+}
+
+# If script is run directly, show help
+if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
+  main "$@"
+fi[?2004hroot@7186cdd8cb2e:/app# bash -x solution/solve.sh 2>&1 | tail -n 30
+[?2004l+ set -e
++++ dirname solution/solve.sh
+++ cd solution
+++ pwd
++ SCRIPT_DIR=/app/solution
++ PYTHON_SCRIPT=/app/solution/CSVIngester.py
++ '[' '!' -f /app/solution/CSVIngester.py ']'
++ '[' solution/solve.sh == solution/solve.sh ']'
++ main
++ local command=
++ shift
++ true
++ case "$command" in
++ echo -e 'Error: Unknown command '\'''\'''
+Error: Unknown command ''
++ echo ''
+
++ exit 1
+[?2004hroot@7186cdd8cb2e:/app# source solution/solve.sh
+[?2004l[?2004hroot@7186cdd8cb2e:/app# declare -F | grep -E '(detect_encoding|standardize_column_name|detect_column_type|get_csv_summary)'
+[?2004ldeclare -f detect_column_type
+declare -f detect_encoding
+declare -f get_csv_summary
+declare -f standardize_column_name
+[?2004hroot@7186cdd8cb2e:/app# detect_encoding tests/test_data.csv
+[?2004lutf-8
+[?2004hroot@7186cdd8cb2e:/app# detect_column_type tests/test_data.csv 'Order Date'
+[?2004ldate
+[?2004hroot@7186cdd8cb2e:/app# detect_column_type tests/test_data.csv 'Product Price $'
+[?2004lnumeric
+[?2004hroot@7186cdd8cb2e:/app# get_csv_summary tests/test_data.csv | python -m json.tool | head -n 20
+[?2004l{
+    "file": "tests/test_data.csv",
+    "rows": 10,
+    "columns": 8,
+    "column_names": [
+        "Order ID",
+        "Customer Name",
+        "Order Date",
+        "Product Price $",
+        "Quantity!!",
+        "Total Amount",
+        "Ship Date",
+        "Status"
+    ],
+    "dtypes": {
+        "Order ID": "object",
+        "Customer Name": "object",
+        "Order Date": "object",
+        "Product Price $": "float64",
+        "Quantity!!": "int64",
+[?2004hroot@7186cdd8cb2e:/app# process_files bash_output.csv bash_log.json tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+[?2004lProcessing 3 CSV file(s)...
+  Loading test_data.csv...
+  Loading test2_data.csv...
+  Loading test3_data.csv...
+Consolidating datasets...
+Writing cleaned data to bash_output.csv...
+Writing cleaning log to bash_log.json...
+
+Complete!
+  Processed: 3 file(s)
+  Output rows: 30
+  Output columns: 22
+{
+  "timestamp": "2026-01-04T01:12:53.032225",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "tests/test_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-04T01:12:53.033207"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-04T01:12:53.033399"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "customer_name",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-04T01:12:53.034188"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "order_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-04T01:12:53.034741"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "product_price",
+        "lower_bound": 68.64064916777441,
+        "upper_bound": 477.36989036333176,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-04T01:12:53.035753"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "quantity",
+        "lower_bound": 2.45,
+        "upper_bound": 17.0,
+        "values_clipped": 1
+      },
+      "timestamp": "2026-01-04T01:12:53.036613"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "total_amount",
+        "lower_bound": 499.44282820755103,
+        "upper_bound": 6875.881001412972,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-04T01:12:53.037345"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "ship_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-04T01:12:53.037738"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "status",
+        "fill_value": "Unknown",
+        "missing_count": 6
+      },
+      "timestamp": "2026-01-04T01:12:53.037977"
+    },
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "tests/test2_data.csv",
+        "rows": 10,
+        "columns": 7
+      },
+      "timestamp": "2026-01-04T01:12:53.038486"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "tests/test2_data.csv",
+        "mappings": {
+          "SKU#": "sku",
+          "Product  Name": "product_name",
+          "stock_qty": "stock_qty",
+          "Unit Cost ($)": "unit_cost",
+          "Last Restock": "last_restock",
+          "Supplier": "supplier",
+          "Category Type": "category_type"
+        }
+      },
+      "timestamp": "2026-01-04T01:12:53.038541"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "stock_qty",
+        "lower_bound": 9.33,
+        "upper_bound": 12715.090000000002,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-04T01:12:53.039668"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "unit_cost",
+        "lower_bound": 32.3640947273435,
+        "upper_bound": 1985.7700631562775,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-04T01:12:53.040319"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "last_restock",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-04T01:12:53.040741"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "supplier",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-04T01:12:53.041005"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "category_type",
+        "fill_value": "Unknown",
+        "missing_count": 2
+      },
+      "timestamp": "2026-01-04T01:12:53.041237"
+    },
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "tests/test3_data.csv",
+        "rows": 10,
+        "columns": 7
+      },
+      "timestamp": "2026-01-04T01:12:53.041717"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "tests/test3_data.csv",
+        "mappings": {
+          "EMP_ID": "emp_id",
+          "Full Name": "full_name",
+          "hire-date": "hire_date",
+          "Department Name": "department_name",
+          "Annual_Salary": "annual_salary",
+          "Performance Score": "performance_score",
+          "Email Address": "email_address"
+        }
+      },
+      "timestamp": "2026-01-04T01:12:53.041770"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "full_name",
+        "fill_value": "Unknown",
+        "missing_count": 1
+      },
+      "timestamp": "2026-01-04T01:12:53.042219"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "hire_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-04T01:12:53.042628"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "department_name",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-04T01:12:53.042870"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "annual_salary",
+        "lower_bound": 46027.87625251987,
+        "upper_bound": 148435.13722494972,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-04T01:12:53.043518"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "performance_score",
+        "lower_bound": 1.09,
+        "upper_bound": 10.0,
+        "values_clipped": 1
+      },
+      "timestamp": "2026-01-04T01:12:53.044172"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "email_address",
+        "fill_value": "Unknown",
+        "missing_count": 1
+      },
+      "timestamp": "2026-01-04T01:12:53.044485"
+    },
+    {
+      "operation": "consolidate",
+      "details": {
+        "total_dataframes": 3,
+        "total_rows": 30,
+        "total_columns": 22
+      },
+      "timestamp": "2026-01-04T01:12:53.048493"
+    }
+  ]
+}
+[?2004hroot@7186cdd8cb2e:/app# ls -lh bash_output.csv bash_log.json
+[?2004l-rw-r--r-- 1 root root 6.5K Jan  4 01:12 bash_log.json
+-rw-r--r-- 1 root root 3.1K Jan  4 01:12 bash_output.csv
+[?2004hroot@7186cdd8cb2e:/app# head -n 3 bash_output.csv | cut -c1-150
+[?2004lannual_salary,category_type,customer_name,department_name,email_address,emp_id,full_name,hire_date,last_restock,order_date,order_id,performance_score,
+,,Unknown,,,,,,,2023-10-01,ORD1000,,,264.3134984759545,7.0,2023-10-09,,Unknown,,,1850.194489331681,
+,,Unknown,,,,,,,2023-02-04,ORD1001,,,171.54224088174146,17.0,,,Shipped,,,2916.2180949896047,
+[?2004hroot@7186cdd8cb2e:/app# ls -la solution/*.sh solution/*.py tests/*.sh
+[?2004l-rw-r--r-- 1 root root 10121 Jan  3 15:08 solution/CSVIngester.py
+-rwxr-xr-x 1 root root  8798 Jan  3 15:41 solution/solve.sh
+-rw-r--r-- 1 root root   779 Jan  2 01:34 tests/test.sh
+[?2004hroot@7186cdd8cb2e:/app# cat tests/test.sh
+[?2004l#!/bin/bash
+
+# Install curl
+apt-get update
+apt-get install -y curl
+
+# Install uv
+curl -LsSf https://astral.sh/uv/0.9.5/install.sh | sh
+
+source $HOME/.local/bin/env
+
+# Check if we're in a valid working directory
+if [ "$PWD" = "/" ]; then
+    echo "Error: No working directory set. Please set a WORKDIR in your Dockerfile before running this script."
+    exit 1
+fi
+
+
+# Don't change anything below this line
+uvx \
+  -p 3.13 \
+  -w pytest==8.4.1 \
+  -w pytest-json-ctrf==0.3.5 \
+  -w argparse==1.4.0 \
+  -w datetime==5.5 \
+  -w numpy==2.0.2 \
+  -w pandas==2.3.3 \
+  -w pathlib==1.0.1 \
+  -w typing==3.10.0.0 \
+  pytest --ctrf /logs/verifier/ctrf.json /tests/test_outputs.py -rA
+
+
+if [ $? -eq 0 ]; then
+  echo 1 > /logs/verifier/reward.txt
+else
+  echo 0 > /logs/verifier/reward.txt
+fi[?2004hroot@7186cdd8cb2e:/app# head -n 5 solution/CSVIngester.py
+[?2004l
+import argparse
+import json
+from pathlib import Path
+from datetime import datetime
+[?2004hroot@7186cdd8cb2e:/app# chmod +x solution/CSVIngester.py tests/test.sh
+[?2004l[?2004hroot@7186cdd8cb2e:/app# ls -la solution/*.sh solution/*.py tests/*.sh
+[?2004l-rwxr-xr-x 1 root root 10121 Jan  3 15:08 solution/CSVIngester.py
+-rwxr-xr-x 1 root root  8798 Jan  3 15:41 solution/solve.sh
+-rwxr-xr-x 1 root root   779 Jan  2 01:34 tests/test.sh
+[?2004hroot@7186cdd8cb2e:/app# pytest tests/test_outputs.py -v --tb=short 2>&1 | tail -n 10
+[?2004ltree -L 2 -I '__pycache__|.pytest_cache|.venv|.git' 2>/dev/null || find . -maxdepth 2 -not -path '*/.*' -type f -o -type d | grep -E '(solution|tests)' | head -n 20
+tests/test_outputs.py::test_process_full_pipeline PASSED                 [ 69%]
+tests/test_outputs.py::test_process_log_contains_operations PASSED       [ 73%]
+tests/test_outputs.py::test_get_existing_operations PASSED               [ 78%]
+tests/test_outputs.py::test_get_cleaning_log PASSED                      [ 82%]
+tests/test_outputs.py::test_get_cleaning_log_nonexistent_file PASSED     [ 86%]
+tests/test_outputs.py::test_get_csv_summary PASSED                       [ 91%]
+tests/test_outputs.py::test_summary_shows_missing_values PASSED          [ 95%]
+tests/test_outputs.py::test_full_workflow PASSED                         [100%]
+
+============================== 23 passed in 8.36s ==============================
+[?2004hroot@7186cdd8cb2e:/app# tree -L 2 -I '__pycache__|.pytest_cache|.venv|.git' 2>/dev/null || find . -maxdepth 2 -not -path '*/.*' -type f -o -type d | grep -E '(solution|tests)' | head -n 20
+[?2004l./solution
+./solution/solve.sh
+./solution/CSVIngester.py
+./solution/__pycache__
+./tests
+./tests/test3_data.csv
+./tests/test_data.csv
+./tests/test.sh
+./tests/cleaned.csv
+./tests/test_outputs.py
+./tests/__pycache__
+./tests/test2_data.csv
+[?2004hroot@7186cdd8cb2e:/app# rm -f test_output.csv test_log.json bash_output.csv bash_log.json
+[?2004l[?2004hroot@7186cdd8cb2e:/app# echo '=== Solution Verification Complete ===' && echo 'Python CLI:' && python solution/CSVIngester.py --help | head -n 5
+[?2004l=== Solution Verification Complete ===
+Python CLI:
+usage: CSVIngester.py [-h] [-o OUTPUT] [-l LOG] input_files [input_files ...]
+
+Clean and consolidate multiple CSV files with inconsistent schemas
+
+positional arguments:
+[?2004hroot@7186cdd8cb2e:/app# echo && echo 'Bash Functions:' && declare -F | grep -c 'detect\|standardize\|process\|consolidate\|clean'
+[?2004l
+Bash Functions:
+7
+[?2004hroot@7186cdd8cb2e:/app# echo && echo 'Test Suite: 23/23 PASSED' && echo 'All requirements met!' && ls -lh solution/ tests/*.csv tests/*.py tests/*.sh
+[?2004l
+Test Suite: 23/23 PASSED
+All requirements met!
+-rw-r--r-- 1 root root 1.9K Jan  3 17:15 tests/cleaned.csv
+-rwxr-xr-x 1 root root  779 Jan  2 01:34 tests/test.sh
+-rw-r--r-- 1 root root  756 Jan  2 16:31 tests/test2_data.csv
+-rw-r--r-- 1 root root  838 Jan  2 16:30 tests/test3_data.csv
+-rw-r--r-- 1 root root  880 Jan  2 16:31 tests/test_data.csv
+-rw-r--r-- 1 root root  18K Jan  3 19:06 tests/test_outputs.py
+
+solution/:
+total 28K
+-rwxr-xr-x 1 root root 9.9K Jan  3 15:08 CSVIngester.py
+drwxr-xr-x 2 root root 4.0K Jan  3 15:08 __pycache__
+-rwxr-xr-x 1 root root 8.6K Jan  3 15:41 solve.sh
+[?2004hroot@7186cdd8cb2e:/app# echo '=== Final Comprehensive Test ===' && python solution/CSVIngester.py tests/test_data.csv tests/test2_data.csv tests/test3_data.csv -o final_test.csv -l final_test.json
+[?2004l=== Final Comprehensive Test ===
+Processing 3 CSV file(s)...
+  Loading test_data.csv...
+  Loading test2_data.csv...
+  Loading test3_data.csv...
+Consolidating datasets...
+Writing cleaned data to final_test.csv...
+Writing cleaning log to final_test.json...
+
+Complete!
+  Processed: 3 file(s)
+  Output rows: 30
+  Output columns: 22
+[?2004hroot@7186cdd8cb2e:/app# echo && echo 'Output Files:' && ls -lh final_test.csv final_test.json && echo && echo 'Sample Cleaned Data (first 2 rows):' && head -n 3 final_test.csv | cut -c1-120
+[?2004l
+Output Files:
+-rw-r--r-- 1 root root 3.1K Jan  4 01:14 final_test.csv
+-rw-r--r-- 1 root root 6.5K Jan  4 01:14 final_test.json
+
+Sample Cleaned Data (first 2 rows):
+annual_salary,category_type,customer_name,department_name,email_address,emp_id,full_name,hire_date,last_restock,order_da
+,,Unknown,,,,,,,2023-10-01,ORD1000,,,264.3134984759545,7.0,2023-10-09,,Unknown,,,1850.194489331681,
+,,Unknown,,,,,,,2023-02-04,ORD1001,,,171.54224088174146,17.0,,,Shipped,,,2916.2180949896047,
+[?2004hroot@7186cdd8cb2e:/app# echo && echo 'Log Summary:' && cat final_test.json | python -m json.tool | grep -E '(operation|timestamp)' | head -n 20
+[?2004l
+Log Summary:
+    "timestamp": "2026-01-04T01:14:13.710438",
+    "operations": [
+            "operation": "load_file",
+            "timestamp": "2026-01-04T01:14:13.714258"
+            "operation": "standardize_columns",
+            "timestamp": "2026-01-04T01:14:13.714619"
+            "operation": "fill_missing_categorical",
+            "timestamp": "2026-01-04T01:14:13.716002"
+            "operation": "format_dates",
+            "timestamp": "2026-01-04T01:14:13.731122"
+            "operation": "outlier_truncate",
+            "timestamp": "2026-01-04T01:14:13.734205"
+            "operation": "outlier_truncate",
+            "timestamp": "2026-01-04T01:14:13.735678"
+            "operation": "outlier_truncate",
+            "timestamp": "2026-01-04T01:14:13.736521"
+            "operation": "format_dates",
+            "timestamp": "2026-01-04T01:14:13.737052"
+            "operation": "fill_missing_categorical",
+            "timestamp": "2026-01-04T01:14:13.737326"
+[?2004hroot@7186cdd8cb2e:/app# rm -f final_test.csv final_test.json && echo && echo '✅ All requirements verified and working!'
+[?2004l
+✅ All requirements verified and working!
+[?2004hroot@7186cdd8cb2e:/app# 

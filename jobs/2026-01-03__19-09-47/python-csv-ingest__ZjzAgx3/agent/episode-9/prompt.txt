@@ -1,0 +1,54 @@
+New Terminal Output:
+
+(python-csv-ingest) root@7186cdd8cb2e:/app# cat test_log.json | python -m json.tool | head -n 50
+{
+    "timestamp": "2026-01-04T01:11:04.878268",
+    "operations": [
+        {
+            "operation": "load_file",
+            "details": {
+                "source": "tests/test_data.csv",
+                "rows": 10,
+                "columns": 8
+            },
+            "timestamp": "2026-01-04T01:11:04.880647"
+        },
+        {
+            "operation": "standardize_columns",
+            "details": {
+                "source": "tests/test_data.csv",
+                "mappings": {
+                    "Order ID": "order_id",
+                    "Customer Name": "customer_name",
+                    "Order Date": "order_date",
+                    "Product Price $": "product_price",
+                    "Quantity!!": "quantity",
+                    "Total Amount": "total_amount",
+                    "Ship Date": "ship_date",
+                    "Status": "status"
+                }
+            },
+            "timestamp": "2026-01-04T01:11:04.880932"
+        },
+        {
+            "operation": "fill_missing_categorical",
+            "details": {
+                "column": "customer_name",
+                "fill_value": "Unknown",
+                "missing_count": 3
+            },
+            "timestamp": "2026-01-04T01:11:04.882130"
+        },
+        {
+            "operation": "format_dates",
+            "details": {
+                "column": "order_date",
+                "format": "ISO-8601 (YYYY-MM-DD)"
+            },
+            "timestamp": "2026-01-04T01:11:04.882946"
+        },
+        {
+            "operation": "outlier_truncate",
+            "details": {
+                "column": "product_price",
+(python-csv-ingest) root@7186cdd8cb2e:/app#

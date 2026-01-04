@@ -1,0 +1,17 @@
+Current terminal state:
+New Terminal Output:
+
+root@9449aaacef4f:/app# ls -lah
+total 40K
+drwxr-xr-x 1 root root 4.0K Jan  4 04:38 .
+drwxr-xr-x 1 root root 4.0K Jan  4 04:30 ..
+drwxr-xr-x 3 root root 4.0K Jan  4 04:33 .pytest_cache
+-rw-r--r-- 1 root root 2.6K Jan  4 04:38 instruction.md
+drwxr-xr-x 2 root root 4.0K Jan  4 04:32 solution
+drwxr-xr-x 1 root root 4.0K Jan  4 04:34 src
+-rw-r--r-- 1 root root  753 Jan  4 04:38 task.toml
+drwxr-xr-x 3 root root 4.0K Jan  4 04:38 tests
+root@9449aaacef4f:/app#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

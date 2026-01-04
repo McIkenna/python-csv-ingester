@@ -1,0 +1,29 @@
+```json
+{
+  "analysis": "CSVIngester.py is already implemented with all core functionality: encoding detection, column standardization, type detection, date parsing, outlier clipping, imputation, and logging. Now need to create solution/ and tests/ directories, generate test CSV files with inconsistent schemas, create solve.sh bash interface, and implement the test suite.",
+  "plan": "Create directory structure (solution/, tests/), generate three test CSV files with varying schemas/encodings/date formats, create solve.sh with all required bash functions, create test_outputs.py with all 24 test cases, and create test.sh runner. Then install dependencies and test.",
+  "commands": [
+    {
+      "keystrokes": "mkdir -p solution tests\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat > tests/test_data.csv << 'EOF'\nOrder ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status\n1001,John Doe,2025-01-01,99.99,2,199.98,01/05/2025,Active\n1002,,01/15/2025,150.50,,300.00,Jan 20 2025,Pending\n1003,Jane Smith,Jan 10 2025,45.00,1,45.00,15-01-2025,Active\n1004,Bob Wilson,15-01-2025,9999.99,5,500.00,2025/01/25,Completed\n1005,Alice Brown,2025/01/20,10.00,3,90.00,30-Jan-2025,Active\n1006,,25-Jan-2025,250.75,,250.75,2025-02-01,Pending\n1007,Charlie Davis,2025-01-30,175.25,4,701.00,05/02/2025,Active\n1008,Eve Martin,01-Feb-2025,88.50,2,177.00,,Completed\n1009,Frank Lee,February 5 2025,325.00,1,325.00,10-02-2025,Active\n1010,Grace Kim,,485.20,6,2911.20,Feb 15 2025,\nEOF\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat > tests/test2_data.csv << 'EOF'\nemployee_id,Full Name,Hire-Date,Annual Salary,Department Code,Performance Score,Last Review,Employment Status\nE001,Michael Johnson,2024-03-15,75000.50,101,4.5,2024-12-01,Active\nE002,,15/03/2024,82000.00,,3.8,01-Dec-2024,Active\nE003,Sarah Williams,Mar 20 2024,95000.75,103,4.9,2024/12/05,Active\nE004,David Brown,20-03-2024,15000.00,102,2.1,10-Dec-2024,Probation\nE005,Emma Davis,2024/03/25,150000.99,104,5.0,15-Dec-2024,Active\nE006,,30-Mar-2024,68000.25,,4.2,2024-12-20,Active\nE007,Oliver Miller,2024-04-01,88500.00,101,3.9,25/12/2024,Active\nE008,Sophia Garcia,05-Apr-2024,91000.50,103,4.6,,Active\nE009,James Martinez,April 10 2024,77500.00,102,4.0,2025-01-05,Active\nE010,Isabella Lopez,,85000.00,104,4.7,Jan 10 2025,\nEOF\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat > tests/test3_data.csv << 'EOF'\nProduct-ID,product_name,Launch Date,unit_price,Stock_Quantity,Supplier_Rating,Restock Date,availability\nP001,Laptop Computer,2024-06-01,899.99,50,4.8,2025-01-15,In Stock\nP002,,01/06/2024,1299.00,,4.5,15-Jan-2025,In Stock\nP003,Wireless Mouse,Jun 10 2024,25.50,200,4.2,2025/01/20,In Stock\nP004,USB Cable,10-06-2024,5.00,1000,3.9,25-Jan-2025,In Stock\nP005,Monitor Stand,2024/06/15,45.75,75,4.6,2025-02-01,In Stock\nP006,,20-Jun-2024,199.99,,4.9,05/02/2025,In Stock\nP007,Desk Lamp,2024-06-25,35.00,120,4.1,10-02-2025,In Stock\nP008,Notebook Set,30-Jun-2024,12.50,500,4.4,,In Stock\nP009,Pen Collection,July 5 2024,8.99,800,4.0,2025-02-20,In Stock\nP010,Stapler,,18.25,150,4.3,Feb 25 2025,\nEOF\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "ls -la tests/\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}
+```

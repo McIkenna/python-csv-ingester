@@ -6,7 +6,7 @@ apt-get install -y curl
 
 # Install uv
 curl -LsSf https://astral.sh/uv/0.9.5/install.sh | sh
-
+uv pip install pytest requests docker datetime numpy pandas pytest-json-ctrf
 source $HOME/.local/bin/env
 
 # Check if we're in a valid working directory
@@ -21,13 +21,11 @@ uvx \
   -p 3.13 \
   -w pytest==8.4.1 \
   -w pytest-json-ctrf==0.3.5 \
-  -w argparse==1.4.0 \
   -w datetime==5.5 \
   -w numpy==2.0.2 \
   -w pandas==2.3.3 \
-  -w pathlib==1.0.1 \
-  -w typing==3.10.0.0 \
-  pytest --ctrf /logs/verifier/ctrf.json /tests/test_outputs.py -rA
+  -w docker==7.1.0 \
+  pytest --ctrf /logs/verifier/ctrf.json tests/test_outputs.py -rA
 
 
 if [ $? -eq 0 ]; then

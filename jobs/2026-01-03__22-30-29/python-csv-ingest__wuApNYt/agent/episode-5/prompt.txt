@@ -1,0 +1,216 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@9449aaacef4f:/app# cat > solution/solve.sh << 'EOFBASH'
+> #!/bin/bash
+>
+> # Path to the Python CLI
+> PYTHON_CLI="src/CSVIngester.py"
+>
+> # Function: encoding-detection
+> encoding-detection() {
+>     python3 -c "
+> import sys
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> from pathlib import Path
+> ingester = CSVIngester()
+> encoding = ingester.encode_process(Path('$1'))
+> print(encoding)
+> "
+> }
+>
+> # Function: name-standardization
+> name-standardization() {
+>     python3 -c "
+perations, indent=2))
+"
+}
+
+# Export functions
+export -f encoding-detection
+export -f name-standardization
+export -f type-detection
+export -f date-parsing
+export -f outlier-truncate
+export -f dataframe-cleaning
+export -f dataframe-consolidation
+export -f file-processing
+export -f cleaning_log
+export -f csv-summary
+export -f get-operations
+E> import sys
+> sys.path.insert(0, 'src')
+OFBASH
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> standardized = ingester.standardize_column_name('$1')
+> print(standardized)
+> "
+> }
+>
+> # Function: type-detection
+> type-detection() {
+>     python3 -c "
+> import sys
+> import pandas as pd
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> from pathlib import Path
+> ingester = CSVIngester()
+> encoding = ingester.encode_process(Path('$1'))
+> df = pd.read_csv('$1', encoding=encoding)
+> if '$2' in df.columns:
+>     col_type = ingester.detect_column_type(df['$2'])
+>     print(col_type)
+> else:
+>     print('Column not found', file=sys.stderr)
+>     sys.exit(1)
+> "
+> }
+>
+> # Function: date-parsing
+> date-parsing() {
+>     python3 -c "
+> import sys
+> import pandas as pd
+> import json
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> from pathlib import Path
+> ingester = CSVIngester()
+> encoding = ingester.encode_process(Path('$1'))
+> df = pd.read_csv('$1', encoding=encoding)
+> if '$2' in df.columns:
+>     parsed = ingester.date_parser(df['$2'])
+>     result = parsed.dropna().tolist()
+>     print(json.dumps(result))
+> else:
+>     print('Column not found', file=sys.stderr)
+>     sys.exit(1)
+> "
+> }
+>
+> # Function: outlier-truncate
+> outlier-truncate() {
+>     python3 -c "
+> import sys
+> import pandas as pd
+> import json
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> from pathlib import Path
+> ingester = CSVIngester()
+> encoding = ingester.encode_process(Path('$1'))
+> df = pd.read_csv('$1', encoding=encoding)
+> if '$2' in df.columns:
+>     series = pd.to_numeric(df['$2'], errors='coerce')
+>     lower = series.quantile(0.01)
+>     upper = series.quantile(0.99)
+>     clipped = series.clip(lower=lower, upper=upper)
+>     result = {
+>         'lower_bound': float(lower),
+>         'upper_bound': float(upper),
+>         'original_min': float(series.min()),
+>         'original_max': float(series.max()),
+>         'clipped_min': float(clipped.min()),
+>         'clipped_max': float(clipped.max())
+>     }
+>     print(json.dumps(result, indent=2))
+> else:
+>     print('Column not found', file=sys.stderr)
+>     sys.exit(1)
+> "
+> }
+>
+> # Function: dataframe-cleaning
+> dataframe-cleaning() {
+>     local input_file="$1"
+>     local output_file="${2:-cleaned_output.csv}"
+>     python3 "$PYTHON_CLI" "$input_file" -o "$output_file" -l "temp_log.json"
+> }
+>
+> # Function: dataframe-consolidation
+> dataframe-consolidation() {
+>     local output_file="$1"
+>     shift
+>     python3 "$PYTHON_CLI" "$@" -o "$output_file" -l "temp_log.json"
+> }
+>
+> # Function: file-processing
+> file-processing() {
+>     local output_file="$1"
+>     local log_file="$2"
+>     shift 2
+>     python3 "$PYTHON_CLI" "$@" -o "$output_file" -l "$log_file"
+> }
+>
+> # Function: cleaning_log
+> cleaning_log() {
+>     local log_file="${1:-data_cleaning_log.json}"
+>     if [ -f "$log_file" ]; then
+>         cat "$log_file"
+>     else
+>         echo "Log file not found: $log_file" >&2
+>         return 1
+>     fi
+> }
+>
+> # Function: csv-summary
+> csv-summary() {
+>     python3 -c "
+> import sys
+> import pandas as pd
+> import json
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> from pathlib import Path
+> ingester = CSVIngester()
+> encoding = ingester.encode_process(Path('$1'))
+> df = pd.read_csv('$1', encoding=encoding)
+> missing = df.isnull().sum()
+> missing_dict = {col: int(count) for col, count in missing.items() if count > 0}
+> summary = {
+>     'file': '$1',
+>     'rows': len(df),
+>     'columns': len(df.columns),
+>     'column_names': df.columns.tolist(),
+>     'missing_values': missing_dict
+> }
+> print(json.dumps(summary, indent=2))
+> "
+> }
+>
+> # Function: get-operations
+> get-operations() {
+>     local log_file="$1"
+>     python3 -c "
+> import sys
+> import json
+> from pathlib import Path
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> operations = ingester.get_operations_log(Path('$log_file'))
+> print(json.dumps(operations, indent=2))
+> "
+> }
+>
+> # Export functions
+> export -f encoding-detection
+> export -f name-standardization
+> export -f type-detection
+> export -f date-parsing
+> export -f outlier-truncate
+> export -f dataframe-cleaning
+> export -f dataframe-consolidation
+> export -f file-processing
+> export -f cleaning_log
+> export -f csv-summary
+> export -f get-operations
+> EOFBASH
+root@9449aaacef4f:/app# chmod +x solution/solve.sh
+root@9449aaacef4f:/app#

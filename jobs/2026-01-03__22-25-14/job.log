@@ -1,0 +1,5 @@
+Trial python-csv-ingest__gPckrJA failed: Docker compose command failed for environment . Command: docker compose -p python-csv-ingest__gpckrja -f /Users/newaccount/.local/share/uv/tools/harbor/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-prebuilt.yaml up -d. Return code: 1. Stdout:  main Pulling 
+ main Error pull access denied for pythoncsvingest, repository does not exist or may require 'docker login': denied: requested access to the resource is denied
+Error response from daemon: pull access denied for pythoncsvingest, repository does not exist or may require 'docker login': denied: requested access to the resource is denied
+. Stderr: None. 
+Not retrying trial because the maximum number of retries has been reached
