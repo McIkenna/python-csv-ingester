@@ -1,0 +1,232 @@
+New Terminal Output:
+
+root@eb6fbc872eff:/app# python3 solution/CSVIngester.py get-operations tests/log.json | sed -n '1,60p'
+error: [Errno 2] No such file or directory: 'tests/log.json'
+root@eb6fbc872eff:/app# cat > solution/CSVIngester.py << 'PYEOF'
+> #!/usr/bin/env python3
+> import argparse
+> import sys
+> import json
+> import re
+> from datetime import datetime
+> from pathlib import Path
+> from typing import List, Dict, Any, Tuple
+> import pandas as pd
+> import numpy as np
+>
+> class CSVIngester:
+>     def __init__(self):
+>         self.operations: List[Dict[str, Any]] = []
+>
+>     def _log(self, operation: str, details: Dict[str, Any]):
+>         self.operations.append({
+>             "operation": operation,
+>             "details": details,
+>             "timestamp": datetime.utcnow().isoformat()
+>         })
+>
+>     def encode_process(self, filepath: str) -> str:
+>         path = Path(filepath)
+>         if not path.exists():
+>             self._log("detect_encoding_error", {"source": str(filepath), "error": "file_not_found"})
+>             raise FileNotFoundError(f"File not found: {filepath}")
+>         for enc in ("utf-8", "latin-1"):
+>             try:
+>                 with open(path, 'r', encoding=enc) as f:
+>                     f.read(4096)
+>                 self._log("detect_encoding", {"source": str(filepath), "encoding": enc})
+>                 return enc
+, regex=True)
+                df[col] = s
+                imputations["ca>             except Exception:
+>                 continue
+>         self._log("detect_encoding", {"source": str(filepath), "encoding": "latin-1", "note": "fallback"})
+>         return "latin-1"
+>
+>     @staticmethod
+>     def standardize_column_name(name: str) -> str:
+>         s = name.strip().lower()
+>         s = re.sub(r"[^0-9a-zA-Z]+", "_", s)
+>         s = re.sub(r"_+", "_", s).strip("_")
+>         return s
+>
+>     def detect_column_type(self, series: pd.Series) -> str:
+>         # numeric detection
+>         coerced = pd.to_numeric(series, errors='coerce')
+>         if coerced.notna().mean() >= 0.9:
+>             return "numeric"
+>         # date detection: try both dayfirst False and True
+>         parsed_nf = pd.to_datetime(series, errors='coerce', dayfirst=False)
+>         parsed_df = pd.to_datetime(series, errors='coerce', dayfirst=True)
+>         if max(parsed_nf.notna().mean(), parsed_df.notna().mean()) >= 0.6:
+>             return "date"
+>         return "categorical"
+>
+>     def date_parser(self, series: pd.Series) -> pd.Series:
+>         parsed = pd.to_datetime(series, errors='coerce', dayfirst=False)
+>         mask = parsed.isna()
+>         if mask.any():
+>             parsed2 = pd.to_datetime(series[mask], errors='coerce', dayfirst=True)
+>             parsed.loc[mask] = parsed2
+ile_error", {"source": fp, "error": str(e)})
+        if not frames:
+            return pd.DataFrame()
+        result = pd.concat(frames, axis=0, ignore_index=True, sort=False)
+        self._log("consolidate", {"files": filepaths, "rows": int(result.shape[0]), "columns": list(result.columns)})
+        return result
+
+    def logging_process(self, log_file: str):
+        p = Path(log_file)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        with open(p>         return parsed.dt.date.astype('string')
+>
+>     def outlier_truncate(self, series: pd.Series) -> Tuple[pd.Series, Dict[str, Any]]:
+>         num = pd.to_numeric(series, errors='coerce')
+>         if num.notna().sum() == 0:
+>             return series, {
+oding='utf-8') as f:
+            json.dump({"timestamp": datetime.utcnow().isoformat(), "operations": self.operations}, f, indent=2)
+
+    def get_operations_log(self) -> List[Dict[str, Any]]:
+        return self.operations
+
+
+def csv_summary(f>                 "lower_bound": None, "upper_bound": None,
+>                 "original_min": None, "original_max": None,
+ead_csv(filepath)
+    df, _ = ing._standardize>                 "clipped_min": None, "clipped_max": None
+>             }
+>         original_min = float(np.nanmin(num))
+>         original_max = float(np.nanmax(num))
+>         lower = float(np.nanpercentile(num, 1))
+>         upper = float(np.nanpercentile(num, 99))
+>         clipped = num.clip(lower, upper)
+>         details = {
+>             "lower_bound": lower, "upper_bound": upper,
+>             "original_min": original_min, "original_max": original_max,
+>             "clipped_min": float(np.nanmin(clipped)), "clipped_max": float(np.nanmax(clipped))
+ s>         }
+>         return clipped.astype(series.dtype if series.dtype.kind in ['i', 'f'] else float), details
+>
+>     def _read_csv(self, filepath: str) -> pd.DataFrame:
+>         enc = self.encode_process(filepath)
+>         df = pd.read_csv(filepath, encoding=enc)
+>         self._log("load_file", {"source": filepath, "rows": int(df.shape[0]), "columns": int(df.shape[1]), "encoding": enc})
+>         return df
+>
+>     def _standardize_columns(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, str]]:
+>   
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+s consistent and as-expected, please specify a format.
+  parsed_nf = pd.to_datetime(series, errors='coerce', dayfirst=False)
+/app/solution/CSVIngester.py:53: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  parsed_df = pd.to_datetime(series, errors='coerce', dayfirst=True)
+/app/solution/CSVIngester.py:52: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  parsed_nf = pd.to_datetime(series, errors='coerce', dayfirst=False)
+/app/solution/CSVIngester.py:53: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  parsed_df = pd.to_datetime(series, errors='coerce', dayfirst=True)
+/app/solution/CSVIngester.py:52: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  parsed_nf = pd.to_datetime(series, errors='coerce', dayfirst=False)
+/app/solution/CSVIngester.py:53: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  parsed_df = pd.to_datetime(series, errors='coerce', dayfirst=True)
+/app/solution/CSVIngester.py:52: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  parsed_nf = pd.to_datetime(series, errors='coerce', dayfirst=False)
+/app/solution/CSVIngester.py:53: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  parsed_df = pd.to_datetime(series, errors='coerce', dayfirst=True)
+{"output": "tests/cleaned.csv", "log": "tests/log.json"}
+root@eb6fbc872eff:/app# sed -n '1,5p' tests/cleaned.csv
+order_id,customer_name,order_date,product_price,quantity,total_amount,ship_date,status,source_file,sku,product_name,stock_qty,unit_cost,last_restock,supplier,ca
+tegory_type
+ORD1000,Unknown,01-10-2023,264.3134984759545,7.0,1850.194489331681,09-10-2023,Unknown,sample1_data.csv,,,,,,,
+ORD1001,Unknown,2023-04-02,171.54224088174146,17.0,2916.2180949896047,Unknown,Shipped,sample1_data.csv,,,,,,,
+ORD1002,Bob Johnson,05.12.2023,171.54224088174146,17.0,3317.4124189023737,2023-12-11,Unknown,sample1_data.csv,,,,,,,
+ORD1003,Alice Williams,29.08.2023,70.21586678937072,10.0,702.1586678937072,09/07/2023,Unknown,sample1_data.csv,,,,,,,
+root@eb6fbc872eff:/app# python3 solution/CSVIngester.py get-operations tests/log.json | sed -n '1,80p'
+[
+  {
+    "operation": "detect_encoding",
+    "details": {
+      "source": "src/sample1_data.csv",
+      "encoding": "utf-8"
+    },
+    "timestamp": "2026-01-19T17:12:23.888438"
+  },
+  {
+    "operation": "load_file",
+    "details": {
+      "source": "src/sample1_data.csv",
+      "rows": 10,
+      "columns": 8,
+      "encoding": "utf-8"
+    },
+    "timestamp": "2026-01-19T17:12:23.889377"
+  },
+  {
+    "operation": "standardize_columns",
+    "details": {
+      "mappings": {
+        "Order ID": "order_id",
+        "Customer Name": "customer_name",
+        "Order Date": "order_date",
+        "Product Price $": "product_price",
+        "Quantity!!": "quantity",
+        "Total Amount": "total_amount",
+        "Ship Date": "ship_date",
+        "Status": "status"
+      }
+    },
+    "timestamp": "2026-01-19T17:12:23.889596"
+  },
+  {
+    "operation": "detect_column_types",
+    "details": {
+      "types": {
+        "order_id": "categorical",
+        "customer_name": "categorical",
+        "order_date": "categorical",
+        "product_price": "numeric",
+        "quantity": "numeric",
+        "total_amount": "numeric",
+        "ship_date": "categorical",
+        "status": "categorical"
+      }
+    },
+    "timestamp": "2026-01-19T17:12:23.895630"
+  },
+  {
+    "operation": "impute_missing",
+    "details": {
+      "numeric": {
+        "product_price": 171.54224088174146,
+        "quantity": 10.5,
+        "total_amount": 1558.7652006045575
+      },
+      "categorical": [
+        "order_id",
+        "customer_name",
+        "order_date",
+        "ship_date",
+        "status"
+      ]
+    },
+    "timestamp": "2026-01-19T17:12:23.898584"
+  },
+  {
+    "operation": "clip_outliers",
+    "details": {
+      "product_price": {
+        "lower_bound": 68.64064916777441,
+        "upper_bound": 477.36989036333176,
+        "original_min": 68.48485841399017,
+        "original_max": 481.85449697522034,
+        "clipped_min": 68.64064916777441,
+        "clipped_max": 477.36989036333176
+      },
+root@eb6fbc872eff:/app#

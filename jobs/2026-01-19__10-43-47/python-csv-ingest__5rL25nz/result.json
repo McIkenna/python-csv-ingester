@@ -1,0 +1,100 @@
+{
+    "id": "2d1c96b9-71db-4799-ae02-8c56573eef3c",
+    "task_name": "",
+    "trial_name": "python-csv-ingest__5rL25nz",
+    "trial_uri": "file:///Users/newaccount/Downloads/python-csv-ingest/jobs/2026-01-19__10-43-47/python-csv-ingest__5rL25nz",
+    "task_id": {
+        "path": "."
+    },
+    "source": null,
+    "task_checksum": "371ed74c52d5aa83c1dba7314665f0eb4f2619d657824eeb51bf405cd30de89b",
+    "config": {
+        "task": {
+            "path": ".",
+            "git_url": null,
+            "git_commit_id": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "python-csv-ingest__5rL25nz",
+        "trials_dir": "jobs/2026-01-19__10-43-47",
+        "timeout_multiplier": 1.0,
+        "agent": {
+            "name": "terminus-2",
+            "import_path": null,
+            "model_name": "openai/@openai-tbench/gpt-5",
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {}
+        },
+        "environment": {
+            "type": "docker",
+            "force_build": false,
+            "delete": true,
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "kwargs": {}
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "job_id": "650094d9-bd52-42fd-bf69-61852da6a410"
+    },
+    "agent_info": {
+        "name": "terminus-2",
+        "version": "2.0.0",
+        "model_info": {
+            "name": "@openai-tbench/gpt-5",
+            "provider": "openai"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 165027,
+        "n_cache_tokens": 97280,
+        "n_output_tokens": 26806,
+        "cost_usd": 0.36490375,
+        "rollout_details": [],
+        "metadata": {
+            "n_episodes": 8,
+            "api_request_times_msec": [
+                15851.203680038452,
+                149071.46692276,
+                91341.18342399597,
+                39230.193853378296,
+                48894.306898117065,
+                83291.0828590393,
+                25171.574115753174,
+                10262.76707649231
+            ],
+            "summarization_count": 0
+        }
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-01-19T10:43:47.965099",
+    "finished_at": "2026-01-19T10:52:49.685175",
+    "environment_setup": {
+        "started_at": "2026-01-19T10:43:49.394327",
+        "finished_at": "2026-01-19T10:43:50.442647"
+    },
+    "agent_setup": {
+        "started_at": "2026-01-19T10:43:50.442732",
+        "finished_at": "2026-01-19T10:43:59.252305"
+    },
+    "agent_execution": {
+        "started_at": "2026-01-19T10:43:59.252452",
+        "finished_at": "2026-01-19T10:52:31.825269"
+    },
+    "verifier": {
+        "started_at": "2026-01-19T10:52:31.826901",
+        "finished_at": "2026-01-19T10:52:37.797082"
+    }
+}

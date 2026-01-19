@@ -1,0 +1,235 @@
+New Terminal Output:
+
+root@eb6fbc872eff:/app# pip --version
+pip 24.0 from /usr/local/lib/python3.11/site-packages/pip (python 3.11)
+root@eb6fbc872eff:/app# mkdir -p solution tests
+root@eb6fbc872eff:/app# cat > solution/CSVIngester.py << 'PYEOF'
+> #!/usr/bin/env python3
+> import argparse
+> import sys
+> import json
+> import re
+> from datetime import datetime
+> from pathlib import Path
+> from typing import List, Dict, Any, Tuple, Optional
+> import pandas as pd
+> import numpy as np
+>
+> class CSVIngester:
+h: str) >     def __init__(self):
+>         self.operations: List[Dict[str, Any]] = []
+>
+>     def _log(self, operation: str, details: Dict[str, Any]):
+>         entry = {
+>             "operation": operation,
+>             "details": details,
+>             "timestamp": datetime.utcnow().isoformat()
+>         }
+>         self.operations.append(entry)
+ col_t>
+>     def encode_process(self, filepath: str) -> str:
+>         path = Path(filepath)
+>         if not path.exists():
+>             self._log("detect_encoding_error", {"source": str(filepath), "error": "file_not_found"})
+>             raise FileNotFoundError(f"File not found: {filepath}")
+>         # Try utf-8 first, fallback to latin-1
+>         for enc in ["utf-8", "latin-1"]:
+>             try:
+>                 with open(path, 'r', encoding=enc) as f:
+>                     f.read(4096)
+>                 self._log("detect_encoding", {"source": str(filepath), "encoding": enc})
+>                 return enc
+>             except Exception:
+>                 continue
+>         # default to latin-1 if all fail (very permissive)
+>         enc = "latin-1"
+>         self._log("detect_encoding", {"source": str(filepath), "encoding": enc, "note": "fallback"})
+>         return enc
+>
+>     @staticmethod
+>     def standardize_column_name(name: str) -> str:
+>         # Lower, replace non-alphanumeric with underscore, collapse underscores, strip
+>         s = name.strip().lower()
+>         s = re.sub(r"[^0-9a-zA-Z]+", "_", s)
+>         s = re.sub(r"_+", "_", s)
+>         s = s.strip("_")
+>         return s
+>
+>     def detect_column_type(self, series: pd.Series) -> str:
+>         # If numeric after coercion -> numeric
+>         coerced = pd.to_numeric(series, errors='coerce')
+>         numeric_ratio = coerced.notna().mean()
+>         if numeric_ratio >= 0.9:
+>             return "numeric"
+>         # Try date
+>         parsed = pd.to_datetime(series, errors='coerce', infer_datetime_format=True, dayfirst=False)
+>         date_ratio = parsed.notna().mean()
+>         if date_ratio >= 0.7:
+>             return "date"
+>         return "categorical"
+>
+>     def date_parser(self, series: pd.Series) -> pd.Series:
+>         parsed = pd.to_datetime(series, errors='coerce', infer_datetime_format=True, dayfirst=False)
+>         return parsed.dt.date.astype('string')  # ISO-like; pandas will print as YYYY-MM-DD or <NA>
+>
+>     def outlier_truncate(self, series: pd.Series) -> Tuple[pd.Series, Dict[str, Any]]:
+>         num = pd.to_numeric(series, errors='coerce')
+>         if num.notna().sum() == 0:
+>             # No numeric data; return as is
+>             details = {
+>                 "lower_bound": None,
+>                 "upper_bound": None,
+f, log_file: str):
+        # Write operations to log file
+        path = Path(log_file)
+>                 "original_min": None,
+>                 "original_max": None,
+>                 "clipped_min": None,
+>                 "clipped_max": None
+>             }
+>             return series, details
+>         original_min = float(np.nanmin(num))
+>         original_max = float(np.nanmax(num))
+>         lower = float(np.nanpercentile(num, 1))
+>         upper = float(np.nanpercentile(num, 99))
+ilepath: str) -> Dict[str, Any]:
+    ing = CSVIngester()>         clipped = num.clip(lower, upper)
+>         details = {
+>             "lower_bound": lower,
+>             "upper_bound": upper,
+>             "original_min": original_min,
+>             "original_max": original_max,
+>             "clipped_min": float(np.nanmin(clipped)),
+>             "clipped_max": float(np.nanmax(clipped)),
+df.columns),
+        "missing>         }
+>         # Preserve original dtype where possible
+>         return clipped.astype(series.dtype if series.dtype.kind in ['i', 'f'] else float), details
+>
+>     def _read_csv(self, filepath: str) -> pd.DataFrame:
+>         enc = self.encode_process(filepath)
+>         df = pd.read_csv(filepath, encoding=enc)
+>         self._log("load_file", {"source": filepath, "rows": int(df.shape[0]), "columns": int(df.shape[1]), "encoding": enc})
+>         return df
+>
+>     def _standardize_columns(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, str]]:
+>         mapping = {c: self.standardize_column_name(c) for c in df.columns}
+>         df = df.rename(columns=mapping)
+>         self._log("standardize_columns", {"mappings": mapping})
+>         return df, mapping
+>
+>     def processed_dataframe(self, filepath: str) -> pd.DataFrame:
+>       
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+tps://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed = pd.to_datetime(series, errors='coerce', infer_datetime_format=True, dayfirst=False)
+/app/solution/CSVIngester.py:59: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  parsed = pd.to_datetime(series, errors='coerce', infer_datetime_format=True, dayfirst=False)
+/app/solution/CSVIngester.py:59: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed = pd.to_datetime(series, errors='coerce', infer_datetime_format=True, dayfirst=False)
+/app/solution/CSVIngester.py:59: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed = pd.to_datetime(series, errors='coerce', infer_datetime_format=True, dayfirst=False)
+/app/solution/CSVIngester.py:59: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  parsed = pd.to_datetime(series, errors='coerce', infer_datetime_format=True, dayfirst=False)
+/app/solution/CSVIngester.py:59: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed = pd.to_datetime(series, errors='coerce', infer_datetime_format=True, dayfirst=False)
+/app/solution/CSVIngester.py:59: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  parsed = pd.to_datetime(series, errors='coerce', infer_datetime_format=True, dayfirst=False)
+{"output": "output.csv", "log": "log.json"}
+root@eb6fbc872eff:/app# ls -la | sed -n '1,200p'
+total 32
+drwxr-xr-x 1 root root 4096 Jan 19 17:10 .
+drwxr-xr-x 1 root root 4096 Jan 19 17:08 ..
+-rw-r--r-- 1 root root 5939 Jan 19 17:10 log.json
+-rw-r--r-- 1 root root 2296 Jan 19 17:10 output.csv
+drwxr-xr-x 2 root root 4096 Jan 19 17:10 solution
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 src
+drwxr-xr-x 2 root root 4096 Jan 19 17:10 tests
+root@eb6fbc872eff:/app# cleaning-log log.json | sed -n '1,80p'
+{
+  "timestamp": "2026-01-19T17:10:32.783420",
+  "operations": [
+    {
+      "operation": "detect_encoding",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "encoding": "utf-8"
+      },
+      "timestamp": "2026-01-19T17:10:32.752118"
+    },
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "rows": 10,
+        "columns": 8,
+        "encoding": "utf-8"
+      },
+      "timestamp": "2026-01-19T17:10:32.752989"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T17:10:32.753200"
+    },
+    {
+      "operation": "detect_column_types",
+      "details": {
+        "types": {
+          "order_id": "categorical",
+          "customer_name": "categorical",
+          "order_date": "categorical",
+          "product_price": "numeric",
+          "quantity": "numeric",
+          "total_amount": "numeric",
+          "ship_date": "categorical",
+          "status": "categorical"
+        }
+      },
+      "timestamp": "2026-01-19T17:10:32.761739"
+    },
+    {
+      "operation": "impute_missing",
+      "details": {
+        "numeric": {
+          "product_price": 171.54224088174146,
+          "quantity": 10.5,
+          "total_amount": 1558.7652006045575
+        },
+        "categorical": [
+          "order_id",
+          "customer_name",
+          "order_date",
+          "ship_date",
+          "status"
+        ]
+      },
+      "timestamp": "2026-01-19T17:10:32.766133"
+    },
+    {
+      "operation": "clip_outliers",
+      "details": {
+        "product_price": {
+          "lower_bound": 68.64064916777441,
+          "upper_bound": 477.36989036333176,
+          "original_min": 68.48485841399017,
+          "original_max": 481.85449697522034,
+          "clipped_min": 68.64064916777441,
+root@eb6fbc872eff:/app#

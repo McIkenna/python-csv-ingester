@@ -1,0 +1,66 @@
+New Terminal Output:
+
+root@c28acbfc71a0:/app# cat > tests/test.sh << 'TEST_BASH_EOF'
+> #!/bin/bash
+>
+> # Test runner for CSV Ingester
+>
+> set -e
+>
+> SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+> PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+>
+> echo "========================================"
+> echo "CSV Ingester Test Suite"
+> echo "========================================"
+> echo ""
+>
+> # Check if pytest is available
+> if ! command -v pytest &> /dev/null; then
+>     echo "Error: pytest not found. Installing..."
+>     pip install pytest pandas numpy 2>&1 | grep -v "already satisfied" || true
+> fi
+>
+> echo "Running pytest tests..."
+> echo ""
+>
+> cd "$SCRIPT_DIR"
+>
+> # Run pytest with verbose output
+> pytest test_outputs.py -v --tb=short
+>
+> TEST_EXIT_CODE=$?
+>
+> if [ $TEST_EXIT_CODE -eq 0 ]; then
+>     echo ""
+>     echo "========================================"
+>     echo "All tests passed!"
+>     echo "========================================"
+> else
+>     echo ""
+>     echo "========================================"
+>     echo "Some tests failed. Exit code: $TEST_EXIT_CODE"
+>     echo "========================================"
+> fi
+>
+> exit $TEST_EXIT_CODE
+> TEST_BASH_EOF
+root@c28acbfc71a0:/app# chmod +x solution/CSVIngester.py solution/solve.sh tests/test.sh tests/test_outputs.py
+root@c28acbfc71a0:/app# ls -lah solution/ tests/
+solution/:
+total 28K
+drwxr-xr-x 2 root root 4.0K Jan 19 16:25 .
+drwxr-xr-x 1 root root 4.0K Jan 19 16:24 ..
+-rwxr-xr-x 1 root root  12K Jan 19 16:25 CSVIngester.py
+-rwxr-xr-x 1 root root 7.6K Jan 19 16:25 solve.sh
+
+tests/:
+total 36K
+drwxr-xr-x 2 root root 4.0K Jan 19 16:27 .
+drwxr-xr-x 1 root root 4.0K Jan 19 16:24 ..
+-rwxr-xr-x 1 root root 1.1K Jan 19 16:27 test.sh
+-rw-r--r-- 1 root root  636 Jan 19 16:26 test2_data.csv
+-rw-r--r-- 1 root root  672 Jan 19 16:26 test3_data.csv
+-rw-r--r-- 1 root root  673 Jan 19 16:26 test_data.csv
+-rwxr-xr-x 1 root root  12K Jan 19 16:27 test_outputs.py
+root@c28acbfc71a0:/app#

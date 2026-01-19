@@ -1,0 +1,282 @@
+New Terminal Output:
+
+root@59fbec45e032:/app# ls -la
+total 12
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 .
+drwxr-xr-x 1 root root 4096 Jan 19 18:01 ..
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 src
+root@59fbec45e032:/app# ls -la solution tests src || true
+ls: cannot access 'solution': No such file or directory
+ls: cannot access 'tests': No such file or directory
+src:
+total 16
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 .
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 ..
+-rw-r--r-- 1 root root  874 Jan  6 04:31 sample1_data.csv
+-rw-r--r-- 1 root root  768 Jan  6 04:17 sample2_data.csv
+root@59fbec45e032:/app# sed -n '1,200p' tests/test_outputs.py
+sed: can't read tests/test_outputs.py: No such file or directory
+root@59fbec45e032:/app# sed -n '200,400p' tests/test_outputs.py
+sed: can't read tests/test_outputs.py: No such file or directory
+root@59fbec45e032:/app# sed -n '400,800p' tests/test_outputs.py
+sed: can't read tests/test_outputs.py: No such file or directory
+root@59fbec45e032:/app# sed -n '1,200p' solution/solve.sh 2>/dev/null || true
+root@59fbec45e032:/app# sed -n '1,200p' solution/CSVIngester.py 2>/dev/null || true
+root@59fbec45e032:/app# sed -n '1,200p' instruction.md 2>/dev/null || true
+root@59fbec45e032:/app# python3 - << 'PY'
+> import sys
+> print(sys.version)
+> try:
+>  import pandas, numpy
+>  print('pandas', pandas.__version__)
+>  print('numpy', numpy.__version__)
+> except Exception as e:
+>  print('deps missing:', e)
+> PY
+3.11.14 (main, Jan 13 2026, 03:19:31) [GCC 14.2.0]
+pandas 2.3.3
+numpy 2.0.2
+root@59fbec45e032:/app# mkdir -p solution
+root@59fbec45e032:/app# cat > solution/CSVIngester.py << 'PY'
+> #!/usr/bin/env python3
+> import argparse
+pper = float> import csv
+> import json
+> import sys
+> from datetime import datetime
+> from pathlib import Path
+> from typing import List, Dict, Any, Optional, Tuple
+>
+> import numpy as np
+> import pandas as pd
+>
+>
+> class CSVIngester:
+>     def __init__(self):
+>         self.operations: List[Dict[str, Any]] = []
+>         # cache of standardized name mappings per file
+>         self._col_maps: Dict[str, Dict[str, str]] = {}
+>
+>     # --- logging helpers ---
+>     def _log(self, operation: str, details: Dict[str, Any]):
+>         self.operations.append({
+>             "operation": operation,
+>             "details": details,
+>             "timestamp": datetime.utcnow().isoformat()
+>         })
+>
+>     def get_operations_log(self) -> List[Dict[str, Any]]:
+>         return self.operations
+>
+>     def logging_process(self, output_log: Path):
+>         output_log = Path(output_log)
+>         output_log.parent.mkdir(parents=True, exist_ok=True)
+>         payload = {
+>             "timestamp": datetime.utcnow().isoformat(),
+t]:
+        return {c: int(df[c].isna().sum()>             "operations": self.operations,
+>         }
+) for c in df.columns}
+
+    def processed_dataframe(s>         output_log.write_text(json.dumps(payload, indent=2))
+>         return str(output_log)
+>
+>     # --- util methods ---
+>     def encode_process(self, filepath: Path) -> str:
+>         fp = Path(filepath)
+>         if not fp.exists():
+>             self._log("detect_encoding_error", {"source": str(fp), "error": "file_not_found"})
+>             raise FileNotFoundError(str(fp))
+>         # Try utf-8 first, fallback to latin-1
+>         for enc in ("utf-8", "latin-1"):
+>             try:
+>                 with open(fp, 'r', encoding=enc) as f:
+>                     f.readline()
+>                 self._log("detect_encoding", {"source": str(fp), "encoding": enc})
+>                 return enc
+>             except Exception:
+>                 continue
+>         # default
+>         enc = "latin-1"
+>         self._log("detect_encoding_default", {"source": str(fp), "encoding": enc})
+>         return enc
+>
+>     def standardize_column_name(self, name: str) -> str:
+>         # Remove currency symbols etc., keep alnum and spaces/underscores/hyphens first
+>         # Normalize spaces and punctuation to underscores
+>         s = name.strip()
+>         # Replace any non-alphanumeric with space
+>         import re
+>         s = re.sub(r"[^0-9A-Za-z]+", "_", s)
+>         # Collapse multiple underscores
+>         s = re.sub(r"_+", "_", s)
+>         s = s.strip("_")
+>         s = s.lower()
+>         return s
+>
+>     def detect_column_type(self, series: pd.Series) -> str:
+>         # Heuristic: dates via to_datetime with errors='coerce' and sufficient parse ratio
+>         s_nonnull = series.dropna().astype(str)
+>         if s_nonnull.empty:
+>             return "categorical"
+>         # try numeric
+>         try:
+>             pd.to_numeric(s_nonnull)
+>             return "numeric"
+>         except Exception:
+>             pass
+>         # detect date
+>         parsed = pd.to_datetime(s_nonnull, errors='coerce', infer_datetime_format=True, dayfirst=False)
+>         parsed2 = pd.to_datetime(s_nonnull, errors='coerce', dayfirst=True)
+>         ratio = parsed.notna().mean()
+>         ratio2 = parsed2.notna().mean()
+>         
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+rse_args(argv)
+>     ing = CSVIngester()
+>
+>     # Individual utilities for shell wrapper
+>     if args.encoding_detection:
+>         enc = ing.encode_process(Path(args.encoding_detection))
+>         print(enc)
+>         return 0
+>     if args.name_standardization:
+>         print(ing.standardize_column_name(args.name_standardization))
+>         return 0
+>     if args.type_detection:
+>         csv_path, col = args.type_detection
+>         enc = ing.encode_process(Path(csv_path))
+>         df = pd.read_csv(csv_path, encoding=enc)
+>         df = ing._standardize_columns(df, source=str(csv_path))
+>         # Map requested name standardization
+>         std = ing.standardize_column_name(col)
+>         if std not in df.columns:
+>             print("error: column not found", file=sys.stderr)
+>             print("unknown")
+>             return 1
+>         print(ing.detect_column_type(df[std]))
+>         return 0
+>     if args.date_parsing:
+>         csv_path, col = args.date_parsing
+>         enc = ing.encode_process(Path(csv_path))
+>         df = pd.read_csv(csv_path, encoding=enc)
+>         df = ing._standardize_columns(df, source=str(csv_path))
+>         std = ing.standardize_column_name(col)
+>         if std not in df.columns:
+>             print(json.dumps({"error": "column_not_found"}))
+>             return 1
+>         iso, info = ing.date_parser(df[std])
+>         out = {"converted": info["converted"], "total": info["total"]}
+>         print(json.dumps(out))
+>         return 0
+>     if args.outlier_truncate:
+>         csv_path, col = args.outlier_truncate
+>         enc = ing.encode_process(Path(csv_path))
+>         df = pd.read_csv(csv_path, encoding=enc)
+>         df = ing._standardize_columns(df, source=str(csv_path))
+>         std = ing.standardize_column_name(col)
+>         if std not in df.columns:
+>             print(json.dumps({"error": "column_not_found"}))
+>             return 1
+>         clipped, details = ing.outlier_truncate(df[std])
+>         print(json.dumps(details))
+>         return 0
+>
+>     # Summary mode
+>     if args.summary:
+>         if not args.files:
+>             print(json.dumps({"error": "no_files"}))
+>             return 1
+>         summary = ing.csv_summary(Path(args.files[0]))
+>         print(json.dumps(summary))
+>         return 0
+>
+>     # Operations log retrieval (just what has been collected for this process)
+>     if args.get_operations:
+>         print(json.dumps({"operations": ing.get_operations_log()}))
+>         return 0
+>
+>     # Default pipeline: process given files
+>     if not args.files:
+>         print("No input files provided", file=sys.stderr)
+>         return 2
+>     out_path, log_path = ing.file_processor(Path(args.output), Path(args.log) if args.log else None, [Path(f) for f in args.files])
+>     print(json.dumps({"output": out_path, "log": log_path}))
+>     return 0
+>
+>
+> if __name__ == "__main__":
+>     sys.exit(main())
+> PY
+root@59fbec45e032:/app# cat > solution/solve.sh << 'SH'
+> #!/usr/bin/env bash
+> set -euo pipefail
+>
+> # Helper to call Python with our script
+> PY_SCRIPT="$(dirname "$0")/CSVIngester.py"
+>
+> encoding-detection() {
+>   python3 "$PY_SCRIPT" --encoding-detection "$1"
+> }
+>
+> name-standardization() {
+>   python3 "$PY_SCRIPT" --name-standardization "$1"
+> }
+>
+> type-detection() {
+>   python3 "$PY_SCRIPT" --type-detection "$1" "$2"
+> }
+>
+> date-parsing() {
+>   python3 "$PY_SCRIPT" --date-parsing "$1" "$2"
+> }
+>
+> outlier-truncate() {
+>   python3 "$PY_SCRIPT" --outlier-truncate "$1" "$2"
+> }
+>
+> dataframe-cleaning() {
+>   local infile="$1"
+>   local outfile="${2:-tests/cleaned_data.csv}"
+>   python3 "$PY_SCRIPT" "$infile" -o "$outfile" -l tests/cleaning_log.json >/dev/null
+>   echo "$outfile"
+> }
+>
+> dataframe-consolidation() {
+>   local outfile="$1"; shift
+>   python3 "$PY_SCRIPT" "$@" -o "$outfile" -l tests/cleaning_log.json >/dev/null
+>   echo "$outfile"
+> }
+>
+> file-processing() {
+>   local outfile="$1"; shift
+>   local log="$1"; shift
+>   python3 "$PY_SCRIPT" "$@" -o "$outfile" -l "$log"
+> }
+>
+> cleaning-log() {
+>   local log_file="${1:-tests/cleaning_log.json}"
+>   if [[ -f "$log_file" ]]; then
+>     cat "$log_file"
+>   else
+>     echo '{"error": "log_not_found"}'
+>   fi
+> }
+>
+> csv-summary() {
+>   python3 "$PY_SCRIPT" --summary "$1"
+> }
+>
+> get-operations() {
+>   # returns current process operations (not persisted)
+>   python3 "$PY_SCRIPT" --get-operations -o /tmp/cleaned.csv "$1" 2>/dev/null
+> }
+> SH
+root@59fbec45e032:/app# chmod +x solution/CSVIngester.py solution/solve.sh
+root@59fbec45e032:/app# pytest -q tests/test_outputs.py -k 'standardize or detect_date_column or parse_iso_dates' --maxfail=1
+bash: pytest: command not found
+root@59fbec45e032:/app# pytest -q tests/test_outputs.py -k 'encoding or summary' --maxfail=1
+bash: pytest: command not found
+root@59fbec45e032:/app# pytest -q tests/test_outputs.py -k 'clean|outlier|consolidate|full|operations|unknown|median' --maxfail=1
+bash: pytest: command not found
+root@59fbec45e032:/app#

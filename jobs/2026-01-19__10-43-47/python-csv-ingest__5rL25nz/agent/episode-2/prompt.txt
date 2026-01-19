@@ -1,0 +1,298 @@
+New Terminal Output:
+
+root@1b998c08ea2f:/app# mkdir -p solution tests
+root@1b998c08ea2f:/app# cat > solution/CSVIngester.py << 'PY'
+> #!/usr/bin/env python3
+> import argparse
+> import json
+> import sys
+> import os
+> from datetime import datetime
+> from typing import List, Dict, Any, Tuple
+> import pandas as pd
+> import numpy as np
+>
+> # Helper: snake_case standardization
+> def _snake_case(name: str) -> str:
+>     if name is None:
+>         return ''
+>     # Lowercase
+>     s = str(name).strip().lower()
+>     # Replace non-alphanumeric with underscore
+>     s = ''.join([c if c.isalnum() else '_' for c in s])
+>     # Collapse multiple underscores
+>     while '__' in s:
+>         s = s.replace('__', '_')
+>     # Strip leading/trailing underscores
+>     s = s.strip('_')
+>     return s
+_nonnull.max())
+        clipped = s.clip(lower=lower, upper=upper)
+        clipped_nonnull = clipped.dropna()
+        info = {
+            'lower_bound': lower,
+            'upper_bound': upper,
+            'original_min': orig_min,
+            'original_max': orig_max,
+            'clipped_min': float(clipped_no>
+> class CSVIngester:
+>     def __init__(self):
+>         self.operations: List[Dict[str, Any]] = []
+>
+>     def _log(self, operation: str, details: Dict[str, Any]):
+>         self.operations.append({
+>             'operation': operation,
+>             'details': details,
+
+    def _read_csv(self, filepath: str, encoding: str = None) -> pd.Dat>             'timestamp': datetime.utcnow().isoformat()
+>         })
+>
+>     def encode_process(self, filepath: str) -> str:
+>         if not os.path.exists(filepath):
+>             raise FileNotFoundError(f"File not found: {filepath}")
+>         # Try utf-8 then latin-1
+': enc})
+        return df
+
+   >         for enc in ['utf-8', 'latin1']:
+ def processed_dataframe(self, filepath:>             try:
+>                 with open(filepath, 'r', encoding=enc) as f:
+>                     f.read(4096)
+>                 self._log('detect_encoding', {'source': filepath, 'encoding': enc})
+>                 return enc
+>             except UnicodeDecodeError:
+>                 continue
+>         # Fallback to latin1
+>         self._log('detect_encoding', {'source': filepath, 'encoding': 'latin1', 'note': 'fallback'})
+>         return 'latin1'
+>
+>     def standardize_column_name(self, name: str) -> str:
+>         return _snake_case(name)
+>
+ate_p>     def _standardize_columns(self, df: pd.DataFrame, source: str = None) -> Tuple[pd.DataFrame, Dict[str, str]]:
+>         mapping = {c: self.standardize_column_name(c) for c in df.columns}
+>         df2 = df.rename(columns=mapping)
+>         self._log('standardize_columns', {'source': source, 'mappings': mapping})
+= [c for c, t in types.items() if t == 'categorical']
+        im>         return df2, mapping
+>
+>     def detect_column_type(self, series: pd.Series) -> str:
+>         # Consider empty as categorical
+>         nonnull = series.dropna()
+>         if nonnull.empty:
+>             return 'categorical'
+>         # Cast to str for robust parsing
+>         sample = nonnull.astype(str)
+>         n = len(sample)
+>         head = sample.head(min(200, n))
+>         # Numeric detection
+>         num = pd.to_numeric(head, errors='coerce')
+otna().any() else 0.0
+            df[c] = df[c].fillna(med)
+            impute_details['numeric'][c] = {'strategy': 'median', 'value': med}
+        # Impute categoricals >         num_ratio = num.notna().mean() if len(head) else 0.0
+>         if num_ratio >= 0.8:
+>             return 'numeric'
+>         # Date detection: try two strategies
+>         def date_ratio(s: pd.Series) -> float:
+>             dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+'').sum())
+            # Treat empty strings as missing
+            df[c] = df[c].replace('', np.nan)
+            df[c] = df[c].fillna('Unknown')
+            impute_details['catego>             return dt.notna().mean()
+>         r1 = date_ratio(head)
+>         if r1 < 0.8:
+>             # Try dayfirst as alternative patterns
+ missing_before}
+        if num_cols or cat_cols:
+            self._log(>             dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+>             r2 = dt.notna().mean()
+>         else:
+>             r2 = r1
+>         if max(r1, r2) >= 0.6:
+>             return 'date'
+ num_cols:
+            clipped, info = self.outlier_truncate(df[c])
+            df[c] = cli>         return 'categorical'
+>
+>     def date_parser(self, series: pd.Series) -> pd.Series:
+>         # Parse a wide range of formats and return ISO date strings
+>         dt = pd.to_datetime(series, errors='coerce', infer_datetime_format=True)
+>         # Second pass: try dayfirst where first pass failed
+>         mask = dt.isna() & series.notna()
+>         if mask.any():
+>             dt2 = pd.to_datetime(series[mask], errors='coerce', dayfirst=True, infer_datetime_format=True)
+>             dt.loc[mask] = dt2
+>         # Format to YYYY-MM-
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+s, 'files', None):
+>         output = args.output
+>         log = args.log
+>         ing.file_processor(output, log, args.files)
+>         print(json.dumps({'output': output, 'log': log}, indent=2))
+>         return 0
+>
+>     parser.print_help()
+>     return 0
+>
+>
+> if __name__ == '__main__':
+>     sys.exit(main())
+> PY
+root@1b998c08ea2f:/app# cat > solution/solve.sh << 'SH'
+> #!/usr/bin/env bash
+> # Shell interface wrapping CSVIngester.py
+>
+> SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+> PYTHON="python3"
+> PY="$SCRIPT_DIR/CSVIngester.py"
+>
+> encoding-detection() {
+>   local file="$1"
+>   "$PYTHON" "$PY" encoding-detection --file "$file"
+> }
+>
+> name-standardization() {
+>   local name="$1"
+>   "$PYTHON" "$PY" name-standardization --name "$name"
+> }
+>
+> type-detection() {
+>   local file="$1" col="$2"
+>   "$PYTHON" "$PY" type-detection --file "$file" --column "$col"
+> }
+>
+> date-parsing() {
+>   local file="$1" col="$2"
+>   "$PYTHON" "$PY" date-parsing --file "$file" --column "$col"
+> }
+>
+> outlier-truncate() {
+>   local file="$1" col="$2"
+>   "$PYTHON" "$PY" outlier-truncate --file "$file" --column "$col"
+> }
+>
+> dataframe-cleaning() {
+>   local file="$1" out="$2"
+>   if [[ -n "$out" ]]; then
+>     "$PYTHON" "$PY" dataframe-cleaning --file "$file" --output "$out"
+>   else
+>     "$PYTHON" "$PY" dataframe-cleaning --file "$file"
+>   fi
+> }
+>
+> dataframe-consolidation() {
+>   local out="$1"; shift
+>   "$PYTHON" "$PY" dataframe-consolidation --output "$out" "$@"
+> }
+>
+> file-processing() {
+>   local out="$1" log="$2"; shift 2
+>   "$PYTHON" "$PY" file-processing --output "$out" --log "$log" "$@"
+> }
+>
+> cleaning-log() {
+>   local log="$1"
+>   "$PYTHON" "$PY" cleaning-log --log "$log"
+> }
+>
+> csv-summary() {
+>   local file="$1"
+>   "$PYTHON" "$PY" csv-summary --file "$file"
+> }
+>
+> get-operations() {
+>   local log="$1"
+>   "$PYTHON" "$PY" get-operations --log "$log"
+> }
+>
+> SH
+root@1b998c08ea2f:/app# chmod +x solution/CSVIngester.py solution/solve.sh
+root@1b998c08ea2f:/app# python3 -m pip install --no-cache-dir pandas==2.3.3 numpy==2.0.2 pytest==8.4.1 >/dev/null 2>&1 || true
+root@1b998c08ea2f:/app# python3 solution/CSVIngester.py --help | head -n 30
+usage: CSVIngester.py [-h] [-o OUTPUT] [-l LOG]
+                      {encoding-detection,name-standardization,type-detection,date-parsing,outlier-truncate,dataframe-cleaning,dataframe-consolidation,file-proc
+essing,cleaning-log,csv-summary,get-operations}
+                      ... [files ...]
+
+CSV Ingester and Cleaner
+
+positional arguments:
+  {encoding-detection,name-standardization,type-detection,date-parsing,outlier-truncate,dataframe-cleaning,dataframe-consolidation,file-processing,cleaning-log,
+csv-summary,get-operations}
+    encoding-detection  Detect file encoding
+    name-standardization
+                        Standardize column name
+    type-detection      Detect column type
+    date-parsing        Parse dates in a column to ISO
+    outlier-truncate    Clip numeric outliers at 1st/99th percentiles
+    dataframe-cleaning  Clean a single CSV file
+    dataframe-consolidation
+                        Consolidate multiple CSV files
+    file-processing     Full pipeline: consolidated cleaned CSV and log
+    cleaning-log        Print cleaning log JSON
+    csv-summary         Get CSV summary
+    get-operations      Get operations list from a log
+  files                 Input CSV files
+
+options:
+  -h, --help            show this help message and exit
+  -o OUTPUT, --output OUTPUT
+                        Output CSV path
+  -l LOG, --log LOG     Log JSON path
+root@1b998c08ea2f:/app# source solution/solve.sh
+root@1b998c08ea2f:/app# csv-summary "src/sample1_data.csv"
+{
+  "file": "src/sample1_data.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "order_id",
+    "customer_name",
+    "order_date",
+    "product_price",
+    "quantity",
+    "total_amount",
+    "ship_date",
+    "status"
+  ],
+  "missing_values": {
+    "order_id": 0,
+    "customer_name": 3,
+    "order_date": 0,
+    "product_price": 1,
+    "quantity": 0,
+    "total_amount": 0,
+    "ship_date": 4,
+    "status": 6
+  }
+}
+root@1b998c08ea2f:/app# file-processing "tests/cleaned_data.csv" "tests/cleaning_log.json" src/sample1_data.csv src/sample2_data.csv
+{
+  "output": "tests/cleaned_data.csv",
+  "log": "tests/cleaning_log.json"
+}
+root@1b998c08ea2f:/app# ls -la tests
+total 20
+drwxr-xr-x 2 root root 4096 Jan 19 16:46 .
+drwxr-xr-x 1 root root 4096 Jan 19 16:46 ..
+-rw-r--r-- 1 root root    1 Jan 19 16:46 cleaned_data.csv
+-rw-r--r-- 1 root root  275 Jan 19 16:46 cleaning_log.json
+-rw-r--r-- 1 root root  230 Jan 19 16:46 final_log.json
+root@1b998c08ea2f:/app# cleaning-log "tests/cleaning_log.json" | head -n 40
+{
+  "timestamp": "2026-01-19T16:46:56.386460",
+  "operations": [
+    {
+      "operation": "export_csv",
+      "details": {
+        "output": "tests/cleaned_data.csv",
+        "rows": 0,
+        "columns": 0
+      },
+      "timestamp": "2026-01-19T16:46:56.386447"
+    }
+  ]
+}
+root@1b998c08ea2f:/app#

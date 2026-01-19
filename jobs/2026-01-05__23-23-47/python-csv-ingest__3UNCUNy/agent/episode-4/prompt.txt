@@ -1,0 +1,301 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@748a2d3420c1:/app# cat > solution/CSVIngester.py << 'ENDOFFILE'
+> #!/usr/bin/env python3
+> """
+> CSV Ingester - A Python CLI for cleaning and consolidating CSV files
+> Handles inconsistent schemas, encodings, date formats, missing values, and outliers
+> """
+>
+> import pandas as pd
+> import numpy as np
+f parsing fails
+
+    def outlier_truncate(self, df: pd.DataFrame, column_name: str) -> Dict[str, Any]:
+        """Clip values at 1st/99th percentiles and return statistics"""
+        if column_name not in df.columns:
+   > import json
+> import argparse
+> import re
+> from datetime import datetime
+> from pathlib import Path
+> from typing import List, Dict, Any, Optional, Tuple
+> import sys
+>
+>
+> class CSVIngester:
+>     """Main class for CSV ingestion, cleaning, and consolidation"""
+n()
+        original_max =>
+>     def __init__(self):
+>         self.operations_log = []
+>
+>     def encode_process(self, filepath: str) -> Optional[str]:
+>         """Auto-detect file encoding (UTF-8, Latin-1)"""
+>         encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+>
+>         if not Path(filepath).exists():
+>             return None
+>
+>         for encoding in encodings:
+>             try:
+>                 with open(filepath, 'r', encoding=encoding) as f:
+>                     f.read()
+>                 return encoding
+: float(original_max) if not pd.isna(original_max) else None,
+            'clipped_min': float(clipped.min()) if not pd.isna(>             except (UnicodeDecodeError, UnicodeError):
+l>                 continue
+>         return 'utf-8'  # default fallback
+>
+>     def standardize_column_name(self, column_name: str) -> str:
+pd.isna(clipped.max()) else None
+        }
+
+    def logging_process(self, operation: str, details: Dict[str>         """Convert column names to snake_case"""
+>         # Remove special characters except spaces and underscores
+>         cleaned = re.sub(r'[^a-zA-Z0-9\s_]', '', column_name)
+>         # Replace spaces with underscores
+>         cleaned = re.sub(r'\s+', '_', cleaned)
+>         # Convert to lowercase
+>         cleaned = cleaned.lower()
+>         # Remove multiple consecutive underscores
+>         cleaned = re.sub(r'_+', '_', cleaned)
+>         # Remove leading/trailing underscores
+>         cleaned = cleaned.strip('_')
+>         return cleaned
+>
+>     def detect_column_type(self, df: pd.DataFrame, column_name: str) -> str:
+ filepath
+
+      >         """Identify column type: numeric, date, or categorical"""
+>         if column_name not in df.columns:
+>             return 'unknown'
+>
+>         col = df[column_name].dropna()
+>
+>         if len(col) == 0:
+>             return 'categorical'
+>
+rocess(>         # Try numeric
+>         try:
+>             pd.to_numeric(col, errors='raise')
+>             return 'numeric'
+>         except (ValueError, TypeError):
+>             pass
+>
+>         # Try date
+>         date_patterns = [
+    'rows': original_rows,
+            'columns': original_cols
+        })
+
+        # Standardize column names
+        column_mappings = {}
+        new_colu>             r'\d{4}-\d{2}-\d{2}',  # 2025-01-01
+>             r'\d{2}/\d{2}/\d{4}',  # 01/15/2025
+>             r'\d{2}-\d{2}-\d{4}',  # 15-01-2025
+>             r'[A-Za-z]{3}\s+\d{1,2}\s+\d{4}',  # Jan 15 2025
+>         ]
+>
+>         date_count = 0
+>         for val in col.astype(str).head(10):
+>             for pattern in date_patterns:
+>                 if re.search(pattern, val):
+>                     date_count += 1
+>                     break
+>
+>         if date_count >= len(col.head(10)) * 0.5:
+>             return 'date'
+>
+>         return 'categorical'
+>
+>     def date_parser(self, date_str: Any) -> Optional[str]:
+>         """Convert various date formats to ISO-8601 (YYYY-MM-DD)"""
+>         if pd.isna(date_str) or date_str == '':
+>             return None
+>
+>         date_str = str(date_str).strip()
+>
+>         # Date format patterns
+>         formats = [
+>             '%Y-%m-%d',          # 2025-01-01
+>             '%Y/%m/%d',          # 2025/01/15
+>             '%Y.%m.%d',          # 2025.01.20
+>             '%m/%d/%Y',          # 01/15/2025
+>             '%d/%m/%Y',          # 15/01/2025
+>             '%m-%d-%Y',          # 01-15-2025
+>             '%d-%m-%Y',          # 15-01-2025
+>             '%d.%m.%Y',          # 15.01.2025
+>             '%b %d %Y',          # Jan 15 2025
+>             '%d %b %Y',          # 15 Jan 2025
+>             '%B %d %Y',          # January 15 2025
+>             '%d %B %Y',          # 15 January 2025
+>             '%b %d, %Y',         # Jan 15, 2025
+>             '%B %d, %Y',         # January 15, 2025
+>         ]
+>
+>         for fmt in formats:
+>             try:
+>                 dt = datetime.strptime(date_str, fmt)
+>                 return dt.strftime('%Y-%m-%d')
+>             except ValueError:
+>                 continue
+>
+>         return date_str  # Return original if parsing fails
+>
+>     def outlier_truncate(self, df: pd.Data
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+pFormatter
+    )
+
+    parser.add_argument>                             'statistics': outlier_stats
+>                         })
+>
+>             elif col_type == 'date':
+>                 # Parse dates
+>                 original_format_sample = df[col].dropna().head(1).tolist()
+>                 df[col] = df[col].apply(self.date_parser)
+>
+log',
+        def>                 self.logging_process('parse_dates', {
+>                     'source': source_name,
+>                     'column': col,
+>                     'original_format_sample': original_format_sample,
+>                     'target_format': 'ISO-8601 (YYYY-MM-DD)'
+>                 })
+>
+>             elif col_type == 'categorical':
+>                 # Impute missing values with 'Unknown'
+>                 if df[col].isna().any() or (df[col] == '').any():
+>                     missing_count = df[col].isna().sum() + (df[col] == '').sum()
+>                     df[col].fillna('Unknown', inplace=True)
+>                     df[col] = df[col].replace('', 'Unknown')
+>
+>                     self.logging_process('impute_missing', {
+>                         'source': source_name,
+>                         'column': col,
+>                         'type': 'categorical',
+>                         'method': 'constant',
+>                         'value': 'Unknown',
+>                         'count': int(missing_count)
+>                     })
+>
+>         return df
+>
+>     def consolidated_cleaned_dataframes(self, dataframes: List[Tuple[pd.DataFrame, str]]) -> pd.DataFrame:
+>         """Merge multiple cleaned DataFrames"""
+>         if not dataframes:
+>             return pd.DataFrame()
+>
+>         # Concatenate all dataframes
+>         dfs = [df for df, _ in dataframes]
+>         consolidated = pd.concat(dfs, ignore_index=True, sort=False)
+>
+>         sources = [source for _, source in dataframes]
+>         total_rows = sum(len(df) for df in dfs)
+>
+>         self.logging_process('consolidate', {
+>             'sources': sources,
+>             'total_rows': total_rows,
+>             'total_columns': len(consolidated.columns)
+>         })
+>
+>         return consolidated
+>
+>     def file_processor(self, input_files: List[str], output_file: str, log_file: str):
+>         """Full pipeline: load, clean, consolidate, and save"""
+>         self.operations_log = []  # Reset log
+>
+>         self.logging_process('start_pipeline', {
+>             'input_files': input_files,
+>             'output_file': output_file,
+>             'log_file': log_file
+>         })
+>
+>         # Process each file
+>         processed_dfs = []
+>         for filepath in input_files:
+>             try:
+>                 df = self.processed_dataframe(filepath)
+>                 processed_dfs.append((df, filepath))
+>             except Exception as e:
+>                 self.logging_process('error', {
+>                     'source': filepath,
+>                     'error': str(e)
+>                 })
+>                 print(f"Error processing {filepath}: {e}", file=sys.stderr)
+>
+>         # Consolidate
+>         if processed_dfs:
+>             consolidated = self.consolidated_cleaned_dataframes(processed_dfs)
+>
+>             # Save output
+>             consolidated.to_csv(output_file, index=False)
+>
+>             self.logging_process('save_output', {
+>                 'output_file': output_file,
+>                 'rows': len(consolidated),
+>                 'columns': len(consolidated.columns)
+>             })
+>
+>         # Save log
+>         log_data = {
+>             'timestamp': datetime.now().isoformat(),
+>             'operations': self.operations_log
+>         }
+>
+>         with open(log_file, 'w') as f:
+>             json.dump(log_data, f, indent=2)
+>
+>         self.logging_process('complete_pipeline', {
+>             'log_file': log_file
+>         })
+>
+>         return consolidated if processed_dfs else pd.DataFrame()
+>
+>
+> def main():
+>     """Main CLI entry point"""
+>     parser = argparse.ArgumentParser(
+>         description='CSV Ingester - Clean and consolidate CSV files',
+>         formatter_class=argparse.RawDescriptionHelpFormatter
+>     )
+>
+>     parser.add_argument(
+>         'input_files',
+>         nargs='+',
+>         help='Input CSV files to process'
+>     )
+>
+>     parser.add_argument(
+>         '-o', '--output',
+>         default='cleaned_data.csv',
+>         help='Output CSV file (default: cleaned_data.csv)'
+>     )
+>
+>     parser.add_argument(
+>         '-l', '--log',
+>         default='cleaning_log.json',
+>         help='Output log file (default: cleaning_log.json)'
+>     )
+>
+>     args = parser.parse_args()
+>
+>     # Process files
+>     ingester = CSVIngester()
+>     ingester.file_processor(args.input_files, args.output, args.log)
+>
+>     print(f"Processing complete!")
+>     print(f"Output: {args.output}")
+>     print(f"Log: {args.log}")
+>
+>
+> if __name__ == '__main__':
+>     main()
+> ENDOFFILE
+root@748a2d3420c1:/app# chmod +x solution/CSVIngester.py
+root@748a2d3420c1:/app#

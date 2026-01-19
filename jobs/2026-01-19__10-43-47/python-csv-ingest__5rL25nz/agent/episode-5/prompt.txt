@@ -1,0 +1,129 @@
+New Terminal Output:
+
+root@1b998c08ea2f:/app# python3 - << 'PY'
+> import importlib.util, sys
+> spec = importlib.util.spec_from_file_location('csving', 'solution/CSVIngester.py')
+> mod = importlib.util.module_from_spec(spec)
+> spec.loader.exec_module(mod)
+> ing = mod.CSVIngester()
+> df = ing.consolidated_cleaned_dataframes(['src/sample1_data.csv','src/sample2_data.csv'])
+> print('combined_shape:', df.shape)
+> print('columns:', list(df.columns))
+> print('rows_head:', df.head(3).to_dict(orient='records'))
+> PY
+/app/solution/CSVIngester.py:67: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+/app/solution/CSVIngester.py:67: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+/app/solution/CSVIngester.py:71: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+/app/solution/CSVIngester.py:71: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+/app/solution/CSVIngester.py:67: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+/app/solution/CSVIngester.py:67: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+/app/solution/CSVIngester.py:71: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+/app/solution/CSVIngester.py:71: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+/app/solution/CSVIngester.py:67: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+/app/solution/CSVIngester.py:71: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+/app/solution/CSVIngester.py:67: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+/app/solution/CSVIngester.py:71: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+/app/solution/CSVIngester.py:67: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argu
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+tomer_name', 'order_date', 'product_price', 'quantity', 'total_amount', 'ship_date', 'status', 'sku', 'product_name', 'stock_qty', 'un
+it_cost', 'last_restock', 'supplier', 'category_type']
+rows_head: [{'order_id': 'ORD1000', 'customer_name': 'Unknown', 'order_date': '01-10-2023', 'product_price': 264.3134984759545, 'quantity': 7.0, 'total_amount':
+ 1850.194489331681, 'ship_date': '09-10-2023', 'status': 'Unknown', 'sku': nan, 'product_name': nan, 'stock_qty': nan, 'unit_cost': nan, 'last_restock': nan, 's
+upplier': nan, 'category_type': nan}, {'order_id': 'ORD1001', 'customer_name': 'Unknown', 'order_date': '2023-04-02', 'product_price': 171.54224088174146, 'quan
+tity': 17.0, 'total_amount': 2916.2180949896047, 'ship_date': 'Unknown', 'status': 'Shipped', 'sku': nan, 'product_name': nan, 'stock_qty': nan, 'unit_cost': na
+n, 'last_restock': nan, 'supplier': nan, 'category_type': nan}, {'order_id': 'ORD1002', 'customer_name': 'Bob Johnson', 'order_date': '05.12.2023', 'product_pri
+ce': 171.54224088174146, 'quantity': 17.0, 'total_amount': 3317.4124189023737, 'ship_date': '2023-12-11', 'status': 'Unknown', 'sku': nan, 'product_name': nan,
+'stock_qty': nan, 'unit_cost': nan, 'last_restock': nan, 'supplier': nan, 'category_type': nan}]
+root@1b998c08ea2f:/app# applypatch << 'PATCH'
+> *** Begin Patch
+> *** Update File: solution/CSVIngester.py
+> @@
+> -def main(argv=None):
+> -    argv = argv if argv is not None else sys.argv[1:]
+> -    parser = _build_parser()
+> -    args = parser.parse_args(argv)
+> +def main(argv=None):
+> +    argv = argv if argv is not None else sys.argv[1:]
+> +    # Support two modes:
+> +    # 1) Subcommand mode: first token is a known subcommand
+> +    # 2) Files-first mode: first token is not a subcommand, treat positional args as files
+> +    parser = _build_parser()
+> +    cmds = {
+> +        'encoding-detection','name-standardization','type-detection','date-parsing',
+> +        'outlier-truncate','dataframe-cleaning','dataframe-consolidation','file-processing',
+> +        'cleaning-log','csv-summary','get-operations'
+> +    }
+> +    if argv and (argv[0] not in cmds) and (not argv[0].startswith('-')):
+> +        # Files-first mode: parse only global options (-o/-l) and collect files from argv
+> +        # Simple manual parse for -o/-l anywhere in argv
+> +        files = [x for x in argv if not x.startswith('-')]
+> +        out = 'tests/cleaned_data.csv'
+> +        log = 'tests/cleaning_log.json'
+> +        # scan for -o/--output and -l/--log values
+> +        for i, tok in enumerate(argv):
+> +            if tok in ('-o','--output') and i+1 < len(argv):
+> +                out = argv[i+1]
+> +            if tok in ('-l','--log') and i+1 < len(argv):
+> +                log = argv[i+1]
+> +        ing = CSVIngester()
+> +        ing.file_processor(out, log, files)
+> +        print(json.dumps({'output': out, 'log': log}, indent=2))
+> +        return 0
+> +    # Otherwise, subcommand mode
+> +    args = parser.parse_args(argv)
+> *** End Patch
+> PATCH
+bash: applypatch: command not found
+root@1b998c08ea2f:/app# chmod +x solution/CSVIngester.py
+root@1b998c08ea2f:/app# python3 solution/CSVIngester.py src/sample1_data.csv src/sample2_data.csv -o tests/cleaned_default.csv -l tests/log_default.json
+usage: CSVIngester.py [-h] [-o OUTPUT] [-l LOG]
+                      {encoding-detection,name-standardization,type-detection,date-parsing,outlier-truncate,dataframe-cleaning,dataframe-consolidation,file-proc
+essing,cleaning-log,csv-summary,get-operations}
+                      ... [files ...]
+CSVIngester.py: error: argument cmd: invalid choice: 'src/sample1_data.csv' (choose from 'encoding-detection', 'name-standardization', 'type-detection', 'date-p
+arsing', 'outlier-truncate', 'dataframe-cleaning', 'dataframe-consolidation', 'file-processing', 'cleaning-log', 'csv-summary', 'get-operations')
+root@1b998c08ea2f:/app# wc -l tests/cleaned_default.csv; head -n 10 tests/cleaned_default.csv
+wc: tests/cleaned_default.csv: No such file or directory
+head: cannot open 'tests/cleaned_default.csv' for reading: No such file or directory
+root@1b998c08ea2f:/app# python3 solution/CSVIngester.py dataframe-consolidation --output tests/cons2.csv src/sample1_data.csv src/sample2_data.csv
+tests/cons2.csv
+root@1b998c08ea2f:/app# wc -l tests/cons2.csv; head -n 10 tests/cons2.csv
+1 tests/cons2.csv
+
+root@1b998c08ea2f:/app# python3 solution/CSVIngester.py cleaning-log --log tests/log_default.json | sed -n '1,200p'
+Traceback (most recent call last):
+  File "/app/solution/CSVIngester.py", line 353, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/app/solution/CSVIngester.py", line 330, in main
+    print(json.dumps(ing.get_operations_log(args.log), indent=2))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/solution/CSVIngester.py", line 181, in get_operations_log
+    raise FileNotFoundError(f"Log file not found: {log_file}")
+FileNotFoundError: Log file not found: tests/log_default.json
+root@1b998c08ea2f:/app#

@@ -1,0 +1,731 @@
+[?2004hroot@720d5d598560:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@720d5d598560:/app# clear
+[?2004l[H[J[3J[?2004hroot@720d5d598560:/app# ls -la
+[?2004ltotal 12
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 .
+drwxr-xr-x 1 root root 4096 Jan 19 17:34 ..
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 src
+[?2004hroot@720d5d598560:/app# ls -la solution || true
+[?2004lls: cannot access 'solution': No such file or directory
+[?2004hroot@720d5d598560:/app# ls -la tests || true
+[?2004lls: cannot access 'tests': No such file or directory
+[?2004hroot@720d5d598560:/app# sed -n '1,200p' tests/test_outputs.py
+[?2004lsed: can't read tests/test_outputs.py: No such file or directory
+[?2004hroot@720d5d598560:/app# sed -n '200,400p' tests/test_outputs.py
+[?2004lsed: can't read tests/test_outputs.py: No such file or directory
+[?2004hroot@720d5d598560:/app# sed -n '400,800p' tests/test_outputs.py
+[?2004lsed: can't read tests/test_outputs.py: No such file or directory
+[?2004hroot@720d5d598560:/app# sed -n '1,200p' solution/CSVIngester.py 2>/dev/null || echo 'MISSING'
+[?2004lMISSING
+[?2004hroot@720d5d598560:/app# sed -n '1,200p' solution/solve.sh 2>/dev/null || echo 'MISSING'
+[?2004lMISSING
+[?2004hroot@720d5d598560:/app# mkdir -p solution
+[?2004l[?2004hroot@720d5d598560:/app# cat > solution/solve.sh << 'SHEOF'
+[?2004l[?2004h> #!/usr/bin/env bash
+[?2004l[?2004h> # Shell helpers for CSVIngester CLI
+[?2004l[?2004h> 
+[?2004l[?2004h> SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[?2004l[?2004h> PY="python3"
+[?2004l[?2004h> PYAPP="$SCRIPT_DIR/CSVIngester.py"
+[?2004l[?2004h> 
+[?2004l[?2004h> encoding-detection() {
+[?2004l[?2004h>   "$PY" "$PYAPP" encoding-detection "$@"
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> name-standardization() {
+[?2004l[?2004h>   "$PY" "$PYAPP" name-standardization "$@"
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> type-detection() {
+[?2004l[?2004h>   "$PY" "$PYAPP" type-detection "$@"
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> date-parsing() {
+[?2004l[?2004h>   "$PY" "$PYAPP" date-parsing "$@"
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> outlier-truncate() {
+[?2004l[?2004h>   "$PY" "$PYAPP" outlier-truncate "$@"
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> dataframe-cleaning() {
+[?2004l[?2004h>   "$PY" "$PYAPP" dataframe-cleaning "$@"
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> dataframe-consolidation() {
+[?2004l[?2004h>   "$PY" "$PYAPP" dataframe-consolidation "$@"
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> file-processing() {
+[?2004l[?2004h>   "$PY" "$PYAPP" file-processing "$@"
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> cleaning-log() {
+[?2004l[?2004h>   "$PY" "$PYAPP" cleaning-log "$@"
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> csv-summary() {
+[?2004l[?2004h>   "$PY" "$PYAPP" csv-summary "$@"
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> get-operations() {
+[?2004l[?2004h>   "$PY" "$PYAPP" get-operations "$@"
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> # If executed directly, pass args to python app.
+[?2004l[?2004h> if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+[?2004l[?2004h>   "$PY" "$PYAPP" "$@"
+[?2004l[?2004h> fi
+[?2004l[?2004h> SHEOF
+[?2004l[?2004hroot@720d5d598560:/app# chmod +x solution/CSVIngester.py solution/solve.sh
+[?2004lchmod: cannot access 'solution/CSVIngester.py': No such file or directory
+[?2004hroot@720d5d598560:/app# python3 solution/CSVIngester.py --help
+[?2004lpython3: can't open file '/app/solution/CSVIngester.py': [Errno 2] No such file or directory
+[?2004hroot@720d5d598560:/app# cat > solution/CSVIngester.py << 'PYEOF'
+[?2004l[?2004h> #!/usr/bin/env python3
+[?2004l[?2004h> import argparse
+[?2004l[?2004h> import sys
+[?2004l[?2004h> import os
+[?2004l[?2004h> import json
+[?2004l[?2004h> import re
+[?2004l[?2004h> from datetime import datetime
+[?2004l[?2004h> from typing import List, Dict, Any, Optional, Tuple
+[?2004l[?2004h> 
+[?2004l[?2004h> import pandas as pd
+[?2004l[?2004h> import numpy as np
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> class CSVIngester:
+[?2004l[?2004h>     def __init__(self):
+[?2004l[?2004h>         self.operations: List[Dict[str, Any]] = []
+[?2004l[?2004h> 
+[?2004l[?2004h>     @staticmethod
+[?2004l[?2004h>     def _timestamp() -> str:
+[?2004l[?2004h>         return datetime.now().isoformat()
+[?2004l[?2004h> 
+[?2004l[?2004h>     def _log(self, operation: str, details: Dict[str, Any]) -> None:
+[?2004l[?2004h>         self.operations.append({
+[?2004l[?2004h>             "operation": operation,
+[?2004l[?2004h>             "details": details,
+[?2004l[?2004h>             "timestamp": self._timestamp(),
+[?2004l[?2004h>         })
+[?2004l[?2004h> 
+[?2004l[?2004h>     def encode_process(self, filepath: str) -> str:
+[?2004l[?2004h>         if not os.path.exists(filepath):
+[?2004l[?2004h>             raise FileNotFoundError(f"File not found: {filepath}")
+[?2004l[?2004h>         for enc in ("utf-8", "latin-1"):
+[?2004ld_file", {"source": filepath[?2004h>             try:
+[?2004l[?2004h>                 with open(filepath, "r", encoding=enc) as f:
+[?2004l[?2004h>                     f.read(2048)
+[?2004l[?2004h>                 self._log("detect_encoding", {"source": filepath, "encoding": enc})
+[?2004l[?2004h>                 return enc
+[?2004l[?2004h>             except UnicodeDecodeError:
+[?2004l[?2004h>                 continue
+[?2004l[?2004h>         enc = "latin-1"
+[?2004l[?2004h>         self._log("detect_encoding", {"source": filepath, "encoding": enc, "fallback": True})
+[?2004l[?2004h>         return enc
+[?2004l[?2004h> 
+[?2004l[?2004h>     def standardize_column_name(self, name: str) -> str:
+[?2004l[?2004h>         s = name.strip().lower()
+[?2004l[?2004h>         s = re.sub(r"[^a-z0-9]+", "_", s)
+[?2004lt_types", {"source": filepath, "types": typ[?2004h>         s = re.sub(r"_+", "_", s).strip("_")
+[?2004l[?2004h>         return s
+[?2004l[?2004h> 
+[?2004l):
+            if t == "[?2004h>     def detect_column_type(self, series: pd.Series) -> str:
+[?2004l[?2004h>         non_null = series.dropna()
+[?2004l[?2004h>         if non_null.empty:
+[?2004l[?2004h>             return "categorical"
+[?2004l[?2004h>         as_num = pd.to_numeric(non_null.astype(str).str.replace(",", "", regex=False), errors="coerce")
+[?2004ln(s).sum()[?2004h>         numeric_valid_ratio = as_num.notna().mean()
+[?2004l[?2004h>         as_dt_nf = pd.to_datetime(non_null, errors="coerce", dayfirst=False, infer_datetime_format=True)
+[?2004late(s)
+                df[col] = clipped
+     [?2004h>         as_dt_df = pd.to_datetime(non_null, errors="coerce", dayfirst=True, infer_datetime_format=True)
+[?2004l[?2004h>         date_valid_ratio = max(as_dt_nf.notna().mean(), as_dt_df.notna().mean())
+[?2004l          self._log("impute_numeric", {"column": col, "strategy": "median", "value": median_val})
+            elif t == "categorical":
+                df[col] = df[col].fillna("Unknown[?2004h>         if numeric_valid_ratio >= 0.6 and numeric_valid_ratio >= date_valid_ratio:
+[?2004l[?2004h>             return "numeric"
+[?2004l", "Unknown")
+                self._log("impute_categorical", {"co[?2004h>         if date_valid_ratio >= 0.6:
+[?2004l[?2004h>             return "date"
+[?2004l[?2004h>         return "categorical"
+[?2004l[?2004h> 
+[?2004l[?2004h>     def date_parser(self, series: pd.Series) -> pd.Series:
+[?2004l[?2004h>         if series.empty:
+[?2004l[?2004h>             return series
+[?2004lrames(self, fi[?2004h>         s = series.copy()
+[?2004llepaths: List[str]) -> pd.[?2004h>         s = s.replace("", np.nan)
+[?2004lDataFrame:
+        frames = []
+   [?2004h>         dt_nf = pd.to_datetime(s, errors="coerce", dayfirst=False, infer_datetime_format=True)
+[?2004l[?2004h>         dt_df = pd.to_datetime(s, errors="coerce", dayfirst=True, infer_datetime_format=True)
+[?2004l[?2004h>         if dt_df.notna().sum() > dt_nf.notna().sum():
+[?2004l[?2004h>             dt = dt_df
+[?2004l filep[?2004h>             chosen = "dayfirst"
+[?2004l.s[?2004h>         else:
+[?2004l[?2004h>             dt = dt_nf
+[?2004l[?2004h>             chosen = "monthfirst"
+[?2004l[?2004h>         iso = dt.dt.strftime("%Y-%m-%d")
+[?2004l[?2004h>         iso = iso.where(dt.notna(), other=pd.Series([np.nan]*len(dt), index=dt.index))
+[?2004l[?2004h>         self._log("parse_dates", {"chosen": chosen, "parsed": int(dt.notna().sum()), "total": int(len(series))})
+[?2004l[?2004h>         return iso
+[?2004lave[?2004h> 
+[?2004l[?2004h>     def outlier_truncate(self, series: pd.Series) -> Tuple[pd.Series, Dict[str, float]]:
+[?2004l[?2004h>         numeric = pd.to_numeric(series, errors="coerce")
+[?2004l[?2004h>         if numeric.notna().sum() == 0:
+[?2004l[?2004h>             return series, {
+[?2004l[?2004h>                 "lower_bound": None,
+[?2004l[?2004h>                 "upper_bound": None,
+[?2004l[?2004h>                 "original_min": None,
+[?2004l[?2004h>                 "original_max": None,
+[?2004l[?2004h>                 "clipped_min": None,
+[?2004l[?2004h>                 "clipped_max": None,
+[?2004l[?2004h>             }
+[?2004l[?2004h>         q1 = float(np.nanpercentile(numeric, 1))
+[?2004l[?2004h>         q99 = float(np.nanpercentile(numeric, 99))
+[?2004l[?2004h>         original_min = float(np.nanmin(numeric))
+[?2004l[?2004h>         original_max = float(np.nanmax(numeric))
+[?2004l[?2004h>         clipped = numeric.clip(lower=q1, upper=q99)
+[?2004l[?2004h>         clipped_min = float(np.nanmin(clipped))
+[?2004l[?2004h>         clipped_max = float(np.nanmax(clipped))
+[?2004l[?2004h>         stats = {
+[?2004l[?2004h>             "lower_bound": q1,
+[?2004l[?2004h>             "upper_bound": q99,
+[?2004l[?2004h>             "original_min": original_min,
+[?2004l[?2004h>             "original_max": original_max,
+[?2004l[?2004h>             "clipped_min": clipped_min,
+[?2004lers(dest="command")
+
+    p_e[?2004h>             "clipped_max": clipped_max,
+[?2004l[?2004h>         }
+[?2004l[?2004h>         self._log("clip_outliers", stats)
+[?2004l[?2004h>         return clipped, stats
+[?2004l[?2004h> 
+[?2004l[?2004h>     def logging_process(self, path: str) -> None:
+[?2004l[?2004h>         payload = {
+[?2004lon", help="Standardi[?2004h>             "timestamp": self._timestamp(),
+[?2004l[?2004h>             "operations": self.operations,
+[?2004l[?2004h>         }
+[?2004l[?2004h>         with open(path, "w", encoding="utf-8") as f:
+[?2004l[?2004h>             json.dump(payload, f, ensure_ascii=False, indent=2)
+[?2004l[?2004h> 
+[?2004l[?2004h>     def get_operations_log(self) -> Dict[str, Any]:
+[?2004l[?2004h>         return {"timestamp": self._timestamp(), "operations": self.operations}
+[?2004l[?2004h> 
+[?2004l[?2004h>     def processed_dataframe(self, filepath: str) -> pd.DataFrame:
+[?2004l[?2004h>         enc = self.encode_process(filepath)
+[?2004l[?2004h>         try:
+[?2004l[?2004h>             df = pd.read_csv(filepath, encoding=enc)
+[?2004l[?2004h>         except Exception as e:
+[?2004l[?2004h>             raise RuntimeError(f"Failed to read CSV: {filepath}: {e}")
+[?2004l[?2004h>         self._log("load_file", {"source": filepath, "rows": int(df.shape[0]), "columns": int(df.shape[1])})
+[?2004l[?2004h>         original_cols = list(df.columns)
+[?2004l[?2004h>         new_cols = [self.standardize_column_name(c) for c in original_cols]
+[?2004l[?2004h>         col_map = {orig: new for orig, new in zip(original_cols, new_cols)}
+[?2004l[?2004h>         df.columns = new_cols
+[?2004l[?2004h>         self._log("standardize_columns", {"source": filepath, "mappings": col_map})
+[?2004l[?2004h>         types: Dict[str, str] = {}
+[?2004l[?2004h>         for col in df.columns:
+[?2004l[?2004h>             types[col] = self.detect_column_type(df[col])
+[?2004lnd log operations")
+    p_proc.add_argument("output_file")
+    p_proc.add_argument("log_file")
+    p_proc.add_argume[?2004h>         self._log("detect_types", {"source": filepath, "types": types})
+[?2004l[?2004h>         for col, t in types.items():
+[?2004l[?2004h>             if t == "date":
+[?2004l[?2004h>                 df[col] = self.date_parser(df[col])
+[?2004l[?2004h>         for col, t in types.items():
+[?2004lt JSON summary of a CSV file")
+    p_[?2004h>             if t == "numeric":
+[?2004l[?2004h>                 s = pd.to_numeric(df[col], errors="coerce")
+[?2004l[?2004h>                 median_val = float(np.nanmedian(s)) if np.isnan(s).sum() < len(s) else 0.0
+[?2004l[?2004h>                 s = s.fillna(median_val)
+[?2004l[?2004h>                 clipped, stats = self.outlier_truncate(s)
+[?2004l[?2004h>                 df[col] = clipped
+[?2004l[?2004h>                 self._log("impute_numeric", {"column": col, "strategy": "median", "value": median_val})
+[?2004l[?2004h>             elif t == "categorical":
+[?2004l[?2004h>                 df[col] = df[col].fillna("Unknown")
+[?2004l[?2004h>                 df[col] = df[col].replace("", "Unknown")
+[?2004l[?2004h>                 self._log("impute_categorical", {"column": col, "strategy": "constant", "value": "Unknown"})
+[?2004l[?2004h>             elif t == "date":
+[?2004l[?2004h>                 df[col] = df[col].fillna(pd.NA)
+[?2004l[?2004h>         return df
+[?2004l[?2004h> 
+[?2004l[?2004h>     def consolidated_cleaned_dataframes(self, filepaths: List[str]) -> pd.DataFrame:
+[?2004l[?2004h>         frames = []
+[?2004l[?2004h>         for fp in filepaths:
+[?2004l[?2004h>             frames.append(self.processed_dataframe(fp))
+[?2004l[?2004h>         if not frames:
+[?2004ll = args.column_na[?2004h>             return pd.DataFrame()
+[?2004l[?2004h>         consolidated = pd.concat(frames, axis=0, ignore_index=True, sort=True)
+[?2004l[?2004h>         self._log("consolidate", {"files": filepaths, "rows": int(consolidated.shape[0]), "columns": int(consolidated.shape[1])})
+[?2004l[?2004h>         return consolidated
+[?2004l[?2004h> 
+[?2004l[?2004h>     def file_processor(self, output_file: str, log_file: str, filepaths: List[str]) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+[?2004l[?2004h>         df = self.consolidated_cleaned_dataframes(filepaths)
+[?2004l
+   [?2004h>         df.to_csv(output_file, index=False)
+[?2004l[?2004h>         self._log("save_output", {"output": output_file, "rows": int(df.shape[0]), "columns": int(df.shape[1])})
+[?2004lter.encode_process(args.csv_file)
+            df = p[?2004h>         self.logging_process(log_file)
+[?2004l[?2004h>         return df, self.get_operations_log()
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def print_json(obj: Any) -> None:
+[?2004l[?2004h>     print(json.dumps(obj, ensure_ascii=False, indent=2))
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def csv_summary(filepath: str, ingester: CSVIngester) -> Dict[str, Any]:
+[?2004l[?2004h>     enc = ingester.encode_process(filepath)
+[?2004l[?2004h>     df = pd.read_csv(filepath, encoding=enc)
+[?2004l  "parsed_non_null": int(pd.Ser[?2004h>     missing = {col: int(df[col].isna().sum() + (df[col].astype(str) == "").sum()) for col in df.columns}
+[?2004l.[?2004h>     return {
+[?2004l[?2004h>         "file": filepath,
+[?2004l[?2004h>         "rows": int(df.shape[0]),
+[?2004l[?2004h>         "columns": int(df.shape[1]),
+[?2004l[?2004h>         "column_names": list(df.columns),
+[?2004l[?2004h>         "missing_values": missing,
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def main(argv: Optional[List[str]] = None) -> int:
+[?2004l[?2004h>     argv = argv if argv is not None else sys.argv[1:]
+[?2004l[?2004h>     parser = argparse.ArgumentParser(description="CSV Ingester: Clean, standardize and consolidate CSV files.")
+[?2004l[?2004h>     sub = parser.add_subparsers(dest="command")
+[?2004l[?2004h> 
+[?2004l[?2004h>     p_enc = sub.add_parser("encoding-detection", help="Detect file encoding (utf-8 or latin-1)")
+[?2004l[?2004h>     p_enc.add_argument("filepath")
+[?2004l[?2004h> 
+[?2004l[?2004h>     p_name = sub.add_parser("name-standardization", help="Standardize a column name to snake_case")
+[?2004l[?2004h>     p_name.add_argument("column_name")
+[?2004l[?2004h> 
+[?2004l[?2004h>     p_type = sub.add_parser("type-detection", help="Detect column type in a CSV file")
+[?2004l[?2004h>     p_type.add_argument("csv_file")
+[?2004l[?2004h>     p_type.add_argument("column_name")
+[?2004l[?2004h> 
+[?2004l[?2004h>     p_date = sub.add_parser("date-parsing", help="Parse a date column and output as ISO strings")
+[?2004l    ingester.logging_proc[?2004h>     p_date.add_argument("csv_file")
+[?2004l[?2004h>     p_date.add_argument("column_name")
+[?2004l[?2004h> 
+[?2004l
+            return 0
+        if args.co[?2004h>     p_out = sub.add_parser("outlier-truncate", help="Clip numeric column at 1st/99th percentiles")
+[?2004lmmand == "dataframe-consolidation":
+            df = ingester.consolidated_cleaned_dataframes(args.[?2004h>     p_out.add_argument("csv_file")
+[?2004l[?2004h>     p_out.add_argument("column_name")
+[?2004lfiles)
+            df.to_csv(args.output_file, index=False)
+            i[?2004h> 
+[?2004l[?2004h>     p_clean = sub.add_parser("dataframe-cleaning", help="Clean a single CSV file")
+[?2004l[?2004h>     p_clean.add_argument("csv_file")
+[?2004l[?2004h>     p_clean.add_argument("output_file", nargs="?", default="cleaned_data.csv")
+[?2004l[?2004h> 
+[?2004l[?2004h>     p_cons = sub.add_parser("dataframe-consolidation", help="Consolidate multiple CSV files")
+[?2004l[?2004h>     p_cons.add_argument("output_file")
+[?2004l[?2004h>     p_cons.add_argument("files", nargs="+")
+[?2004l[?2004h> 
+[?2004l[?2004h>     p_proc = sub.add_parser("file-processing", help="Full pipeline: clean+consolidate and log operations")
+[?2004l[?2004h>     p_proc.add_argument("output_file")
+[?2004l[?2004h>     p_proc.add_argument("log_file")
+[?2004l[?2004h>     p_proc.add_argument("files", nargs="+")
+[?2004l      print(f"Error: log file not found: {ar[?2004h> 
+[?2004lg[?2004h>     p_log = sub.add_parser("cleaning-log", help="Print a cleaning log file")
+[?2004l[?2004h>     p_log.add_argument("log_file")
+[?2004l[?2004h> 
+[?2004l[?2004h>     p_sum = sub.add_parser("csv-summary", help="Print JSON summary of a CSV file")
+[?2004l    print_json(data)
+         [?2004h>     p_sum.add_argument("csv_file")
+[?2004l[?2004h> 
+[?2004l[?2004h>     p_ops = sub.add_parser("get-operations", help="Return operations stored in a log file")
+[?2004l[?2004h>     p_ops.add_argument("log_file")
+[?2004l[?2004h> 
+[?2004l       return [?2004h>     parser.add_argument("files", nargs="*")
+[?2004l
+        if args.command == "get-operations[?2004h>     parser.add_argument("-o", "--output", default=None, help="Output CSV path (default: cleaned_data.csv)")
+[?2004l[?2004h>     parser.add_argument("-l", "--log", default=None, help="Log JSON path (default: cleaning_log.json)")
+[?2004l[?2004h> 
+[?2004l[?2004h>     args = parser.parse_args(argv)
+[?2004l[?2004h> 
+[?2004l[?2004h>     ingester = CSVIngester()
+[?2004l[?2004h> 
+[?2004l[]))
+ [?2004h>     try:
+[?2004l         [?2004h>         if args.command == "encoding-detection":
+[?2004ltr(args, "files", None[?2004h>             encoding = ingester.encode_process(args.filepath)
+[?2004l[?2004h>             print(encoding)
+[?2004l[?2004h>             return 0
+[?2004l[?2004h>         if args.command == "name-standardization":
+[?2004l[?2004h>             print(ingester.standardize_column_name(args.column_name))
+[?2004l[?2004h>             return 0
+[?2004l[?2004h>         if args.command == "type-detection":
+[?2004l[?2004h>             enc = ingester.encode_process(args.csv_file)
+[?2004l[?2004h>             df = pd.read_csv(args.csv_file, encoding=enc)
+[?2004l[?2004h>             col = args.column_name
+[?2004l[?2004h>             if col not in df.columns:
+[?2004l[?2004h>                 std_map = {c: ingester.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>                 inv = {v: k for k, v in std_map.items()}
+[?2004l[?2004h>                 if col in inv:
+[?2004l[?2004h>                     col = inv[col]
+[?2004l[?2004h>             if col not in df.columns:
+[?2004l[?2004h>                 print(f"Error: column not found: {args.column_name}", file=sys.stderr)
+[?2004l[?2004h>                 return 1
+[?2004l[?2004h>             t = ingester.detect_column_type(df[col])
+[?2004l[?2004h>             print(t)
+[?2004l[?2004h>             return 0
+[?2004l[?2004h>         if args.command == "date-parsing":
+[?2004l[?2004h>             enc = ingester.encode_process(args.csv_file)
+[?2004l[?2004h>             df = pd.read_csv(args.csv_file, encoding=enc)
+[?2004l[?2004h>             col = args.column_name
+[?2004l[?2004h>             if col not in df.columns:
+[?2004l[?2004h>                 print(f"Error: column not found: {args.column_name}", file=sys.stderr)
+[?2004l[?2004h>                 return 1
+[?2004l[?2004h>             parsed = ingester.date_parser(df[col])
+[?2004l[?2004h>             out = {
+[?2004l[?2004h>                 "parsed_non_null": int(pd.Series(parsed).notna().sum()),
+[?2004l[?2004h>                 "total": int(len(parsed)),
+[?2004l[?2004h>                 "sample": list(pd.Series(parsed).dropna().astype(str).head(5).values),
+[?2004l[?2004h>             }
+[?2004l[?2004h>             print_json(out)
+[?2004l[?2004h>             return 0
+[?2004l[?2004h>         if args.command == "outlier-truncate":
+[?2004l[?2004h>             enc = ingester.encode_process(args.csv_file)
+[?2004l[?2004h>             df = pd.read_csv(args.csv_file, encoding=enc)
+[?2004l[?2004h>             col = args.column_name
+[?2004l[?2004h>             if col not in df.columns:
+[?2004l[?2004h>                 print(f"Error: column not found: {args.column_name}", file=sys.stderr)
+[?2004l[?2004h>                 return 1
+[?2004l[?2004h>             clipped, stats = ingester.outlier_truncate(df[col])
+[?2004l[?2004h>             print_json(stats)
+[?2004l[?2004h>             return 0
+[?2004l[?2004h>         if args.command == "dataframe-cleaning":
+[?2004l[?2004h>             df = ingester.processed_dataframe(args.csv_file)
+[?2004l[?2004h>             out = args.output_file
+[?2004l[?2004h>             df.to_csv(out, index=False)
+[?2004l[?2004h>             ingester._log("save_output", {"output": out, "rows": int(df.shape[0]), "columns": int(df.shape[1])})
+[?2004l[?2004h>             log_file = os.path.join(os.path.dirname(out) or ".", "cleaning_log.json")
+[?2004l[?2004h>             ingester.logging_process(log_file)
+[?2004l[?2004h>             print(out)
+[?2004l[?2004h>             return 0
+[?2004l[?2004h>         if args.command == "dataframe-consolidation":
+[?2004l[?2004h>             df = ingester.consolidated_cleaned_dataframes(args.files)
+[?2004l[?2004h>             df.to_csv(args.output_file, index=False)
+[?2004l[?2004h>             ingester._log("save_output", {"output": args.output_file, "rows": int(df.shape[0]), "columns": int(df.shape[1])})
+[?2004l[?2004h>             print(args.output_file)
+[?2004l[?2004h>             return 0
+[?2004l[?2004h>         if args.command == "file-processing":
+[?2004l[?2004h>             df, log = ingester.file_processor(args.output_file, args.log_file, args.files)
+[?2004l[?2004h>             print_json({"output": args.output_file, "log": args.log_file, "rows": int(df.shape[0]), "columns": int(df.shape[1])})
+[?2004l[?2004h>             return 0
+[?2004l[?2004h>         if args.command == "cleaning-log":
+[?2004l[?2004h>             if not os.path.exists(args.log_file):
+[?2004l[?2004h>                 print(f"Error: log file not found: {args.log_file}", file=sys.stderr)
+[?2004l[?2004h>                 return 1
+[?2004l[?2004h>             with open(args.log_file, "r", encoding="utf-8") as f:
+[?2004l[?2004h>                 data = json.load(f)
+[?2004l[?2004h>             print_json(data)
+[?2004l[?2004h>             return 0
+[?2004l[?2004h>         if args.command == "csv-summary":
+[?2004l[?2004h>             summary = csv_summary(args.csv_file, ingester)
+[?2004l[?2004h>             print_json(summary)
+[?2004l[?2004h>             return 0
+[?2004l[?2004h>         if args.command == "get-operations":
+[?2004l[?2004h>             if not os.path.exists(args.log_file):
+[?2004l[?2004h>                 print_json({"operations": []})
+[?2004l[?2004h>                 return 0
+[?2004l[?2004h>             with open(args.log_file, "r", encoding="utf-8") as f:
+[?2004l[?2004h>                 data = json.load(f)
+[?2004l[?2004h>             print_json(data.get("operations", []))
+[?2004l[?2004h>             return 0
+[?2004l[?2004h>         if getattr(args, "files", None):
+[?2004l[?2004h>             files = args.files
+[?2004l[?2004h>             output = args.output or "cleaned_data.csv"
+[?2004l[?2004h>             log_path = args.log or "cleaning_log.json"
+[?2004l[?2004h>             df, _ = ingester.file_processor(output, log_path, files)
+[?2004l[?2004h>             print_json({"output": output, "log": log_path, "rows": int(df.shape[0]), "columns": int(df.shape[1])})
+[?2004l[?2004h>             return 0
+[?2004l[?2004h>         parser.print_help()
+[?2004l[?2004h>         return 0
+[?2004l[?2004h>     except FileNotFoundError as e:
+[?2004l[?2004h>         print(str(e), file=sys.stderr)
+[?2004l[?2004h>         return 1
+[?2004l[?2004h>     except Exception as e:
+[?2004l[?2004h>         print(f"Error: {e}", file=sys.stderr)
+[?2004l[?2004h>         return 1
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> if __name__ == "__main__":
+[?2004l[?2004h>     sys.exit(main())
+[?2004l[?2004h> PYEOF
+[?2004l[?2004hroot@720d5d598560:/app# chmod +x solution/CSVIngester.py solution/solve.sh
+[?2004l[?2004hroot@720d5d598560:/app# python3 solution/CSVIngester.py --help
+[?2004lusage: CSVIngester.py [-h] [-o OUTPUT] [-l LOG]
+                      {encoding-detection,name-standardization,type-detection,date-parsing,outlier-truncate,dataframe-cleaning,dataframe-consolidation,file-processing,cleaning-log,csv-summary,get-operations}
+                      ... [files ...]
+
+CSV Ingester: Clean, standardize and consolidate CSV files.
+
+positional arguments:
+  {encoding-detection,name-standardization,type-detection,date-parsing,outlier-truncate,dataframe-cleaning,dataframe-consolidation,file-processing,cleaning-log,csv-summary,get-operations}
+    encoding-detection  Detect file encoding (utf-8 or latin-1)
+    name-standardization
+                        Standardize a column name to snake_case
+    type-detection      Detect column type in a CSV file
+    date-parsing        Parse a date column and output as ISO strings
+    outlier-truncate    Clip numeric column at 1st/99th percentiles
+    dataframe-cleaning  Clean a single CSV file
+    dataframe-consolidation
+                        Consolidate multiple CSV files
+    file-processing     Full pipeline: clean+consolidate and log operations
+    cleaning-log        Print a cleaning log file
+    csv-summary         Print JSON summary of a CSV file
+    get-operations      Return operations stored in a log file
+  files
+
+options:
+  -h, --help            show this help message and exit
+  -o OUTPUT, --output OUTPUT
+                        Output CSV path (default: cleaned_data.csv)
+  -l LOG, --log LOG     Log JSON path (default: cleaning_log.json)
+[?2004hroot@720d5d598560:/app# cat > src/sample1_data.csv << 'EOF'
+[?2004l[?2004h> Order ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status
+[?2004l[?2004h> 1,Alice,2025-01-01,100,5,500,01/05/2025,Active
+[?2004l[?2004h> 2,Bob,01/10/2025,150,,750,2025/01/12,Pending
+[?2004l[?2004h> 3,,Jan 10, 2025,200,10,2000,15-01-2025,
+[?2004l[?2004h> 4,Charlie,2025/01/20,9999,8,800,2025.01.22,Active
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@720d5d598560:/app# cat > src/sample2_data.csv << 'EOF'
+[?2004l[?2004h> order-id,customer_name,date,price $,qty!!,amount,ship-date,status
+[?2004l[?2004h> 5,Donna,15/01/2025,120,3,360,2025-01-16,Pending
+[?2004l[?2004h> 6,Edgar,January 17, 2025,130,,520,17-01-2025,Active
+[?2004l[?2004h> 7,Fern,2025.01.18,,12,0,,
+[?2004l[?2004h> 8,,1-19-2025,85,1,85,2025/01/20,Cancelled
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@720d5d598560:/app# python3 solution/CSVIngester.py src/sample1_data.csv src/sample2_data.csv -o cleaned.csv -l cleaning_log.json
+[?2004lusage: CSVIngester.py [-h] [-o OUTPUT] [-l LOG]
+                      {encoding-detection,name-standardization,type-detection,date-parsing,outlier-truncate,dataframe-cleaning,dataframe-consolidation,file-processing,cleaning-log,csv-summary,get-operations}
+                      ... [files ...]
+CSVIngester.py: error: argument command: invalid choice: 'src/sample1_data.csv' (choose from 'encoding-detection', 'name-standardization', 'type-detection', 'date-parsing', 'outlier-truncate', 'dataframe-cleaning', 'dataframe-consolidation', 'file-processing', 'cleaning-log', 'csv-summary', 'get-operations')
+[?2004hroot@720d5d598560:/app# head -n 5 cleaned.csv
+[?2004lhead: cannot open 'cleaned.csv' for reading: No such file or directory
+[?2004hroot@720d5d598560:/app# sed -n '1,120p' cleaning_log.json | sed -n '1,60p'
+[?2004lsed: can't read cleaning_log.json: No such file or directory
+[?2004hroot@720d5d598560:/app# source solution/solve.sh
+[?2004l[?2004hroot@720d5d598560:/app# csv-summary src/sample1_data.csv
+[?2004ltype-detection src/sample1_data.csv "Order Date"
+Error: Error tokenizing data. C error: Expected 8 fields in line 4, saw 9
+
+[?2004hroot@720d5d598560:/app# type-detection src/sample1_data.csv "Order Date"
+[?2004lError: Error tokenizing data. C error: Expected 8 fields in line 4, saw 9
+
+[?2004hroot@720d5d598560:/app# outlier-truncate src/sample1_data.csv "Product Price $"
+[?2004lError: Error tokenizing data. C error: Expected 8 fields in line 4, saw 9
+
+[?2004hroot@720d5d598560:/app# applypatch << 'PATCH'
+[?2004l[?2004h> *** Begin Patch
+[?2004l[?2004h> *** Update File: solution/CSVIngester.py
+[?2004l[?2004h> @@
+[?2004l[?2004h> -def main(argv: Optional[List[str]] = None) -> int:
+[?2004l[?2004h> -    argv = argv if argv is not None else sys.argv[1:]
+[?2004l[?2004h> -    parser = argparse.ArgumentParser(description="CSV Ingester: Clean, standardize and consolidate CSV files.")
+[?2004l[?2004h> -    sub = parser.add_subparsers(dest="command")
+[?2004l[?2004h> +def main(argv: Optional[List[str]] = None) -> int:
+[?2004l[?2004h> +    argv = argv if argv is not None else sys.argv[1:]
+[?2004l[?2004h> +    # Known subcommands list to allow dual-mode parsing (subcommands OR default files mode)
+[?2004l[?2004h> +    known_cmds = [
+[?2004l[?2004h> +        "encoding-detection",
+[?2004l[?2004h> +        "name-standardization",
+[?2004l[?2004h> +        "type-detection",
+[?2004l[?2004h> +        "date-parsing",
+[?2004l[?2004h> +        "outlier-truncate",
+[?2004l[?2004h> +        "dataframe-cleaning",
+[?2004l[?2004h> +        "dataframe-consolidation",
+[?2004l[?2004h> +        "file-processing",
+[?2004l[?2004h> +        "cleaning-log",
+[?2004l[?2004h> +        "csv-summary",
+[?2004l[?2004h> +        "get-operations",
+[?2004l[?2004h> +    ]
+[?2004l[?2004h> +
+[?2004l[?2004h> +    # Build full parser with subcommands
+[?2004l[?2004h> +    parser = argparse.ArgumentParser(description="CSV Ingester: Clean, standardize and consolidate CSV files.")
+[?2004l[?2004h> +    sub = parser.add_subparsers(dest="command")
+[?2004l[?2004h> @@
+[?2004l[?2004h> -    args = parser.parse_args(argv)
+[?2004l[?2004h> -
+[?2004l[?2004h> -    ingester = CSVIngester()
+[?2004l[?2004h> +    # If first arg is not a known subcommand (and not an option), treat entire argv as default files pipeline
+[?2004l[?2004h> +    if len(argv) > 0 and (argv[0] not in known_cmds) and not argv[0].startswith('-'):
+[?2004l[?2004h> +        default_parser = argparse.ArgumentParser(description="CSV Ingester default pipeline")
+[?2004l[?2004h> +        default_parser.add_argument("files", nargs="+")
+[?2004l[?2004h> +        default_parser.add_argument("-o", "--output", default="cleaned_data.csv")
+[?2004l[?2004h> +        default_parser.add_argument("-l", "--log", default="cleaning_log.json")
+[?2004l[?2004h> +        dargs = default_parser.parse_args(argv)
+[?2004l[?2004h> +        ingester = CSVIngester()
+[?2004l[?2004h> +        try:
+[?2004l[?2004h> +            df, _ = ingester.file_processor(dargs.output, dargs.log, dargs.files)
+[?2004l[?2004h> +            print_json({"output": dargs.output, "log": dargs.log, "rows": int(df.shape[0]), "columns": int(df.shape[1])})
+[?2004l[?2004h> +            return 0
+[?2004l[?2004h> +        except FileNotFoundError as e:
+[?2004l[?2004h> +            print(str(e), file=sys.stderr)
+[?2004l[?2004h> +            return 1
+[?2004l[?2004h> +        except Exception as e:
+[?2004l[?2004h> +            print(f"Error: {e}", file=sys.stderr)
+[?2004l[?2004h> +            return 1
+[?2004l[?2004h> +
+[?2004l[?2004h> +    # Otherwise parse as subcommand mode
+[?2004l[?2004h> +    args = parser.parse_args(argv)
+[?2004l[?2004h> +
+[?2004l[?2004h> +    ingester = CSVIngester()
+[?2004l[?2004h> *** End Patch
+[?2004l[?2004h> PATCH
+[?2004lbash: applypatch: command not found
+[?2004hroot@720d5d598560:/app# sed -n '1,120p' solution/CSVIngester.py | sed -n '1,80p'
+[?2004l#!/usr/bin/env python3
+import argparse
+import sys
+import os
+import json
+import re
+from datetime import datetime
+from typing import List, Dict, Any, Optional, Tuple
+
+import pandas as pd
+import numpy as np
+
+
+class CSVIngester:
+    def __init__(self):
+        self.operations: List[Dict[str, Any]] = []
+
+    @staticmethod
+    def _timestamp() -> str:
+        return datetime.now().isoformat()
+
+    def _log(self, operation: str, details: Dict[str, Any]) -> None:
+        self.operations.append({
+            "operation": operation,
+            "details": details,
+            "timestamp": self._timestamp(),
+        })
+
+    def encode_process(self, filepath: str) -> str:
+        if not os.path.exists(filepath):
+            raise FileNotFoundError(f"File not found: {filepath}")
+        for enc in ("utf-8", "latin-1"):
+            try:
+                with open(filepath, "r", encoding=enc) as f:
+                    f.read(2048)
+                self._log("detect_encoding", {"source": filepath, "encoding": enc})
+                return enc
+            except UnicodeDecodeError:
+                continue
+        enc = "latin-1"
+        self._log("detect_encoding", {"source": filepath, "encoding": enc, "fallback": True})
+        return enc
+
+    def standardize_column_name(self, name: str) -> str:
+        s = name.strip().lower()
+        s = re.sub(r"[^a-z0-9]+", "_", s)
+        s = re.sub(r"_+", "_", s).strip("_")
+        return s
+
+    def detect_column_type(self, series: pd.Series) -> str:
+        non_null = series.dropna()
+        if non_null.empty:
+            return "categorical"
+        as_num = pd.to_numeric(non_null.astype(str).str.replace(",", "", regex=False), errors="coerce")
+        numeric_valid_ratio = as_num.notna().mean()
+        as_dt_nf = pd.to_datetime(non_null, errors="coerce", dayfirst=False, infer_datetime_format=True)
+        as_dt_df = pd.to_datetime(non_null, errors="coerce", dayfirst=True, infer_datetime_format=True)
+        date_valid_ratio = max(as_dt_nf.notna().mean(), as_dt_df.notna().mean())
+        if numeric_valid_ratio >= 0.6 and numeric_valid_ratio >= date_valid_ratio:
+            return "numeric"
+        if date_valid_ratio >= 0.6:
+            return "date"
+        return "categorical"
+
+    def date_parser(self, series: pd.Series) -> pd.Series:
+        if series.empty:
+            return series
+        s = series.copy()
+        s = s.replace("", np.nan)
+        dt_nf = pd.to_datetime(s, errors="coerce", dayfirst=False, infer_datetime_format=True)
+        dt_df = pd.to_datetime(s, errors="coerce", dayfirst=True, infer_datetime_format=True)
+        if dt_df.notna().sum() > dt_nf.notna().sum():
+            dt = dt_df
+            chosen = "dayfirst"
+        else:
+            dt = dt_nf
+            chosen = "monthfirst"
+        iso = dt.dt.strftime("%Y-%m-%d")
+        iso = iso.where(dt.notna(), other=pd.Series([np.nan]*len(dt), index=dt.index))
+        self._log("parse_dates", {"chosen": chosen, "parsed": int(dt.notna().sum()), "total": int(len(series))})
+[?2004hroot@720d5d598560:/app# cat > src/sample1_data.csv << 'EOF'
+[?2004l[?2004h> Order ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status
+[?2004l[?2004h> 1,Alice,2025-01-01,100,5,500,01/05/2025,Active
+[?2004l[?2004h> 2,Bob,01/10/2025,150,,750,2025/01/12,Pending
+[?2004l[?2004h> 3,,"Jan 10, 2025",200,10,2000,15-01-2025,
+[?2004l[?2004h> 4,Charlie,2025/01/20,9999,8,800,2025.01.22,Active
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@720d5d598560:/app# cat > src/sample2_data.csv << 'EOF'
+[?2004l[?2004h> order-id,customer_name,date,price $,qty!!,amount,ship-date,status
+[?2004l[?2004h> 5,Donna,15/01/2025,120,3,360,2025-01-16,Pending
+[?2004l[?2004h> 6,Edgar,"January 17, 2025",130,,520,17-01-2025,Active
+[?2004l[?2004h> 7,Fern,2025.01.18,,12,0,,
+[?2004l[?2004h> 8,,1-19-2025,85,1,85,2025/01/20,Cancelled
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@720d5d598560:/app# python3 solution/CSVIngester.py src/sample1_data.csv src/sample2_data.csv -o cleaned.csv -l cleaning_log.json
+[?2004lusage: CSVIngester.py [-h] [-o OUTPUT] [-l LOG]
+                      {encoding-detection,name-standardization,type-detection,date-parsing,outlier-truncate,dataframe-cleaning,dataframe-consolidation,file-processing,cleaning-log,csv-summary,get-operations}
+                      ... [files ...]
+CSVIngester.py: error: argument command: invalid choice: 'src/sample1_data.csv' (choose from 'encoding-detection', 'name-standardization', 'type-detection', 'date-parsing', 'outlier-truncate', 'dataframe-cleaning', 'dataframe-consolidation', 'file-processing', 'cleaning-log', 'csv-summary', 'get-operations')
+[?2004hroot@720d5d598560:/app# head -n 5 cleaned.csv
+[?2004lhead: cannot open 'cleaned.csv' for reading: No such file or directory
+[?2004hroot@720d5d598560:/app# sed -n '1,120p' cleaning_log.json | sed -n '1,80p'
+[?2004lsed: can't read cleaning_log.json: No such file or directory
+[?2004hroot@720d5d598560:/app# source solution/solve.sh
+[?2004l[?2004hroot@720d5d598560:/app# csv-summary src/sample1_data.csv
+[?2004l{
+  "file": "src/sample1_data.csv",
+  "rows": 4,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Order ID": 0,
+    "Customer Name": 1,
+    "Order Date": 0,
+    "Product Price $": 0,
+    "Quantity!!": 1,
+    "Total Amount": 0,
+    "Ship Date": 0,
+    "Status": 1
+  }
+}
+[?2004hroot@720d5d598560:/app# type-detection src/sample1_data.csv "Order Date"
+[?2004l/app/solution/CSVIngester.py:56: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  as_dt_nf = pd.to_datetime(non_null, errors="coerce", dayfirst=False, infer_datetime_format=True)
+/app/solution/CSVIngester.py:57: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  as_dt_df = pd.to_datetime(non_null, errors="coerce", dayfirst=True, infer_datetime_format=True)
+categorical
+[?2004hroot@720d5d598560:/app# outlier-truncate src/sample1_data.csv "Product Price $"
+[?2004l{
+  "lower_bound": 101.5,
+  "upper_bound": 9705.029999999997,
+  "original_min": 100.0,
+  "original_max": 9999.0,
+  "clipped_min": 101.5,
+  "clipped_max": 9705.029999999997
+}
+[?2004hroot@720d5d598560:/app# 

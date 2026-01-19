@@ -1,0 +1,686 @@
+Running Oracle Solution
+========================
+1. Detecting encoding...
+utf-8
+
+2. Standardizing column name...
+order_date
+
+3. Detecting column type...
+date
+
+4. Parsing dates...
+["2023-10-01", "2023-02-04", "2023-12-05", "2023-08-29", "2023-09-01", "2023-02-14", "2023-04-20", "2023-11-24", "2023-03-22", "2023-07-25"]
+
+5. Clipping outliers...
+{
+  "lower_bound": 499.44282820755103,
+  "upper_bound": 6875.881001412972,
+  "original_min": 479.3940088979312,
+  "original_max": 7227.817454628305,
+  "clipped_min": 499.44282820755103,
+  "clipped_max": 6875.881001412972
+}
+
+6. Cleaning dataframe...
+{
+  "source_file": "./src/sample1_data.csv",
+  "output_file": "./src/cleaned_sample1.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "order_id",
+    "customer_name",
+    "order_date",
+    "product_price",
+    "quantity",
+    "total_amount",
+    "ship_date",
+    "status"
+  ]
+}
+
+7. Consolidating dataframes...
+{
+  "output_file": "./src/consolidated_output.csv",
+  "input_files_count": 2,
+  "total_rows": 20,
+  "total_columns": 15,
+  "columns": [
+    "Category Type",
+    "Customer Name",
+    "Last Restock",
+    "Order Date",
+    "Order ID",
+    "Product  Name",
+    "Product Price $",
+    "Quantity!!",
+    "SKU#",
+    "Ship Date",
+    "Status",
+    "Supplier",
+    "Total Amount",
+    "Unit Cost ($)",
+    "stock_qty"
+  ]
+}
+
+8. Processing files...
+Processing 2 CSV file(s)...
+  Loading sample1_data.csv...
+  Loading sample2_data.csv...
+Consolidating datasets...
+Writing cleaned data to ./src/final_cleaned_data.csv...
+Writing cleaning log to ./src/final_cleaning_log.json...
+ Completed
+  Processed: 2 file(s)
+  Output rows: 20
+  Output columns: 15
+{
+  "timestamp": "2026-01-19T16:11:36.604573",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T16:11:36.605591"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T16:11:36.605764"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "customer_name",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T16:11:36.606557"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "order_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T16:11:36.607123"
+    },
+    {
+      "operation": "fill_missing_numeric",
+      "details": {
+        "column": "product_price",
+        "fill_value": 171.54224088174146,
+        "missing_count": 1
+      },
+      "timestamp": "2026-01-19T16:11:36.607492"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "product_price",
+        "lower_bound": 68.64064916777441,
+        "upper_bound": 477.36989036333176,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T16:11:36.608297"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "quantity",
+        "lower_bound": 2.45,
+        "upper_bound": 17.0,
+        "values_clipped": 1
+      },
+      "timestamp": "2026-01-19T16:11:36.609135"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "total_amount",
+        "lower_bound": 499.44282820755103,
+        "upper_bound": 6875.881001412972,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T16:11:36.609862"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "ship_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T16:11:36.610268"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "status",
+        "fill_value": "Unknown",
+        "missing_count": 6
+      },
+      "timestamp": "2026-01-19T16:11:36.610500"
+    },
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "src/sample2_data.csv",
+        "rows": 10,
+        "columns": 7
+      },
+      "timestamp": "2026-01-19T16:11:36.610996"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "src/sample2_data.csv",
+        "mappings": {
+          "SKU#": "sku",
+          "Product  Name": "product_name",
+          "stock_qty": "stock_qty",
+          "Unit Cost ($)": "unit_cost",
+          "Last Restock": "last_restock",
+          "Supplier": "supplier",
+          "Category Type": "category_type"
+        }
+      },
+      "timestamp": "2026-01-19T16:11:36.611060"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "stock_qty",
+        "lower_bound": 9.33,
+        "upper_bound": 12715.090000000002,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T16:11:36.612250"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "unit_cost",
+        "lower_bound": 32.3640947273435,
+        "upper_bound": 1985.7700631562775,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T16:11:36.612947"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "last_restock",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T16:11:36.613412"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "supplier",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T16:11:36.613683"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "category_type",
+        "fill_value": "Unknown",
+        "missing_count": 2
+      },
+      "timestamp": "2026-01-19T16:11:36.614000"
+    },
+    {
+      "operation": "consolidate",
+      "details": {
+        "total_dataframes": 2,
+        "total_rows": 20,
+        "total_columns": 15
+      },
+      "timestamp": "2026-01-19T16:11:36.616016"
+    }
+  ]
+}
+
+9. Getting cleaning log...
+{
+  "timestamp": "2026-01-19T16:11:36.604573",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T16:11:36.605591"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T16:11:36.605764"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "customer_name",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T16:11:36.606557"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "order_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T16:11:36.607123"
+    },
+    {
+      "operation": "fill_missing_numeric",
+      "details": {
+        "column": "product_price",
+        "fill_value": 171.54224088174146,
+        "missing_count": 1
+      },
+      "timestamp": "2026-01-19T16:11:36.607492"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "product_price",
+        "lower_bound": 68.64064916777441,
+        "upper_bound": 477.36989036333176,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T16:11:36.608297"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "quantity",
+        "lower_bound": 2.45,
+        "upper_bound": 17.0,
+        "values_clipped": 1
+      },
+      "timestamp": "2026-01-19T16:11:36.609135"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "total_amount",
+        "lower_bound": 499.44282820755103,
+        "upper_bound": 6875.881001412972,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T16:11:36.609862"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "ship_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T16:11:36.610268"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "status",
+        "fill_value": "Unknown",
+        "missing_count": 6
+      },
+      "timestamp": "2026-01-19T16:11:36.610500"
+    },
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "src/sample2_data.csv",
+        "rows": 10,
+        "columns": 7
+      },
+      "timestamp": "2026-01-19T16:11:36.610996"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "src/sample2_data.csv",
+        "mappings": {
+          "SKU#": "sku",
+          "Product  Name": "product_name",
+          "stock_qty": "stock_qty",
+          "Unit Cost ($)": "unit_cost",
+          "Last Restock": "last_restock",
+          "Supplier": "supplier",
+          "Category Type": "category_type"
+        }
+      },
+      "timestamp": "2026-01-19T16:11:36.611060"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "stock_qty",
+        "lower_bound": 9.33,
+        "upper_bound": 12715.090000000002,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T16:11:36.612250"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "unit_cost",
+        "lower_bound": 32.3640947273435,
+        "upper_bound": 1985.7700631562775,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T16:11:36.612947"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "last_restock",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T16:11:36.613412"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "supplier",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T16:11:36.613683"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "category_type",
+        "fill_value": "Unknown",
+        "missing_count": 2
+      },
+      "timestamp": "2026-01-19T16:11:36.614000"
+    },
+    {
+      "operation": "consolidate",
+      "details": {
+        "total_dataframes": 2,
+        "total_rows": 20,
+        "total_columns": 15
+      },
+      "timestamp": "2026-01-19T16:11:36.616016"
+    }
+  ]
+}
+
+10. Getting operations log...
+[
+  {
+    "operation": "load_file",
+    "details": {
+      "source": "src/sample1_data.csv",
+      "rows": 10,
+      "columns": 8
+    },
+    "timestamp": "2026-01-19T16:11:36.605591"
+  },
+  {
+    "operation": "standardize_columns",
+    "details": {
+      "source": "src/sample1_data.csv",
+      "mappings": {
+        "Order ID": "order_id",
+        "Customer Name": "customer_name",
+        "Order Date": "order_date",
+        "Product Price $": "product_price",
+        "Quantity!!": "quantity",
+        "Total Amount": "total_amount",
+        "Ship Date": "ship_date",
+        "Status": "status"
+      }
+    },
+    "timestamp": "2026-01-19T16:11:36.605764"
+  },
+  {
+    "operation": "fill_missing_categorical",
+    "details": {
+      "column": "customer_name",
+      "fill_value": "Unknown",
+      "missing_count": 3
+    },
+    "timestamp": "2026-01-19T16:11:36.606557"
+  },
+  {
+    "operation": "format_dates",
+    "details": {
+      "column": "order_date",
+      "format": "ISO-8601 (YYYY-MM-DD)"
+    },
+    "timestamp": "2026-01-19T16:11:36.607123"
+  },
+  {
+    "operation": "fill_missing_numeric",
+    "details": {
+      "column": "product_price",
+      "fill_value": 171.54224088174146,
+      "missing_count": 1
+    },
+    "timestamp": "2026-01-19T16:11:36.607492"
+  },
+  {
+    "operation": "outlier_truncate",
+    "details": {
+      "column": "product_price",
+      "lower_bound": 68.64064916777441,
+      "upper_bound": 477.36989036333176,
+      "values_clipped": 2
+    },
+    "timestamp": "2026-01-19T16:11:36.608297"
+  },
+  {
+    "operation": "outlier_truncate",
+    "details": {
+      "column": "quantity",
+      "lower_bound": 2.45,
+      "upper_bound": 17.0,
+      "values_clipped": 1
+    },
+    "timestamp": "2026-01-19T16:11:36.609135"
+  },
+  {
+    "operation": "outlier_truncate",
+    "details": {
+      "column": "total_amount",
+      "lower_bound": 499.44282820755103,
+      "upper_bound": 6875.881001412972,
+      "values_clipped": 2
+    },
+    "timestamp": "2026-01-19T16:11:36.609862"
+  },
+  {
+    "operation": "format_dates",
+    "details": {
+      "column": "ship_date",
+      "format": "ISO-8601 (YYYY-MM-DD)"
+    },
+    "timestamp": "2026-01-19T16:11:36.610268"
+  },
+  {
+    "operation": "fill_missing_categorical",
+    "details": {
+      "column": "status",
+      "fill_value": "Unknown",
+      "missing_count": 6
+    },
+    "timestamp": "2026-01-19T16:11:36.610500"
+  },
+  {
+    "operation": "load_file",
+    "details": {
+      "source": "src/sample2_data.csv",
+      "rows": 10,
+      "columns": 7
+    },
+    "timestamp": "2026-01-19T16:11:36.610996"
+  },
+  {
+    "operation": "standardize_columns",
+    "details": {
+      "source": "src/sample2_data.csv",
+      "mappings": {
+        "SKU#": "sku",
+        "Product  Name": "product_name",
+        "stock_qty": "stock_qty",
+        "Unit Cost ($)": "unit_cost",
+        "Last Restock": "last_restock",
+        "Supplier": "supplier",
+        "Category Type": "category_type"
+      }
+    },
+    "timestamp": "2026-01-19T16:11:36.611060"
+  },
+  {
+    "operation": "outlier_truncate",
+    "details": {
+      "column": "stock_qty",
+      "lower_bound": 9.33,
+      "upper_bound": 12715.090000000002,
+      "values_clipped": 2
+    },
+    "timestamp": "2026-01-19T16:11:36.612250"
+  },
+  {
+    "operation": "outlier_truncate",
+    "details": {
+      "column": "unit_cost",
+      "lower_bound": 32.3640947273435,
+      "upper_bound": 1985.7700631562775,
+      "values_clipped": 2
+    },
+    "timestamp": "2026-01-19T16:11:36.612947"
+  },
+  {
+    "operation": "format_dates",
+    "details": {
+      "column": "last_restock",
+      "format": "ISO-8601 (YYYY-MM-DD)"
+    },
+    "timestamp": "2026-01-19T16:11:36.613412"
+  },
+  {
+    "operation": "fill_missing_categorical",
+    "details": {
+      "column": "supplier",
+      "fill_value": "Unknown",
+      "missing_count": 3
+    },
+    "timestamp": "2026-01-19T16:11:36.613683"
+  },
+  {
+    "operation": "fill_missing_categorical",
+    "details": {
+      "column": "category_type",
+      "fill_value": "Unknown",
+      "missing_count": 2
+    },
+    "timestamp": "2026-01-19T16:11:36.614000"
+  },
+  {
+    "operation": "consolidate",
+    "details": {
+      "total_dataframes": 2,
+      "total_rows": 20,
+      "total_columns": 15
+    },
+    "timestamp": "2026-01-19T16:11:36.616016"
+  }
+]
+
+11. Logging custom operation...
+{
+  "timestamp": "2026-01-19T16:11:37.233127",
+  "operations": [
+    {
+      "operation": "custom_test_operation",
+      "details": {
+        "test_key": "test_value"
+      },
+      "timestamp": "2026-01-19T16:11:37.233141"
+    }
+  ]
+}
+
+12. Getting CSV summary...
+{
+  "file": "./src/sample1_data.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "dtypes": {
+    "Order ID": "object",
+    "Customer Name": "object",
+    "Order Date": "object",
+    "Product Price $": "float64",
+    "Quantity!!": "int64",
+    "Total Amount": "float64",
+    "Ship Date": "object",
+    "Status": "object"
+  },
+  "missing_values": {
+    "Order ID": 0,
+    "Customer Name": 3,
+    "Order Date": 0,
+    "Product Price $": 1,
+    "Quantity!!": 0,
+    "Total Amount": 0,
+    "Ship Date": 4,
+    "Status": 6
+  },
+  "memory_usage": "3.17 KB"
+}
+
+========================
+Oracle solution completed successfully!

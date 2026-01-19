@@ -1,0 +1,158 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@748a2d3420c1:/app# python3 solution/CSVIngester.py tests/test_data.csv tests/test2_data.csv tests/test3_data.csv -o tests/cleaned_data.csv -l tests/cleanin
+g_log.json
+/app/solution/CSVIngester.py:250: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:208: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:208: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:250: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:250: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:208: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:250: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:208: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:250: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:250: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:208: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:208: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:250: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:250: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+Processing complete!
+Output: tests/cleaned_data.csv
+Log: tests/cleaning_log.json
+root@748a2d3420c1:/app# ls -la tests/*.csv tests/*.json 2>/dev/null | head -20
+-rw-r--r-- 1 root root  2771 Jan  6 05:27 tests/cleaned_data.csv
+-rw-r--r-- 1 root root 13228 Jan  6 05:27 tests/cleaning_log.json
+-rw-r--r-- 1 root root   695 Jan  6 05:24 tests/test2_data.csv
+-rw-r--r-- 1 root root   727 Jan  6 05:24 tests/test3_data.csv
+-rw-r--r-- 1 root root   640 Jan  6 05:24 tests/test_data.csv
+root@748a2d3420c1:/app#

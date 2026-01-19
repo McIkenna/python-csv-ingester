@@ -1,0 +1,43 @@
+Current Terminal Screen:
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+>         assert 'operations' in log_data
+>         assert len(log_data['operations']) > 0
+>
+>         # Check for expected operations
+>         op_types = [op['operation'] for op in log_data['operations']]
+>         assert 'load_file' in op_types
+>         assert 'standardize_columns' in op_types
+>
+>
+> if __name__ == '__main__':
+>     pytest.main([__file__, '-v'])
+> PYTEST_FIX_EOF
+root@c28acbfc71a0:/app# cd /app/tests && pytest test_outputs.py -v --tb=short 2>&1 | tail -20
+test_outputs.py: 24 warnings
+  /app/solution/CSVIngester.py:245: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace me
+thod.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a
+ copy.
+
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, t
+o perform the operation inplace on the original object.
+
+
+    df[col].fillna('Unknown', inplace=True)
+
+test_outputs.py: 22 warnings
+  /app/solution/CSVIngester.py:220: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace me
+thod.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a
+ copy.
+
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, t
+o perform the operation inplace on the original object.
+
+
+    df[col].fillna(median_val, inplace=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 25 passed, 66 warnings in 0.51s ========================
+root@c28acbfc71a0:/app/tests#

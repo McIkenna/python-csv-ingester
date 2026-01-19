@@ -1,0 +1,231 @@
+New Terminal Output:
+
+root@720d5d598560:/app# cat > solution/CSVIngester.py << 'PYEOF'
+> #!/usr/bin/env python3
+> import argparse
+> import sys
+> import os
+> import json
+> import re
+> from datetime import datetime
+> from typing import List, Dict, Any, Optional, Tuple
+>
+> import pandas as pd
+> import numpy as np
+>
+>
+> class CSVIngester:
+>     def __init__(self):
+>         self.operations: List[Dict[str, Any]] = []
+>
+>     @staticmethod
+>     def _timestamp() -> str:
+>         return datetime.now().isoformat()
+>
+>     def _log(self, operation: str, details: Dict[str, Any]) -> None:
+>         self.operations.append({
+>             "operation": operation,
+>             "details": details,
+>             "timestamp": self._timestamp(),
+>         })
+>
+>     def encode_process(self, filepath: str) -> str:
+>         if not os.path.exists(filepath):
+>             raise FileNotFoundError(f"File not found: {filepath}")
+>         for enc in ("utf-8", "latin-1"):
+d_file", {"source": filepath>             try:
+>                 with open(filepath, "r", encoding=enc) as f:
+>                     f.read(2048)
+>                 self._log("detect_encoding", {"source": filepath, "encoding": enc})
+>                 return enc
+>             except UnicodeDecodeError:
+>                 continue
+>         enc = "latin-1"
+>         self._log("detect_encoding", {"source": filepath, "encoding": enc, "fallback": True})
+>         return enc
+>
+>     def standardize_column_name(self, name: str) -> str:
+>         s = name.strip().lower()
+>         s = re.sub(r"[^a-z0-9]+", "_", s)
+t_types", {"source": filepath, "types": typ>         s = re.sub(r"_+", "_", s).strip("_")
+>         return s
+>
+):
+            if t == ">     def detect_column_type(self, series: pd.Series) -> str:
+>         non_null = series.dropna()
+>         if non_null.empty:
+>             return "categorical"
+>         as_num = pd.to_numeric(non_null.astype(str).str.replace(",", "", regex=False), errors="coerce")
+n(s).sum()>         numeric_valid_ratio = as_num.notna().mean()
+>         as_dt_nf = pd.to_datetime(non_null, errors="coerce", dayfirst=False, infer_datetime_format=True)
+ate(s)
+                df[col] = clipped
+     >         as_dt_df = pd.to_datetime(non_null, errors="coerce", dayfirst=True, infer_datetime_format=True)
+>         date_valid_ratio = max(as_dt_nf.notna().mean(), as_dt_df.notna().mean())
+          self._log("impute_numeric", {"column": col, "strategy": "median", "value": median_val})
+            elif t == "categorical":
+                df[col] = df[col].fillna("Unknown>         if numeric_valid_ratio >= 0.6 and numeric_valid_ratio >= date_valid_ratio:
+>             return "numeric"
+", "Unknown")
+                self._log("impute_categorical", {"co>         if date_valid_ratio >= 0.6:
+>             return "date"
+>         return "categorical"
+>
+>     def date_parser(self, series: pd.Series) -> pd.Series:
+>         if series.empty:
+>             return series
+rames(self, fi>         s = series.copy()
+lepaths: List[str]) -> pd.>         s = s.replace("", np.nan)
+DataFrame:
+        frames = []
+   >         dt_nf = pd.to_datetime(s, errors="coerce", dayfirst=False, infer_datetime_format=True)
+>         dt_df = pd.to_datetime(s, errors="coerce", dayfirst=True, infer_datetime_format=True)
+>         if dt_df.notna().sum() > dt_nf.notna().sum():
+>             dt = dt_df
+ filep>             chosen = "dayfirst"
+.s>         else:
+>             dt = dt_nf
+>             chosen = "monthfirst"
+>         iso = dt.dt.strftime("%Y-%m-%d")
+>         iso = iso.where(dt.notna(), other=pd.Series([np.nan]*len(dt), index=dt.index))
+>         self._log("parse_dates", {"chosen": chosen, "parsed": int(dt.notna().sum()), "total": int(len(series))})
+>         return iso
+ave>
+>     def outlier_truncate(self, series: pd.Series) -> Tuple[pd.Series, Dict[str, float]]:
+>         numeric = pd.to_numeric(series, errors="coerce")
+>         if numeric.notna().sum() == 0:
+>             return series, {
+>                 "lower_bound": None,
+>                 "upper_bound": None,
+>                 "original_min": None,
+>                 "original_max": None,
+>                 "clipped_min": None,
+>                 "clipped_max": None,
+>             }
+>         q1 = float(np.nanpercentile(numeric, 1))
+>         q99 = float(np.nanpercentile(numeric, 99))
+>         original_min = float(np.nanmin(numeric))
+>         original_max = float(np.nanmax(numeric))
+>         clipped = numeric.clip(lower=q1, upper=q99)
+>         clipped_min = float(np.nanmin(clipped))
+>         clipped_max = float(np.nanmax(clipped))
+>         stats = {
+>             "lower_bound": q1,
+>             "upper_bound": q99,
+>             "original_min": original_min,
+>             "original_max": original_max,
+>             "clipped_min": clipped_min,
+ers(dest="command")
+
+    p_e>             "clipped_max": clipped_max,
+>         }
+>         self._log("clip_outliers", stats)
+>         return clipped, stats
+>
+>     def logging_pr
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+           }
+>             print_json(out)
+>             return 0
+>         if args.command == "outlier-truncate":
+>             enc = ingester.encode_process(args.csv_file)
+>             df = pd.read_csv(args.csv_file, encoding=enc)
+>             col = args.column_name
+>             if col not in df.columns:
+>                 print(f"Error: column not found: {args.column_name}", file=sys.stderr)
+>                 return 1
+>             clipped, stats = ingester.outlier_truncate(df[col])
+>             print_json(stats)
+>             return 0
+>         if args.command == "dataframe-cleaning":
+>             df = ingester.processed_dataframe(args.csv_file)
+>             out = args.output_file
+>             df.to_csv(out, index=False)
+>             ingester._log("save_output", {"output": out, "rows": int(df.shape[0]), "columns": int(df.shape[1])})
+>             log_file = os.path.join(os.path.dirname(out) or ".", "cleaning_log.json")
+>             ingester.logging_process(log_file)
+>             print(out)
+>             return 0
+>         if args.command == "dataframe-consolidation":
+>             df = ingester.consolidated_cleaned_dataframes(args.files)
+>             df.to_csv(args.output_file, index=False)
+>             ingester._log("save_output", {"output": args.output_file, "rows": int(df.shape[0]), "columns": int(df.shape[1])})
+>             print(args.output_file)
+>             return 0
+>         if args.command == "file-processing":
+>             df, log = ingester.file_processor(args.output_file, args.log_file, args.files)
+>             print_json({"output": args.output_file, "log": args.log_file, "rows": int(df.shape[0]), "columns": int(df.shape[1])})
+>             return 0
+>         if args.command == "cleaning-log":
+>             if not os.path.exists(args.log_file):
+>                 print(f"Error: log file not found: {args.log_file}", file=sys.stderr)
+>                 return 1
+>             with open(args.log_file, "r", encoding="utf-8") as f:
+>                 data = json.load(f)
+>             print_json(data)
+>             return 0
+>         if args.command == "csv-summary":
+>             summary = csv_summary(args.csv_file, ingester)
+>             print_json(summary)
+>             return 0
+>         if args.command == "get-operations":
+>             if not os.path.exists(args.log_file):
+>                 print_json({"operations": []})
+>                 return 0
+>             with open(args.log_file, "r", encoding="utf-8") as f:
+>                 data = json.load(f)
+>             print_json(data.get("operations", []))
+>             return 0
+>         if getattr(args, "files", None):
+>             files = args.files
+>             output = args.output or "cleaned_data.csv"
+>             log_path = args.log or "cleaning_log.json"
+>             df, _ = ingester.file_processor(output, log_path, files)
+>             print_json({"output": output, "log": log_path, "rows": int(df.shape[0]), "columns": int(df.shape[1])})
+>             return 0
+>         parser.print_help()
+>         return 0
+>     except FileNotFoundError as e:
+>         print(str(e), file=sys.stderr)
+>         return 1
+>     except Exception as e:
+>         print(f"Error: {e}", file=sys.stderr)
+>         return 1
+>
+>
+> if __name__ == "__main__":
+>     sys.exit(main())
+> PYEOF
+root@720d5d598560:/app# chmod +x solution/CSVIngester.py solution/solve.sh
+root@720d5d598560:/app# python3 solution/CSVIngester.py --help
+usage: CSVIngester.py [-h] [-o OUTPUT] [-l LOG]
+                      {encoding-detection,name-standardization,type-detection,date-parsing,outlier-truncate,dataframe-cleaning,dataframe-consolidation,file-proc
+essing,cleaning-log,csv-summary,get-operations}
+                      ... [files ...]
+
+CSV Ingester: Clean, standardize and consolidate CSV files.
+
+positional arguments:
+  {encoding-detection,name-standardization,type-detection,date-parsing,outlier-truncate,dataframe-cleaning,dataframe-consolidation,file-processing,cleaning-log,
+csv-summary,get-operations}
+    encoding-detection  Detect file encoding (utf-8 or latin-1)
+    name-standardization
+                        Standardize a column name to snake_case
+    type-detection      Detect column type in a CSV file
+    date-parsing        Parse a date column and output as ISO strings
+    outlier-truncate    Clip numeric column at 1st/99th percentiles
+    dataframe-cleaning  Clean a single CSV file
+    dataframe-consolidation
+                        Consolidate multiple CSV files
+    file-processing     Full pipeline: clean+consolidate and log operations
+    cleaning-log        Print a cleaning log file
+    csv-summary         Print JSON summary of a CSV file
+    get-operations      Return operations stored in a log file
+  files
+
+options:
+  -h, --help            show this help message and exit
+  -o OUTPUT, --output OUTPUT
+                        Output CSV path (default: cleaned_data.csv)
+  -l LOG, --log LOG     Log JSON path (default: cleaning_log.json)
+root@720d5d598560:/app#

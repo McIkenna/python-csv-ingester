@@ -1,0 +1,29 @@
+{
+    "id": "79427acb-c122-49dd-8b0e-617838b61ef8",
+    "started_at": "2026-01-05T23:20:45.911291",
+    "finished_at": "2026-01-05T23:21:34.571971",
+    "n_total_trials": 1,
+    "stats": {
+        "n_trials": 1,
+        "n_errors": 0,
+        "evals": {
+            "oracle__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 1.0
+                    }
+                ],
+                "reward_stats": {
+                    "reward": {
+                        "1.0": [
+                            "python-csv-ingest__kb6dM47"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        }
+    }
+}

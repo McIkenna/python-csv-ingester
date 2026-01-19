@@ -1,0 +1,34 @@
+New Terminal Output:
+
+root@c28acbfc71a0:/app/tests# cd /app && source solution/solve.sh
+root@c28acbfc71a0:/app# encoding-detection tests/test_data.csv
+utf-8
+root@c28acbfc71a0:/app# name-standardization "Product Price $"
+product_price
+root@c28acbfc71a0:/app# type-detection tests/test_data.csv "Order Date"
+/app/solution/CSVIngester.py:111: UserWarning: Parsing dates in %d.%m.%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+ a format to silence this warning.
+  parsed_date = pd.to_datetime(date_str, errors='coerce')
+date
+root@c28acbfc71a0:/app# csv-summary tests/test_data.csv | head -20
+{
+  "file": "tests/test_data.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Customer Name": 2,
+    "Product Price $": 1,
+    "Quantity!!": 1,
+    "Ship Date": 4,
+    "Status": 3
+root@c28acbfc71a0:/app#

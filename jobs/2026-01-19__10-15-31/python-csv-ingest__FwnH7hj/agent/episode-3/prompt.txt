@@ -1,0 +1,73 @@
+Current terminal state:
+New Terminal Output:
+
+(venv) root@e011675799ef:/app# encoding-detection src/sample1_data.csv
+name-standardization "Product Price $"
+utf-8
+(venv) root@e011675799ef:/app# name-standardization "Product Price $"
+product_price
+type-detection src/sample1_data.csv "Order Date"
+(venv) root@e011675799ef:/app# type-detection src/sample1_data.csv "Order Date"
+/app/solution/CSVIngester.py:85: UserWarning: Parsing dates in %d.%m.%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+a format to silence this warning.
+  dt = pd.to_datetime(v, errors='raise', dayfirst=dayfirst, yearfirst=False)
+/app/solution/CSVIngester.py:85: UserWarning: Parsing dates in %d-%m-%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+a format to silence this warning.
+  dt = pd.to_datetime(v, errors='raise', dayfirst=dayfirst, yearfirst=False)
+date
+(venv) root@e011675799ef:/app# type-detection src/sample1_data.csv "Product Price $"
+numeric
+(venv) root@e011675799ef:/app# type-detection src/sample1_data.csv "Status"
+categorical
+(venv) root@e011675799ef:/app# outlier-truncate src/sample1_data.csv "Product Price $"
+{
+  "lower_bound": 68.62333908402061,
+  "upper_bound": 477.86817998687496,
+  "original_min": 68.48485841399017,
+  "original_max": 481.85449697522034,
+  "clipped_min": 68.62333908402061,
+  "clipped_max": 477.86817998687496
+}
+(venv) root@e011675799ef:/app# dataframe-cleaning src/sample1_data.csv src/cleaned_output.csv
+/app/solution/CSVIngester.py:85: UserWarning: Parsing dates in %d.%m.%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+a format to silence this warning.
+  dt = pd.to_datetime(v, errors='raise', dayfirst=dayfirst, yearfirst=False)
+/app/solution/CSVIngester.py:85: UserWarning: Parsing dates in %d-%m-%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+a format to silence this warning.
+  dt = pd.to_datetime(v, errors='raise', dayfirst=dayfirst, yearfirst=False)
+/app/solution/CSVIngester.py:85: UserWarning: Parsing dates in %d.%m.%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+a format to silence this warning.
+  dt = pd.to_datetime(v, errors='raise', dayfirst=dayfirst, yearfirst=False)
+/app/solution/CSVIngester.py:85: UserWarning: Parsing dates in %d.%m.%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+a format to silence this warning.
+  dt = pd.to_datetime(v, errors='raise', dayfirst=dayfirst, yearfirst=False)
+/app/solution/CSVIngester.py:85: UserWarning: Parsing dates in %d-%m-%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+a format to silence this warning.
+  dt = pd.to_datetime(v, errors='raise', dayfirst=dayfirst, yearfirst=False)
+src/cleaned_output.csv
+(venv) root@e011675799ef:/app# dataframe-consolidation consolidated_output.csv src/sample1_data.csv src/sample2_data.csv
+consolidated_output.csv
+bash: src/sample1_data.csv: Permission denied
+asciinema: recording finished
+asciinema: asciicast saved to /logs/agent/recording.cast
+root@e011675799ef:/app# file-processing output.csv final_log.json src/sample1_data.csv src/sample2_data.csv
+bash: file-processing: command not found
+root@e011675799ef:/app# ls -la | sed -n '1,200p'
+total 48
+drwxr-xr-x 1 root root 4096 Jan 19 16:19 .
+drwxr-xr-x 1 root root 4096 Jan 19 16:15 ..
+drwxr-xr-x 3 root root 4096 Jan 19 16:17 .pytest_cache
+-rw-r--r-- 1 root root 1929 Jan 19 16:18 cleaned_data.csv
+-rw-r--r-- 1 root root 8431 Jan 19 16:18 cleaning_log.json
+-rw-r--r-- 1 root root    1 Jan 19 16:19 consolidated_output.csv
+drwxr-xr-x 3 root root 4096 Jan 19 16:19 solution
+drwxr-xr-x 1 root root 4096 Jan 19 16:19 src
+drwxr-xr-x 5 root root 4096 Jan 19 16:16 venv
+root@e011675799ef:/app# head -n 3 output.csv
+head: cannot open 'output.csv' for reading: No such file or directory
+root@e011675799ef:/app# head -n 40 final_log.json
+head: cannot open 'final_log.json' for reading: No such file or directory
+root@e011675799ef:/app#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

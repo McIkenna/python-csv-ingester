@@ -1,0 +1,330 @@
+New Terminal Output:
+
+root@c28acbfc71a0:/app# cat > solution/solve.sh << 'BASH_EOF'
+ then
+        echo "Usage: dataframe-> #!/bin/bash
+>
+> # CSV Ingester Shell Interface
+> # Provides command-line access to CSV cleaning operations
+>
+> SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+consolidation <output_file> <file1> <file2> ..."
+        return 1
+    fi
+
+    local files_str=""
+    for file in "${files[@]}"; do
+        files_str="$files_s> PYTHON_SCRIPT="$SCRIPT_DIR/CSVIngester.py"
+one
+    files_str="[${file>
+> # Import Python for inline operations
+> run_python() {
+>     python3 -c "$1"
+> }
+>
+> encoding-detection() {
+>     local filepath="$1"
+>     if [[ -z "$filepath" ]]; then
+>         echo "Usage: encoding-detection <filepath>"
+>         return 1
+>     fi
+>
+>     python3 << EOF
+> import sys
+> sys.path.insert(0, '$SCRIPT_DIR')
+save> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> result = ingester.encode_process('$filepath')
+> if result:
+>     print(result)
+> else:
+>     print('File not found', file=sys.stderr)
+>     sys.exit(1)
+> EOF
+> }
+>
+> name-standardization() {
+>     local col_name="$1"
+>     if [[ -z "$col_name" ]]; then
+>         echo "Usage: name-standardization <column_name>"
+>         return 1
+>     fi
+>
+>     python3 << EOF
+> import sys
+> sys.path.insert(0, '$SCRIPT_DIR')
+       return 1
+    fi
+
+    local files_str=""> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> result = ingester.standardize_column_name('$col_name')
+> print(result)
+> EOF
+> }
+>
+> type-detection() {
+>     local csv_file="$1"
+>     local col_name="$2"
+>
+{files_str%,}]"
+
+    python3 << EOF
+import sys
+sys.path.insert(0, '$SCRIPT_DIR')
+from CSVIngester import >     if [[ -z "$csv_file" ]] || [[ -z "$col_name" ]]; then
+>         echo "Usage: type-detection <csv_file> <column_name>"
+>         return 1
+>     fi
+>
+>     python3 << EOF
+> import sys
+> import pandas as pd
+> sys.path.insert(0, '$SCRIPT_DIR')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> try:
+>     encoding = ingester.encode_process('$csv_file')
+>     df = pd.read_csv('$csv_file', encoding=encoding)
+>     result = ingester.detect_column_type(df, '$col_name')
+>     print(result)
+> except Exception as e:
+o "Log file not found: $log_file" >&2
+    >     print(f'Error: {e}', file=sys.stderr)
+>     sys.exit(1)
+> EOF
+> }
+>
+> date-parsing() {
+>     local csv_file="$1"
+>     local col_name="$2"
+>
+>     if [[ -z "$csv_file" ]] || [[ -z "$col_name" ]]; then
+>         echo "Usage: date-parsing <csv_file> <column_name>"
+>         return 1
+>     fi
+>
+>     python3 << EOF
+> import sys
+> import pandas as pd
+> import json
+> sys.path.insert(0, '$SCRIPT_DIR')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> try:
+>     encoding = ingester.encode_process('$csv_file')
+>     df = pd.read_csv('$csv_file', encoding=encoding)
+>     if '$col_name' in df.columns:
+ "$output_file" ]]; the>         parsed = df['$col_name'].apply(lambda x: ingester.date_parser(str(x)) if pd.notna(x) else None)
+>         result = parsed.dropna().tolist()[:5]  # Show first 5
+>         print(json.dumps(result, indent=2))
+>     else:
+>         print(f"Column '$col_name' not found", file=sys.stderr)
+>         sys.exit(1)
+> except Exception as e:
+>     print(f'Error: {e}', file=sys.stderr)
+>     sys.exit(1)
+> EOF
+> }
+>
+> outlier-truncate() {
+>     local csv_file="$1"
+>     local col_name="$2"
+>
+>     if [[ -z "$csv_file" ]] || [[ -z "$col_name" ]]; then
+>         echo "Usage: outlier-truncate <csv_file> <column_name>"
+>         return 1
+>     fi
+>
+>     python3 << EOF
+> import sys
+> import pandas as pd
+> import json
+> sys.path.insert(0, '$SCRIPT_DIR')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> try:
+>     encoding = ingester.encode_process('$csv_file')
+>     df = pd.read_csv('$csv_file', encoding=encoding)
+>     result = ingester.outlier_truncate(df, '$col_name')
+andardization <column_name>"
+    echo "  type-detection <csv_file> <column_name>"
+ >     print(json.dumps(result, indent=2))
+> except Exception as e:
+>     print(f'Error: {e}', file=sys.stderr)
+>     sys.exit(1)
+> EOF
+> }
+>
+name>"
+    echo "  dataframe-c> dataframe-cleaning() {
+>     local csv_file="$1"
+>     local output_file="${2:-cleaned_output.csv}"
+>
+>     if [[ -z "$csv_file" ]]; then
+>         echo "Usage: dataframe-cleaning <csv_file> [output_file]"
+>         return 1
+>     fi
+>
+>     python3 << EOF
+> import sys
+> sys.path.insert(0, '$SCRIPT_DIR')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> try:
+>     df = ingester.processed_dataframe('$csv_file')
+>     df.to_csv('$output_file', index=False)
+>     print(f"Cleaned data saved to: $output_file")
+> except Exception as e:
+>     print(f'Error: {e}', file=sys.stderr)
+>     sys.exit(1)
+> EOF
+> }
+>
+> dataframe-consolidation() {
+>     local output_file="$1"
+>     shift
+>     local files=("$@")
+>
+>     if [[ -z "$output_file" ]] || [[ ${#files[@]} -eq 0 ]]; then
+>         echo "Usage: dataframe-consolidation <output_file> <file1> <file2> ..."
+>         return 1
+>     fi
+>
+>     local files_str=""
+>     for file in "${files[@]}"; do
+>         files_str="$files_str'$file',"
+>     done
+>     files_str="[${files_str%,}]"
+>
+>     python3 << EOF
+> import sys
+> sys.path.insert(0, '$SCRIPT_DIR')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> try:
+>     files = $files_str
+>     df = ingester.consolidated_cleaned_dataframes(files)
+>     df.to_csv('$output_file', index=False)
+>     print(f"Consolidated data saved to: $output_file")
+> except Exception as e:
+>     print(f'Error: {e}', file=sys.stderr)
+>     sys.exit(1)
+> EOF
+> }
+>
+> file-processing() {
+>     local output_file="$1"
+>     local log_file="$2"
+>     shift 2
+>     local files=("$@")
+>
+>     if [[ -z "$output_file" ]] || [[ -z "$log_file" ]] || [[ ${#files[@]} -eq 0 ]]; then
+>         echo "Usage: file-processing <output_file> <log_file> <file1> <file2> ..."
+>         return 1
+>     fi
+>
+>     local files_str=""
+>     for file in "${files[@]}"; do
+>         files_str="$files_str'$file',"
+>     done
+>     files_str="[${files_str%,}]"
+>
+>     python3 << EOF
+> import sys
+> sys.path.insert(0, '$SCRIPT_DIR')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> try:
+>     files = $files_str
+>     ingester.file_processor(files, '$output_file', '$log_file')
+>     print(f"Processing complete!")
+>     print(f"Output: $output_file")
+>     print(f"Log: $log_file")
+> except Exception as e:
+>     print(f'Error: {e}', file=sys.stderr)
+>     sys.exit(1)
+> EOF
+> }
+>
+> cleaning-log() {
+>     local log_file="${1:-cleaning_log.json}"
+>
+>     if [[ -f "$log_file" ]]; then
+>         cat "$log_file"
+>     else
+>         echo "Log file not found: $log_file" >&2
+>         return 1
+>     fi
+> }
+>
+> csv-summary() {
+>     local csv_file="$1"
+>
+>     if [[ -z "$csv_file" ]]; then
+>         echo "Usage: csv-summary <csv_file>"
+>         return 1
+>     fi
+>
+>     python3 << EOF
+> import sys
+> import json
+> sys.path.insert(0, '$SCRIPT_DIR')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> try:
+>     result = ingester.get_csv_summary('$csv_file')
+>     print(json.dumps(result, indent=2))
+> except Exception as e:
+>     print(f'Error: {e}', file=sys.stderr)
+>     sys.exit(1)
+> EOF
+> }
+>
+> get-operations() {
+>     local output_file="$1"
+>
+>     if [[ -z "$output_file" ]]; then
+>         echo "Usage: get-operations <output_file>"
+>         return 1
+>     fi
+>
+>     python3 << EOF
+> import sys
+> import json
+> sys.path.insert(0, '$SCRIPT_DIR')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> try:
+>     operations = ingester.get_operations_log()
+>     with open('$output_file', 'w') as f:
+>         json.dump({'operations': operations}, f, indent=2)
+>     print(f"Operations saved to: $output_file")
+> except Exception as e:
+>     print(f'Error: {e}', file=sys.stderr)
+>     sys.exit(1)
+> EOF
+> }
+>
+> # If script is sourced, functions are available
+> # If script is executed, show help
+> if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+>     echo "CSV Ingester Shell Interface"
+>     echo "Source this script to use functions:"
+>     echo "  source solve.sh"
+>     echo ""
+>     echo "Available commands:"
+>     echo "  encoding-detection <filepath>"
+>     echo "  name-standardization <column_name>"
+>     echo "  type-detection <csv_file> <column_name>"
+>     echo "  date-parsing <csv_file> <column_name>"
+>     echo "  outlier-truncate <csv_file> <column_name>"
+>     echo "  dataframe-cleaning <csv_file> [output_file]"
+>     echo "  dataframe-consolidation <output_file> <file1> <file2> ..."
+>     echo "  file-processing <output_file> <log_file> <file1> <file2> ..."
+>     echo "  cleaning-log [log_file]"
+>     echo "  csv-summary <csv_file>"
+>     echo "  get-operations <output_file>"
+> fi
+> BASH_EOF
+root@c28acbfc71a0:/app#

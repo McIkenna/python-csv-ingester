@@ -1,0 +1,268 @@
+New Terminal Output:
+
+root@f35f41e753a3:/app# sed -n '1,200p' solution/CSVIngester.py
+#!/usr/bin/env python3
+import argparse
+import json
+import sys
+import os
+from datetime import datetime
+from typing import List, Dict, Any, Optional
+import pandas as pd
+import numpy as np
+
+class CSVIngester:
+    def __init__(self):
+        self.operations: List[Dict[str, Any]] = []
+        self.encoding_cache: Dict[str, str] = {}
+
+    def _log(self, operation: str, details: Dict[str, Any]) -> None:
+        self.operations.append({
+            "operation": operation,
+            "details": details,
+            "timestamp": datetime.utcnow().isoformat()
+        })
+
+    def encode_process(self, filepath: str) -> str:
+        if not os.path.exists(filepath):
+            self._log("encoding_detection_error", {"source": filepath, "error": "file_not_found"})
+            raise FileNotFoundError(filepath)
+        # try utf-8 then latin-1
+        for enc in ("utf-8", "latin-1"):
+            try:
+                with open(filepath, 'r', encoding=enc) as f:
+                    f.read(2048)
+                self._log("detect_encoding", {"source": filepath, "encoding": enc})
+                self.encoding_cache[filepath] = enc
+                return enc
+            except Exception:
+                continue
+        # fallback
+        enc = "latin-1"
+        self._log("detect_encoding_fallback", {"source": filepath, "encoding": enc})
+        self.encoding_cache[filepath] = enc
+        return enc
+
+    def standardize_column_name(self, name: str) -> str:
+        # lower-case, replace non-alphanum with underscore, collapse repeats, trim underscores
+        import re
+        s = name.strip().lower()
+        s = re.sub(r"[^0-9a-z]+", "_", s)
+        s = re.sub(r"_+", "_", s)
+        s = s.strip("_")
+        self._log("standardize_column", {"original": name, "standardized": s})
+        return s
+
+    def detect_column_type(self, series: pd.Series) -> str:
+        # Try date detection
+        if series.dropna().empty:
+            return "categorical"
+        sample = series.dropna().astype(str).head(20)
+        date_parse_success = 0
+        for v in sample:
+            try:
+                pd.to_datetime(v, errors='raise', infer_datetime_format=True, dayfirst=False)
+                date_parse_success += 1
+            except Exception:
+                pass
+        if date_parse_success >= max(1, int(len(sample) * 0.6)):
+            return "date"
+        # Numeric detection
+        try:
+            pd.to_numeric(series.dropna(), errors='raise')
+            return "numeric"
+        except Exception:
+            return "categorical"
+
+    def date_parser(self, series: pd.Series) -> pd.Series:
+        parsed = pd.to_datetime(series, errors='coerce', infer_datetime_format=True, dayfirst=False)
+        # For any remaining NaT, try dayfirst True to catch European formats
+        mask_nat = parsed.isna() & series.notna()
+        if mask_nat.any():
+            parsed2 = pd.to_datetime(series[mask_nat], errors='coerce', infer_datetime_format=True, dayfirst=True)
+            parsed.loc[mask_nat] = parsed2
+        # format to ISO date (YYYY-MM-DD)
+        iso = parsed.dt.strftime('%Y-%m-%d')
+        self._log("parse_dates", {"converted_count": int(parsed.notna().sum()), "original_non_null": int(series.notna().sum())})
+        return iso
+
+    def outlier_truncate(self, series: pd.Series) -> Dict[str, Any]:
+        numeric = pd.to_numeric(series, errors='coerce')
+        if numeric.dropna().empty:
+            info = {
+                "lower_bound": None,
+                "upper_bound": None,
+                "original_min": None,
+                "original_max": None,
+                "clipped_min": None,
+                "clipped_max": None
+            }
+            self._log("outlier_truncate_skip", info)
+            return info
+        lower = np.nanpercentile(numeric, 1)
+        upper = np.nanpercentile(numeric, 99)
+        original_min = float(np.nanmin(numeric))
+        original_max = float(np.nanmax(numeric))
+        clipped = numeric.clip(lower, upper)
+        info = {
+            "lower_bound": float(lower),
+            "upper_bound": float(upper),
+            "original_min": original_min,
+            "original_max": original_max,
+            "clipped_min": float(np.nanmin(clipped)),
+            "clipped_max": float(np.nanmax(clipped))
+        }
+        self._log("outlier_truncate", info)
+        return info
+
+    def processed_dataframe(self, filepath: str) -> pd.DataFrame:
+        enc = self.encoding_cache.get(filepath) or self.encode_process(filepath)
+        try:
+            df = pd.read_csv(filepath, encoding=enc)
+        except Exception as e:
+            # try with engine python for messy CSV
+            df = pd.read_csv(filepath, encoding=enc, engine='python')
+        self._log("load_file", {"source": filepath, "rows": int(df.shape[0]), "columns": int(df.shape[1])})
+        # standardize columns
+        original_cols = list(df.columns)
+        new_cols 
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+format=True, dayfirst=False)
+/app/solution/CSVIngester.py:57: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  pd.to_datetime(v, errors='raise', infer_datetime_format=True, dayfirst=False)
+/app/solution/CSVIngester.py:70: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed = pd.to_datetime(series, errors='coerce', infer_datetime_format=True, dayfirst=False)
+/app/solution/CSVIngester.py:73: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed2 = pd.to_datetime(series[mask_nat], errors='coerce', infer_datetime_format=True, dayfirst=True)
+cleaned_data.csv
+root@f35f41e753a3:/app# head -n 5 cleaned_data.csv
+order_id,customer_name,order_date,product_price,quantity,total_amount,ship_date,status,sku,product_name,stock_qty,unit_cost,last_restock,supplier,category_type
+ORD1000,Unknown,2023-01-10,264.3134984759545,7.0,1850.194489331681,2023-09-10,Unknown,,,,,,,
+ORD1001,Unknown,2023-02-04,171.54224088174146,17.0,2916.2180949896047,Unknown,Shipped,,,,,,,
+ORD1002,Bob Johnson,Unknown,171.54224088174146,17.0,3317.4124189023737,2023-11-12,Unknown,,,,,,,
+ORD1003,Alice Williams,Unknown,70.21586678937072,10.0,702.1586678937072,Unknown,Unknown,,,,,,,
+root@f35f41e753a3:/app# sed -n '1,120p' cleaning_log.json
+{
+  "timestamp": "2026-01-19T17:49:59.271565",
+  "operations": [
+    {
+      "operation": "detect_encoding",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "encoding": "utf-8"
+      },
+      "timestamp": "2026-01-19T17:49:59.227073"
+    },
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T17:49:59.228187"
+    },
+    {
+      "operation": "standardize_column",
+      "details": {
+        "original": "Order ID",
+        "standardized": "order_id"
+      },
+      "timestamp": "2026-01-19T17:49:59.228241"
+    },
+    {
+      "operation": "standardize_column",
+      "details": {
+        "original": "Customer Name",
+        "standardized": "customer_name"
+      },
+      "timestamp": "2026-01-19T17:49:59.228245"
+    },
+    {
+      "operation": "standardize_column",
+      "details": {
+        "original": "Order Date",
+        "standardized": "order_date"
+      },
+      "timestamp": "2026-01-19T17:49:59.228247"
+    },
+    {
+      "operation": "standardize_column",
+      "details": {
+        "original": "Product Price $",
+        "standardized": "product_price"
+      },
+      "timestamp": "2026-01-19T17:49:59.228250"
+    },
+    {
+      "operation": "standardize_column",
+      "details": {
+        "original": "Quantity!!",
+        "standardized": "quantity"
+      },
+      "timestamp": "2026-01-19T17:49:59.228252"
+    },
+    {
+      "operation": "standardize_column",
+      "details": {
+        "original": "Total Amount",
+        "standardized": "total_amount"
+      },
+      "timestamp": "2026-01-19T17:49:59.228254"
+    },
+    {
+      "operation": "standardize_column",
+      "details": {
+        "original": "Ship Date",
+        "standardized": "ship_date"
+      },
+      "timestamp": "2026-01-19T17:49:59.228256"
+    },
+    {
+      "operation": "standardize_column",
+      "details": {
+        "original": "Status",
+        "standardized": "status"
+      },
+      "timestamp": "2026-01-19T17:49:59.228260"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T17:49:59.228289"
+    },
+    {
+      "operation": "detect_column_types",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "types": {
+          "order_id": "categorical",
+          "customer_name": "categorical",
+          "order_date": "date",
+          "product_price": "numeric",
+          "quantity": "numeric",
+          "total_amount": "numeric",
+          "ship_date": "date",
+          "status": "categorical"
+        }
+      },
+      "timestamp": "2026-01-19T17:49:59.243820"
+    },
+    {
+      "operation": "parse_dates",
+root@f35f41e753a3:/app#

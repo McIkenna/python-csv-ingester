@@ -1,0 +1,318 @@
+New Terminal Output:
+
+root@59fbec45e032:/app# sed -n '1,200p' solution/CSVIngester.py
+#!/usr/bin/env python3
+import argparse
+import csv
+import json
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import List, Dict, Any, Optional, Tuple
+
+import numpy as np
+import pandas as pd
+
+
+class CSVIngester:
+    def __init__(self):
+        self.operations: List[Dict[str, Any]] = []
+        # cache of standardized name mappings per file
+        self._col_maps: Dict[str, Dict[str, str]] = {}
+
+    # --- logging helpers ---
+    def _log(self, operation: str, details: Dict[str, Any]):
+        self.operations.append({
+            "operation": operation,
+            "details": details,
+            "timestamp": datetime.utcnow().isoformat()
+        })
+
+    def get_operations_log(self) -> List[Dict[str, Any]]:
+        return self.operations
+
+    def logging_process(self, output_log: Path):
+        output_log = Path(output_log)
+        output_log.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "operations": self.operations,
+        }
+        output_log.write_text(json.dumps(payload, indent=2))
+        return str(output_log)
+
+    # --- util methods ---
+    def encode_process(self, filepath: Path) -> str:
+        fp = Path(filepath)
+        if not fp.exists():
+            self._log("detect_encoding_error", {"source": str(fp), "error": "file_not_found"})
+            raise FileNotFoundError(str(fp))
+        # Try utf-8 first, fallback to latin-1
+        for enc in ("utf-8", "latin-1"):
+            try:
+                with open(fp, 'r', encoding=enc) as f:
+                    f.readline()
+                self._log("detect_encoding", {"source": str(fp), "encoding": enc})
+                return enc
+            except Exception:
+                continue
+        # default
+        enc = "latin-1"
+        self._log("detect_encoding_default", {"source": str(fp), "encoding": enc})
+        return enc
+
+    def standardize_column_name(self, name: str) -> str:
+        # Remove currency symbols etc., keep alnum and spaces/underscores/hyphens first
+        # Normalize spaces and punctuation to underscores
+        s = name.strip()
+        # Replace any non-alphanumeric with space
+        import re
+        s = re.sub(r"[^0-9A-Za-z]+", "_", s)
+        # Collapse multiple underscores
+        s = re.sub(r"_+", "_", s)
+        s = s.strip("_")
+        s = s.lower()
+        return s
+
+    def detect_column_type(self, series: pd.Series) -> str:
+        # Heuristic: dates via to_datetime with errors='coerce' and sufficient parse ratio
+        s_nonnull = series.dropna().astype(str)
+        if s_nonnull.empty:
+            return "categorical"
+        # try numeric
+        try:
+            pd.to_numeric(s_nonnull)
+            return "numeric"
+        except Exception:
+            pass
+        # detect date
+        parsed = pd.to_datetime(s_nonnull, errors='coerce', infer_datetime_format=True, dayfirst=False)
+        parsed2 = pd.to_datetime(s_nonnull, errors='coerce', dayfirst=True)
+        ratio = parsed.notna().mean()
+        ratio2 = parsed2.notna().mean()
+        if max(ratio, ratio2) >= 0.6:  # threshold
+            return "date"
+        return "categorical"
+
+    def date_parser(self, series: pd.Series) -> Tuple[pd.Series, Dict[str, Any]]:
+        # Try parsing with mixed formats; prefer successful parse using two strategies
+        s = series.astype(str)
+        parsed1 = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+        parsed2 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+        parsed = parsed1.where(parsed1.notna(), parsed2)
+        iso = parsed.dt.date.astype('string')
+        # Normalize None -> NaT -> keep as missing
+        info = {
+            "converted": int(parsed.notna().sum()),
+            "total": int(len(series)),
+        }
+        return iso, info
+
+    def outlier_truncate(self, series: pd.Series) -> Tuple[pd.Series, Dict[str, Any]]:
+        s = pd.to_numeric(series, errors='coerce')
+        if s.dropna().empty:
+            return series, {"note": "no_numeric_values"}
+        lower = float(np.nanpercentile(s, 1))
+        upper = float(np.nanpercentile(s, 99))
+        original_min = float(np.nanmin(s))
+        original_max = float(np.nanmax(s))
+        clipped = s.clip(lower, upper)
+        details = {
+            "lower_bound": lower,
+            "upper_bound": upper,
+            "original_min": original_min,
+            "original_max": original_max,
+            "clipped_min": float(np.nanmin(clipped)),
+            "clipped_max": float(np.nanmax(clipped)),
+        }
+        return clipped, details
+
+    def _standardize_columns(self, df: pd.DataFrame, source: Optional[str] = None) -> pd.DataFrame:
+        mapping = {c: self.standardize_column_name(c) for c in df.columns}
+        if source is not None:
+            self._col_maps[source] = mapping
+        self._log("standardize_columns", {"source": sou
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+026-01-19T18:05:16.136531"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T18:05:16.136605"
+    },
+    {
+      "operation": "detect_column_types",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "types": {
+          "order_id": "categorical",
+          "customer_name": "categorical",
+          "order_date": "categorical",
+          "product_price": "numeric",
+          "quantity": "numeric",
+          "total_amount": "numeric",
+          "ship_date": "categorical",
+          "status": "categorical"
+        }
+      },
+      "timestamp": "2026-01-19T18:05:16.148452"
+    },
+    {
+      "operation": "impute_categorical",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "column": "order_id",
+        "filled": 0,
+        "value": "Unknown"
+      },
+      "timestamp": "2026-01-19T18:05:16.149109"
+    },
+    {
+      "operation": "impute_categorical",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "column": "customer_name",
+        "filled": 3,
+        "value": "Unknown"
+      },
+      "timestamp": "2026-01-19T18:05:16.149371"
+    },
+    {
+      "operation": "impute_categorical",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "column": "order_date",
+        "filled": 0,
+        "value": "Unknown"
+      },
+      "timestamp": "2026-01-19T18:05:16.149582"
+    },
+    {
+      "operation": "impute_numeric",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "column": "product_price",
+        "strategy": "median",
+        "value": 171.54224088174146
+      },
+      "timestamp": "2026-01-19T18:05:16.151094"
+    },
+    {
+      "operation": "clip_outliers",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "column": "product_price",
+        "lower_bound": 68.64064916777441,
+        "upper_bound": 477.36989036333176,
+        "original_min": 68.48485841399017,
+        "original_max": 481.85449697522034,
+        "clipped_min": 68.64064916777441,
+        "clipped_max": 477.36989036333176
+      },
+      "timestamp": "2026-01-19T18:05:16.153315"
+    },
+    {
+      "operation": "impute_numeric",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "column": "quantity",
+        "strategy": "median",
+        "value": 10.5
+      },
+      "timestamp": "2026-01-19T18:05:16.153503"
+    },
+    {
+      "operation": "clip_outliers",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "column": "quantity",
+        "lower_bound": 2.45,
+        "upper_bound": 17.0,
+        "original_min": 2.0,
+        "original_max": 17.0,
+        "clipped_min": 2.45,
+        "clipped_max": 17.0
+      },
+      "timestamp": "2026-01-19T18:05:16.154611"
+    },
+    {
+      "operation": "impute_numeric",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "column": "total_amount",
+        "strategy": "median",
+        "value": 1558.7652006045575
+      },
+      "timestamp": "2026-01-19T18:05:16.154756"
+    },
+    {
+      "operation": "clip_outliers",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "column": "total_amount",
+        "lower_bound": 499.44282820755103,
+        "upper_bound": 6875.881001412972,
+        "original_min": 479.3940088979312,
+        "original_max": 7227.817454628305,
+        "clipped_min": 499.44282820755103,
+        "clipped_max": 6875.881001412972
+      },
+      "timestamp": "2026-01-19T18:05:16.155251"
+    },
+    {
+      "operation": "impute_categorical",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "column": "ship_date",
+        "filled": 4,
+        "value": "Unknown"
+      },
+      "timestamp": "2026-01-19T18:05:16.155521"
+    },
+    {
+      "operation": "impute_categorical",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "column": "status",
+        "filled": 6,
+        "value": "Unknown"
+      },
+      "timestamp": "2026-01-19T18:05:16.155706"
+    },
+    {
+      "operation": "missing_summary",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "missing": {
+          "order_id": 0,
+          "customer_name": 0,
+          "order_date": 0,
+          "product_price": 0,
+          "quantity": 0,
+          "total_amount": 0,
+          "ship_date": 0,
+          "status": 0
+        }
+      },
+      "timestamp": "2026-01-19T18:05:16.156043"
+    },
+    {
+      "operation": "detect_encoding",
+      "details": {
+        "source": "src/sample2_data.csv",
+        "encoding": "utf-8"
+      },
+      "timestamp": "2026-01-19T18:05:16.156128"
+root@59fbec45e032:/app#

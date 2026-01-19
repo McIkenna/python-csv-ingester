@@ -1,0 +1,305 @@
+New Terminal Output:
+
+root@eb6fbc872eff:/app# python3 - << 'PY'
+> import pandas as pd
+> s = pd.read_csv('src/sample1_data.csv')['Order Date']
+> parsed_nf = pd.to_datetime(s, errors='coerce', dayfirst=False)
+> parsed_df = pd.to_datetime(s, errors='coerce', dayfirst=True)
+> print('NF ratio:', parsed_nf.notna().mean(), parsed_nf)
+> print('DF ratio:', parsed_df.notna().mean(), parsed_df)
+> PY
+NF ratio: 0.1 0   2023-01-10
+1          NaT
+2          NaT
+3          NaT
+4          NaT
+5          NaT
+6          NaT
+7          NaT
+8          NaT
+9          NaT
+Name: Order Date, dtype: datetime64[ns]
+DF ratio: 0.2 0   2023-10-01
+1          NaT
+2          NaT
+3          NaT
+4          NaT
+5   2023-02-14
+6          NaT
+7          NaT
+8          NaT
+9          NaT
+Name: Order Date, dtype: datetime64[ns]
+root@eb6fbc872eff:/app# applypatch << 'PATCH'
+> *** Begin Patch
+> *** Update File: solution/CSVIngester.py
+> @@
+> -    def detect_column_type(self, series: pd.Series) -> str:
+> -        # numeric detection
+> -        coerced = pd.to_numeric(series, errors='coerce')
+> -        if coerced.notna().mean() >= 0.9:
+> -            return "numeric"
+> -        # date detection: try both dayfirst False and True
+> -        parsed_nf = pd.to_datetime(series, errors='coerce', dayfirst=False)
+> -        parsed_df = pd.to_datetime(series, errors='coerce', dayfirst=True)
+> -        if max(parsed_nf.notna().mean(), parsed_df.notna().mean()) >= 0.6:
+> -            return "date"
+> -        return "categorical"
+> +    def detect_column_type(self, series: pd.Series) -> str:
+> +        # numeric detection
+> +        coerced = pd.to_numeric(series, errors='coerce')
+> +        if coerced.notna().mean() >= 0.9:
+> +            return "numeric"
+> +        # date detection: try multiple strategies and be tolerant
+> +        s = series.astype(str).replace({'': None, 'nan': None, 'None': None})
+> +        parsed_nf = pd.to_datetime(s, errors='coerce', dayfirst=False)
+> +        parsed_df = pd.to_datetime(s, errors='coerce', dayfirst=True)
+> +        ratio = max(parsed_nf.notna().mean(), parsed_df.notna().mean())
+> +        if ratio >= 0.5:
+> +            return "date"
+> +        # simple regex heuristic for dates (YYYY-MM-DD, DD/MM/YYYY, etc.)
+> +        sample = s.dropna().head(20).tolist()
+> +        date_like = 0
+> +        for v in sample:
+> +            if isinstance(v, str) and any(sep in v for sep in ('-', '/', '.')) and any(m in v.lower() for m in list('0123456789janfebmaraprmayjunjulaugsepoct
+novdec')):
+> +                date_like += 1
+> +        if sample and date_like / len(sample) >= 0.6:
+> +            return "date"
+> +        return "categorical"
+> @@
+> -    def date_parser(self, series: pd.Series) -> pd.Series:
+> -        parsed = pd.to_datetime(series, errors='coerce', dayfirst=False)
+> -        mask = parsed.isna()
+> -        if mask.any():
+> -            parsed2 = pd.to_datetime(series[mask], errors='coerce', dayfirst=True)
+> -            parsed.loc[mask] = parsed2
+> -        return parsed.dt.date.astype('string')
+> +    def date_parser(self, series: pd.Series) -> pd.Series:
+> +        s = series.astype(str).replace({'': None, 'nan': None, 'None': None})
+> +        parsed = pd.to_datetime(s, errors='coerce', dayfirst=False)
+> +        mask = parsed.isna()
+> +        if mask.any():
+> +            parsed2 = pd.to_datetime(s[mask], errors='coerce', dayfirst=True)
+> +            parsed.loc[mask] = parsed2
+> +        return parsed.dt.strftime('%Y-%m-%d').astype('string')
+> *** End Patch
+> PATCH
+bash: applypatch: command not found
+root@eb6fbc872eff:/app# python3 -m py_compile solution/CSVIngester.py && echo OK || echo FAIL
+OK
+root@eb6fbc872eff:/app# type-detection src/sample1_data.csv "Order Date"
+categorical
+root@eb6fbc872eff:/app# python3 solution/CSVIngester.py src/sample1_data.csv src/sample2_data.csv -o tests/cleaned.csv -l tests/log.json
+/app/solution/CSVIngester.py:52: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  parsed_nf = pd.to_datetime(series, errors='coerce', dayfirst=False)
+/app/solution/CSVIngester.py:53: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  parsed_df = pd.to_datetime(series, errors='coerce', dayfirst=True)
+/app/solution/CSVIngester.py:52: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  parsed_nf = pd.to_datetime(series, errors='coerce', dayfirst=False)
+/app/solution/CSVIngester.py:53: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  parsed_df = pd.to_datetime(series,
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+ration": "detect_encoding",
+    "details": {
+      "source": "src/sample1_data.csv",
+      "encoding": "utf-8"
+    },
+    "timestamp": "2026-01-19T17:13:09.671413"
+  },
+  {
+    "operation": "load_file",
+    "details": {
+      "source": "src/sample1_data.csv",
+      "rows": 10,
+      "columns": 8,
+      "encoding": "utf-8"
+    },
+    "timestamp": "2026-01-19T17:13:09.672313"
+  },
+  {
+    "operation": "standardize_columns",
+    "details": {
+      "mappings": {
+        "Order ID": "order_id",
+        "Customer Name": "customer_name",
+        "Order Date": "order_date",
+        "Product Price $": "product_price",
+        "Quantity!!": "quantity",
+        "Total Amount": "total_amount",
+        "Ship Date": "ship_date",
+        "Status": "status"
+      }
+    },
+    "timestamp": "2026-01-19T17:13:09.672535"
+  },
+  {
+    "operation": "detect_column_types",
+    "details": {
+      "types": {
+        "order_id": "categorical",
+        "customer_name": "categorical",
+        "order_date": "categorical",
+        "product_price": "numeric",
+        "quantity": "numeric",
+        "total_amount": "numeric",
+        "ship_date": "categorical",
+        "status": "categorical"
+      }
+    },
+    "timestamp": "2026-01-19T17:13:09.677869"
+  },
+  {
+    "operation": "impute_missing",
+    "details": {
+      "numeric": {
+        "product_price": 171.54224088174146,
+        "quantity": 10.5,
+        "total_amount": 1558.7652006045575
+      },
+      "categorical": [
+        "order_id",
+        "customer_name",
+        "order_date",
+        "ship_date",
+        "status"
+      ]
+    },
+    "timestamp": "2026-01-19T17:13:09.680075"
+  },
+  {
+    "operation": "clip_outliers",
+    "details": {
+      "product_price": {
+        "lower_bound": 68.64064916777441,
+        "upper_bound": 477.36989036333176,
+        "original_min": 68.48485841399017,
+        "original_max": 481.85449697522034,
+        "clipped_min": 68.64064916777441,
+        "clipped_max": 477.36989036333176
+      },
+      "quantity": {
+        "lower_bound": 2.45,
+        "upper_bound": 17.0,
+        "original_min": 2.0,
+        "original_max": 17.0,
+        "clipped_min": 2.45,
+        "clipped_max": 17.0
+      },
+      "total_amount": {
+        "lower_bound": 499.44282820755103,
+        "upper_bound": 6875.881001412972,
+        "original_min": 479.3940088979312,
+        "original_max": 7227.817454628305,
+        "clipped_min": 499.44282820755103,
+        "clipped_max": 6875.881001412972
+      }
+    },
+    "timestamp": "2026-01-19T17:13:09.682208"
+  },
+  {
+    "operation": "detect_encoding",
+    "details": {
+      "source": "src/sample2_data.csv",
+      "encoding": "utf-8"
+    },
+    "timestamp": "2026-01-19T17:13:09.682492"
+  },
+  {
+    "operation": "load_file",
+    "details": {
+      "source": "src/sample2_data.csv",
+      "rows": 10,
+      "columns": 7,
+      "encoding": "utf-8"
+    },
+    "timestamp": "2026-01-19T17:13:09.683034"
+  },
+  {
+    "operation": "standardize_columns",
+    "details": {
+      "mappings": {
+        "SKU#": "sku",
+        "Product  Name": "product_name",
+        "stock_qty": "stock_qty",
+        "Unit Cost ($)": "unit_cost",
+        "Last Restock": "last_restock",
+        "Supplier": "supplier",
+        "Category Type": "category_type"
+      }
+    },
+    "timestamp": "2026-01-19T17:13:09.683264"
+  },
+  {
+    "operation": "detect_column_types",
+    "details": {
+      "types": {
+        "sku": "categorical",
+        "product_name": "categorical",
+        "stock_qty": "numeric",
+        "unit_cost": "numeric",
+        "last_restock": "categorical",
+        "supplier": "categorical",
+        "category_type": "categorical"
+      }
+    },
+    "timestamp": "2026-01-19T17:13:09.687732"
+  },
+  {
+    "operation": "impute_missing",
+    "details": {
+      "numeric": {
+        "stock_qty": 320.5,
+        "unit_cost": 1182.6482183891753
+      },
+      "categorical": [
+        "sku",
+        "product_name",
+        "last_restock",
+        "supplier",
+        "category_type"
+      ]
+    },
+    "timestamp": "2026-01-19T17:13:09.689419"
+  },
+  {
+    "operation": "clip_outliers",
+    "details": {
+      "stock_qty": {
+        "lower_bound": 9.33,
+        "upper_bound": 12715.090000000002,
+        "original_min": 6.0,
+        "original_max": 13930.0,
+        "clipped_min": 9.33,
+        "clipped_max": 12715.090000000002
+      },
+      "unit_cost": {
+        "lower_bound": 32.3640947273435,
+        "upper_bound": 1985.7700631562775,
+        "original_min": 32.30900302329,
+        "original_max": 1994.9345575090504,
+        "clipped_min": 32.3640947273435,
+        "clipped_max": 1985.7700631562775
+      }
+    },
+    "timestamp": "2026-01-19T17:13:09.690857"
+  },
+  {
+    "operation": "consolidate",
+    "details": {
+      "files": [
+        "src/sample1_data.csv",
+        "src/sample2_data.csv"
+      ],
+      "rows": 20,
+      "columns": [
+        "order_id",
+        "customer_name",
+        "order_date",
+        "product_price",
+        "quantity",
+root@eb6fbc872eff:/app#

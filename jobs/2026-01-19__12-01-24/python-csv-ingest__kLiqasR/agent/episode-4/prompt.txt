@@ -1,0 +1,43 @@
+Current Terminal Screen:
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+}root@59fbec45e032:/app# python3 solution/CSVIngester.py --summary src/sample1_data.csv
+{"file": "src/sample1_data.csv", "rows": 10, "columns": 8, "column_names": ["order_id", "customer_name", "order_date", "product_price", "quantity", "total_amoun
+t", "ship_date", "status"], "missing_values": {"order_id": 0, "customer_name": 3, "order_date": 0, "product_price": 1, "quantity": 0, "total_amount": 0, "ship_d
+ate": 4, "status": 6}}
+root@59fbec45e032:/app# python3 solution/CSVIngester.py --encoding-detection src/sample1_data.csv
+python3 solution/CSVIngester.py --name-standardization 'Product Price $'
+utf-8
+root@59fbec45e032:/app# python3 solution/CSVIngester.py --name-standardization 'Product Price $'
+product_price
+root@59fbec45e032:/app# python3 solution/CSVIngester.py --type-detection src/sample1_data.csv 'Order Date'
+/app/solution/CSVIngester.py:74: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed1 = pd.to_datetime(s_nonnull, errors='coerce', infer_datetime_format=True, dayfirst=False)
+categorical
+root@59fbec45e032:/app# python3 solution/CSVIngester.py --date-parsing src/sample1_data.csv 'Order Date'
+/app/solution/CSVIngester.py:83: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed1 = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+{"converted": 2, "total": 10}
+root@59fbec45e032:/app# python3 solution/CSVIngester.py --outlier-truncate src/sample1_data.csv 'Product Price $'
+{"lower_bound": 68.62333908402061, "upper_bound": 477.86817998687496, "original_min": 68.48485841399017, "original_max": 481.85449697522034, "clipped_min": 68.6
+2333908402061, "clipped_max": 477.86817998687496}
+root@59fbec45e032:/app# source solution/solve.sh
+root@59fbec45e032:/app# encoding-detection src/sample2_data.csv
+python3: can't open file '/bin/CSVIngester.py': [Errno 2] No such file or directory
+asciinema: recording finished
+asciinema: asciicast saved to /logs/agent/recording.cast
+root@59fbec45e032:/app# name-standardization 'Quantity!!'
+bash: name-standardization: command not found
+root@59fbec45e032:/app# type-detection src/sample2_data.csv 'Ship Date'
+bash: type-detection: command not found
+root@59fbec45e032:/app# csv-summary src/sample2_data.csv
+bash: csv-summary: command not found
+root@59fbec45e032:/app# file-processing tests/output.csv tests/final_log.json src/sample1_data.csv src/sample2_data.csv
+bash: file-processing: command not found
+root@59fbec45e032:/app# sed -n '1,50p' tests/output.csv
+sed: can't read tests/output.csv: No such file or directory
+root@59fbec45e032:/app# sed -n '1,120p' tests/final_log.json
+sed: can't read tests/final_log.json: No such file or directory
+root@59fbec45e032:/app#

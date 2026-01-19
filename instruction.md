@@ -6,7 +6,7 @@ Implement a Python CLI that ingests multiple CSV inputs with inconsistent schema
 - Python CLI that ingests multiple CSV inputs
 - Inputs must have inconsistent schemas (varying names, encodings, date formats)
 - Must have standardized column names, ISO-formats dates
-- Inputs missing numericals by median and categoricals as 'Unknown'
+- Change inputs missing numericals to median and categoricals to 'Unknown'
 - Clip the numeric outliers at the 1st/99th percentiles
 - Should output a consolidated cleaned dataset
 - Have a JSON log of applied cleaning operations
@@ -20,14 +20,13 @@ Implement a Python CLI that ingests multiple CSV inputs with inconsistent schema
 
 ### Python Dependencies
 ```bash
-
-pytest==8.4.1 \# For testing
+pytest==8.4.1 \
 argparse==1.4.0 \
 datetime==5.5 \
-pandas>=2.0.0
-numpy>=1.24.0
+pandas==2.3.3 \
+numpy==2.0.2 \
 pathlib==1.0.1 \
- typing==3.10.0.0 
+typing==3.10.0.0 
 ```
 
 ---
@@ -46,7 +45,7 @@ pip install pandas numpy pytest
 
 ### 3. Make Scripts Executable
 ```bash
-chmod +x src/CSVIngester.py
+chmod +x solution/CSVIngester.py
 chmod +x solution/solve.sh
 chmod +x tests/test.sh
 ```
@@ -56,11 +55,13 @@ chmod +x tests/test.sh
 ## Project Structure
 
 ```
-python-csv-ingest/
-├── src
-|   |__ CSVIngester.py         # Main Python CLI application
-├── solution        
-|   |__ solve.sh                # Bash shell interface
+python-csv-ingest/      
+├── solution  
+|   |__ CSVIngester.py        # Main Python CLI application
+|   |__ solve.sh                # Bash shell interface to run the solution
+|__ src
+|   |__ sample1_data.csv       # Sample data to test the solution
+|   |__ sample2_data.csv
 ├── tests
 |    |__ test.sh                # Bash shell to run test interface
 |   |__test_outputs.py            # Pytest test suite
@@ -78,24 +79,24 @@ python-csv-ingest/
 
 ## Core Components
 
-### 1. CSV Ingester (`CSVIngester.py`)
+### 1. CSV Ingester `CSVIngester.py`
 
 **Main Class: `CSVIngester`**
 
 **Key Methods:**
-- `encode_process()` - Auto-detects file encoding (UTF-8, Latin-1, etc.)
+- `encode_process()` - Auto-detects file encoding (UTF-8, and Latin-1)
 - `standardize_column_name()` - Converts columns to snake_case
 - `detect_column_type()` - Identifies numeric/date/categorical columns
 - `date_parser()` - Converts various date formats to ISO-8601
 - `outlier_truncate()` - Clips values at 1st/99th percentiles
 - `logging_process()` - Output a json log of the cleaned process
 - `get_operations_log()` - Helper functions to output json logs
-- `processed_dataframe()` - Cleans and process a single CSV file
-- `consolidated_cleaned_dataframes()` - Merges multiple cleaned CSV file 
+- `processed_dataframe()` - Clean and process a single CSV file
+- `consolidated_cleaned_dataframes()` - Merge multiple cleaned CSV file 
 - `file_processor()` - Full pipeline execution
 
 **Features:**
-- ✅ Handles multiple encodings (UTF-8, Latin-1, ISO-8859-1, CP1252)
+- ✅ Handles multiple encodings (UTF-8, and Latin-1)
 - ✅ Standardizes inconsistent column names
 - ✅ Detects and parses 14+ date formats
 - ✅ Fills missing numerics with median
@@ -114,7 +115,7 @@ python-csv-ingest/
 - `dataframe-cleaning <csv_file> [output_file]`
 - `dataframe-consolidation <output_file> <file1> <file2> ...`
 - `file-processing <output_file> <log_file> <file1> <file2> ...`
-- `cleaning_log [log_file]`
+- `cleaning-log [log_file]`
 - `csv-summary <csv_file>`
 - `get-operations <output_file>`
 
@@ -134,13 +135,13 @@ Three already generated messy CSV files for testing:
 #### 1. Clean Data Using Python CLI
 ```bash
 # Basic usage
-python src/CSVIngester.py tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+python solution/CSVIngester.py tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
 
 # Custom output paths
-python src/CSVIngester.py tests/test_data.csv tests/test2_data.csv -o tests/cleaned.csv -l tests/log.json
+python solution/CSVIngester.py tests/test_data.csv tests/test2_data.csv -o tests/cleaned.csv -l tests/log.json
 
 # View help
-python src/CSVIngester.py --help
+python solution/CSVIngester.py --help
 ```
 
 #### 3. Clean Data Using Bash Functions
@@ -184,7 +185,7 @@ type-detection "tests/test_data.csv" "Status"  # Returns: categorical
 
 #### Analyze Outliers
 ```bash
-outlier_truncate "tests/test_data.csv" "Product Price $"
+outlier-truncate "tests/test_data.csv" "Product Price $"
 ```
 
 Output (JSON):
@@ -212,7 +213,7 @@ dataframe-consolidation "consolidated_output.csv" "tests/test_data.csv" "tests/t
 #### View Cleaning Log
 ```bash
 file-processing "output.csv" "log.json" "tests/test_data.csv"
-cleaning_log "log.json"
+cleaning-log "log.json"
 ```
 
 Output (JSON):
@@ -520,7 +521,7 @@ pytest tests/test_outputs.py::test_summary_shows_missing_values -v
 ```
 --
 
-### Test Case 10: Log Operations Data
+### Test Case 11: Log Operations Data
 
 **Input:**
 - CSV files
@@ -536,7 +537,7 @@ pytest tests/test_outputs.py::test_get_existing_operations -v
 pytest tests/test_outputs.py::test_process_log_contains_operations -v
 ```
 
-### Test Case 11: Replacing Empty Values
+### Test Case 12: Replacing Empty Values
 **Input:**
 - CSV files
 

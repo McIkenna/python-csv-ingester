@@ -1,0 +1,42 @@
+New Terminal Output:
+
+root@c28acbfc71a0:/app# cat > tests/test_data.csv << 'CSV_EOF'
+> Order ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status
+> ORD1000,,01-10-2023,264.31,7,1850.19,09-10-2023,
+> ORD1001,John Doe,2023-04-02,171.54,17,2916.22,,Shipped
+> ORD1002,Bob Johnson,05.12.2023,,17,3317.41,2023-12-11,
+> ORD1003,Alice Williams,29.08.2023,70.22,10,702.16,09/07/2023,Pending
+> ORD1004,John Smith,2023/01/09,318.75,8,2550.02,,Active
+> ORD1005,,14-02-2023,90.52,14,1267.34,,Cancelled
+> ORD1006,Alice Williams,20.04.2023,432.03,2,864.05,21.04.2023,Cancelled
+> ORD1007,Jane Doe,11/24/2023,68.48,,479.39,2023/11/29,
+> ORD1008,Jane Doe,03/22/2023,9500.00,15,7227.82,,Active
+> ORD1009,Alice Williams,25.07.2023,111.06,11,1221.61,03-08-2023,Shipped
+> CSV_EOF
+root@c28acbfc71a0:/app# cat > tests/test2_data.csv << 'CSV_EOF'
+> SKU#,Product  Name,stock_qty,Unit Cost ($),Last Restock,Supplier,Category Type
+> SKU-3000,Monitor,261,32.31,2023-11-11,,Accessories
+> SKU-3001,Mouse,431,194.72,23-09-2023,MegaStore,Accessories
+> SKU-3002,Chair,406,1994.93,2023/10/15,,Electronics
+> SKU-3003,Monitor,411,1763.16,2023/11/08,GlobalTech,Accessories
+> SKU-3004,,124,1402.72,2023-10-28,GlobalTech,Accessories
+> SKU-3005,Keyboard,375,1195.11,04-08-2023,OfficeSupply Inc,
+> SKU-3006,Monitor,43,1893.11,05-12-2023,GlobalTech,Electronics
+> SKU-3007,Mouse,13930,399.45,08/04/2023,TechCorp,Accessories
+> SKU-3008,Laptop,266,,2023/11/24,,
+> SKU-3009,Desk,6,32.92,08/22/2023,OfficeSupply Inc,Accessories
+> CSV_EOF
+root@c28acbfc71a0:/app# cat > tests/test3_data.csv << 'CSV_EOF'
+> Employee-ID,Full Name,Hire_Date,Annual Salary,Department!!,Manager,Performance Score
+> EMP001,Sarah Connor,Jan 15 2023,75000.50,Engineering,John Smith,
+> EMP002,,2023-02-20,65000.00,Sales,,85
+> EMP003,Michael Scott,03/10/2023,95000.00,Management,Jane Doe,92
+> EMP004,Pam Beesly,2023.04.05,55000.00,Reception,Michael Scott,88
+> EMP005,Jim Halpert,15-05-2023,,Sales,Michael Scott,
+> EMP006,Dwight Schrute,06/15/2023,70000.00,Sales,,95
+> EMP007,,2023-07-01,80000.00,Engineering,John Smith,87
+> EMP008,Angela Martin,08.20.2023,60000.00,,Michael Scott,90
+> EMP009,Kevin Malone,2023/09/12,50000.00,Accounting,Angela Martin,75
+> EMP010,Oscar Martinez,10-25-2023,72000.00,Accounting,Angela Martin,93
+> CSV_EOF
+root@c28acbfc71a0:/app#

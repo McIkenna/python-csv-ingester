@@ -5,6 +5,30 @@ import subprocess
 import csv
 
 
+def get_test_directory():
+    """Get test directory with Oracle/local fallback"""
+    if os.path.exists('/tests') and os.path.isdir('/tests'):
+        return '/tests'
+    return os.path.dirname(os.path.abspath(__file__))
+
+def get_solve_sh_path():
+    """Find solve.sh with multiple fallback locations"""
+    possible_paths = [
+        '/solution/solve.sh',  # Oracle absolute path
+        'solution/solve.sh',   # Relative from project root
+        os.path.join(os.path.dirname(get_test_directory()), 'solution', 'solve.sh'),
+    ]
+    
+    for path in possible_paths:
+        if os.path.exists(path):
+            return path
+    
+    raise FileNotFoundError(f"solve.sh not found. Tried: {possible_paths}")
+
+TEST_DIR = get_test_directory()
+# os.path.dirname(os.path.abspath(__file__)) 
+# PROJECT_ROOT = os.path.dirname(TEST_DIR)
+# PROJECT_ROOT= "app/solution"
 def extract_json_from_output(output):
     """Extract JSON from output that may contain other text"""
     try:
@@ -35,7 +59,7 @@ def extract_json_from_output(output):
 
 @pytest.fixture
 def mock_latin1_data():
-    filepath = os.path.join('tests', 'latin1_data.csv')
+    filepath = os.path.join(TEST_DIR, 'latin1_data.csv')
     latin1_bytes = (
     b"Order Date,Product Price \xa3,Quantity!!,Total Amount,Ship Date\n"
     b"01-10-2023,264.31,7,1850.19,09-10-2023\n"
@@ -53,11 +77,16 @@ def mock_latin1_data():
     with open(filepath, 'w', newline='', encoding='latin-1') as f:
         writer = csv.writer(f)
         writer.writerows(csv_text)
-    return filepath
+
+    print(f"Created mock Latin-1 data file at: {filepath}")
+    yield filepath
+
+    if os.path.exists(filepath):
+        os.remove(filepath)
 
 @pytest.fixture
 def mock_test_data():
-    filepath = os.path.join('tests', 'test_data.csv')
+    filepath = os.path.join(TEST_DIR, 'test_data.csv')
     data = [
     ["Order ID", "Customer Name", "Order Date", "Product Price $", "Quantity!!", "Total Amount", "Ship Date", "Status"],
     ["ORD1000", "", "01-10-2023", "264.3134984759545", "7", "1850.1944893316813", "09-10-2023", ""],
@@ -75,11 +104,14 @@ def mock_test_data():
     with open(filepath, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerows(data)
-    return filepath
+    yield filepath
+
+    if os.path.exists(filepath):
+        os.remove(filepath)
 
 @pytest.fixture
 def mock_test_data_two():
-    filepath = os.path.join('tests', 'test2_data.csv')
+    filepath = os.path.join(TEST_DIR, 'test2_data.csv')
     data = [
     ["SKU#", "Product  Name", "stock_qty", "Unit Cost ($)", "Last Restock", "Supplier", "Category Type"],
     ["SKU-3000", "Monitor", "261", "32.30900302329", "2023-11-11", "", "Accessories"],
@@ -96,11 +128,14 @@ def mock_test_data_two():
     with open(filepath, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerows(data)
-    return filepath
+    yield filepath
+
+    if os.path.exists(filepath):
+        os.remove(filepath)
 
 @pytest.fixture
 def mock_test_data_three():
-    filepath = os.path.join('tests', 'test3_data.csv')
+    filepath = os.path.join(TEST_DIR, 'test3_data.csv')
     data = [
     ["EMP_ID", "Full Name", "hire-date", "Department Name", "Annual_Salary", "Performance Score", "Email Address"],
     ["E2000", "David Wilson", "12/11/21", "Finance", "114970.72704852688", "2", "david.wilson@company.com"],
@@ -117,12 +152,16 @@ def mock_test_data_three():
     with open(filepath, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerows(data)
-    return filepath
+    yield filepath
+
+    if os.path.exists(filepath):
+        os.remove(filepath)
 
 @pytest.fixture
 def solve_sh_path():
-    """Get path to solve.sh"""
-    return os.path.join('solution', "solve.sh")
+    """Return the absolute path to solve.sh"""
+    path = get_solve_sh_path()
+    return path
 
 def run_bash_command(command_name, args, file_path):
     cmd = f"{file_path} {command_name} {args}"
@@ -178,7 +217,7 @@ def test_should_detect_latin_encoding(mock_latin1_data, solve_sh_path):
 
 def test_should_detect_encoding_nonexistent_file(solve_sh_path):
     """Test with non-existent file"""
-    fake_file = os.path.join('tests', "nonexistent.csv")
+    fake_file = os.path.join(TEST_DIR, "nonexistent.csv")
     stdout, stderr, returncode = run_bash_command(
         "encoding-detection",
         f'"{fake_file}"',
@@ -257,7 +296,7 @@ def test_detect_nonexistent_column(mock_test_data_three, solve_sh_path):
         f'"{mock_test_data_three}" "NonExistent"',
         solve_sh_path
     )
-    assert returncode == 0
+    assert returncode == 1
     assert "not found" in stdout.lower()
 
 
@@ -296,6 +335,7 @@ def test_parse_mixed_date_formats( mock_test_data_two, solve_sh_path):
 # Outlier Truncation Tests
 #=============================================================================
 def test_clip_numeric_outliers(mock_test_data, solve_sh_path):
+    print('solve_sh_path:', solve_sh_path)
     """Test clipping of numeric outliers"""
     stdout, stderr, returncode = run_bash_command(
         "outlier-truncate",
@@ -320,7 +360,7 @@ def test_clip_numeric_outliers(mock_test_data, solve_sh_path):
 #=============================================================================
 def test_clean_single_dataframe(mock_test_data, solve_sh_path):
     """Test cleaning of entire dataframe"""
-    output_file = os.path.join('tests', 'cleaned_output.csv')
+    output_file = os.path.join(TEST_DIR, 'cleaned_output.csv')
     if os.path.exists(output_file):
         os.remove(output_file)
     
@@ -342,7 +382,7 @@ def test_clean_single_dataframe(mock_test_data, solve_sh_path):
 
 def test_cleaned_columns_standardized(mock_test_data, solve_sh_path):
         """Test that cleaned CSV has standardized column names"""
-        output_file = os.path.join('tests', 'cleaned_output.csv')
+        output_file = os.path.join(TEST_DIR, 'cleaned_output.csv')
         stdout, stderr, returncode = run_bash_command(
             "dataframe-cleaning",
             f'"{mock_test_data}" "{output_file}"',
@@ -367,7 +407,7 @@ def test_cleaned_columns_standardized(mock_test_data, solve_sh_path):
 #=============================================================================
 def test_consolidate_dataframes(mock_test_data, mock_test_data_two, mock_test_data_three, solve_sh_path):
     """Test consolidation of multiple dataframes"""
-    output_file = os.path.join('tests', 'consolidated_output.csv')
+    output_file = os.path.join(TEST_DIR, 'consolidated_output.csv')
     
     stdout, stderr, returncode = run_bash_command(
         "dataframe-consolidation",
@@ -390,8 +430,8 @@ def test_consolidate_dataframes(mock_test_data, mock_test_data_two, mock_test_da
 
 def test_process_full_pipeline(mock_test_data, mock_test_data_two, mock_test_data_three, solve_sh_path):
         """Test the complete processing pipeline"""
-        output_file = os.path.join('tests', "final_output.csv")
-        log_file = os.path.join('tests', "process_log.json")
+        output_file = os.path.join(TEST_DIR, "final_output.csv")
+        log_file = os.path.join(TEST_DIR, "process_log.json")
         
         stdout, stderr, returncode = run_bash_command(
             "file-processing",
@@ -418,8 +458,8 @@ def test_process_full_pipeline(mock_test_data, mock_test_data_two, mock_test_dat
 
 def test_process_log_contains_operations(mock_test_data_two,solve_sh_path):
         """Test that processing log contains expected operations"""
-        output_file = os.path.join('tests', "output.csv")
-        log_file = os.path.join('tests', "log.json")
+        output_file = os.path.join(TEST_DIR, "output.csv")
+        log_file = os.path.join(TEST_DIR, "log.json")
         
         stdout, stderr, returncode = run_bash_command(
             "file-processing",
@@ -439,8 +479,8 @@ def test_process_log_contains_operations(mock_test_data_two,solve_sh_path):
 
 def test_get_existing_operations(mock_test_data, solve_sh_path):
   
-        output_file = os.path.join('tests', "output.csv")
-        log_file = os.path.join('tests', "log.json")
+        output_file = os.path.join(TEST_DIR, "output.csv")
+        log_file = os.path.join(TEST_DIR, "log.json")
         
         # First, run processing to generate log
         stdout, stderr, returncode = run_bash_command(
@@ -470,8 +510,8 @@ def test_get_existing_operations(mock_test_data, solve_sh_path):
 #=============================================================================
 def test_get_median_for_missing(mock_test_data, solve_sh_path):
     """Test to replace missing categorical values with 'Unknown'"""
-    output_file = os.path.join('tests', 'output.csv')
-    log_file = os.path.join('tests', "log.json")
+    output_file = os.path.join(TEST_DIR, 'output.csv')
+    log_file = os.path.join(TEST_DIR, "log.json")
     if os.path.exists(output_file):
         os.remove(output_file)
     with open(mock_test_data, "r", encoding="utf-8") as f:
@@ -520,8 +560,8 @@ def test_get_median_for_missing(mock_test_data, solve_sh_path):
 
 def test_get_unknown_for_missing(mock_test_data_two, solve_sh_path):
     """Test to replace missing categorical values with 'Unknown'"""
-    output_file = os.path.join('tests', 'output.csv')
-    log_file = os.path.join('tests', "log.json")
+    output_file = os.path.join(TEST_DIR, 'output.csv')
+    log_file = os.path.join(TEST_DIR, "log.json")
     if os.path.exists(output_file):
         os.remove(output_file)
     with open(mock_test_data_two, "r", encoding="utf-8") as f:
@@ -569,8 +609,8 @@ def test_get_unknown_for_missing(mock_test_data_two, solve_sh_path):
 #=============================================================================
 def test_get_cleaning_log(mock_test_data, solve_sh_path):
         """Test retrieval of cleaning log"""
-        output_file = os.path.join('tests', "output.csv")
-        log_file = os.path.join('tests', "log.json")
+        output_file = os.path.join(TEST_DIR, "output.csv")
+        log_file = os.path.join(TEST_DIR, "log.json")
         
         # First, run processing to generate log
         stdout, stderr, returncode = run_bash_command(
@@ -582,7 +622,7 @@ def test_get_cleaning_log(mock_test_data, solve_sh_path):
         
         # Now, get cleaning log
         stdout, stderr, returncode = run_bash_command(
-            "cleaning_log",
+            "cleaning-log",
             f'"{log_file}"',
             solve_sh_path
         )
@@ -599,10 +639,10 @@ def test_get_cleaning_log(mock_test_data, solve_sh_path):
 
 def test_get_cleaning_log_nonexistent_file(solve_sh_path):
         """Test retrieval of cleaning log from non-existent file"""
-        fake_log_file = os.path.join('tests', "nonexistent_log.json")
+        fake_log_file = os.path.join(TEST_DIR, "nonexistent_log.json")
         
         stdout, stderr, returncode = run_bash_command(
-            "cleaning_log",
+            "cleaning-log",
             f'"{fake_log_file}"',
             solve_sh_path
         )
@@ -682,8 +722,8 @@ def test_full_workflow(mock_test_data, mock_test_data_two,  mock_test_data_three
     assert "numeric" in stdout2.strip()
     
     # 3. Process files
-    output_file = os.path.join('tests', "final.csv")
-    log_file = os.path.join('tests', "final_log.json")
+    output_file = os.path.join(TEST_DIR, "final.csv")
+    log_file = os.path.join(TEST_DIR, "final_log.json")
     stdout3, _, _ = run_bash_command(
         "file-processing",
         f'"{output_file}" "{log_file}" "{mock_test_data}" "{mock_test_data_two}" "{mock_test_data_three}"',

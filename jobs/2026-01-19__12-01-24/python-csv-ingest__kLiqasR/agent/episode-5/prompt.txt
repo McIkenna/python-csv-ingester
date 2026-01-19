@@ -1,0 +1,43 @@
+Current Terminal Screen:
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+        "source": "src/sample1_data.csv",
+        "column": "quantity",
+        "lower_bound": 2.45,
+        "upper_bound": 17.0,
+        "original_min": 2.0,
+        "original_max": 17.0,
+        "clipped_min": 2.45,
+        "clipped_max": 17.0
+      },
+      "timestamp": "2026-01-19T18:07:31.524049"
+    },
+    {
+      "operation": "impute_numeric",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "column": "total_amount",
+        "strategy": "median",
+        "value": 1558.7652006045575
+      },
+      "timestamp": "2026-01-19T18:07:31.524178"
+    },
+    {
+      "operation": "clip_outliers",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "column": "total_amount",
+        "lower_bound": 499.44282820755103,
+        "upper_bound": 6875.881001412972,
+        "original_min": 479.3940088979312,
+        "original_max": 7227.817454628305,
+        "clipped_min": 499.44282820755103,
+        "clipped_max": 6875.881001412972
+      },
+      "timestamp": "2026-01-19T18:07:31.524646"
+    },
+    {
+      "operation": "impute_categorical",
+      "details": {
+        "source": "src/sample1_data.csv",
+root@59fbec45e032:/app#

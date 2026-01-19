@@ -1,0 +1,24 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@748a2d3420c1:/app# source solution/solve.sh 2>&1 | head -15
+CSV Ingester bash functions loaded. Available commands:
+  - encoding-detection <filepath>
+  - name-standardization <column_name>
+  - type-detection <csv_file> <column_name>
+  - date-parsing <csv_file> <column_name>
+  - outlier-truncate <csv_file> <column_name>
+  - dataframe-cleaning <csv_file> [output_file]
+  - dataframe-consolidation <output_file> <file1> <file2> ...
+  - file-processing <output_file> <log_file> <file1> <file2> ...
+  - cleaning-log [log_file]
+  - csv-summary <csv_file>
+  - get-operations <log_file>
+root@748a2d3420c1:/app# encoding-detection tests/test_data.csv
+bash: encoding-detection: command not found
+root@748a2d3420c1:/app# name-standardization "Product Price $"
+bash: name-standardization: command not found
+root@748a2d3420c1:/app#

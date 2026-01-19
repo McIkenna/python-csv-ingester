@@ -1,0 +1,258 @@
+New Terminal Output:
+
+(venv) root@e011675799ef:/app# sed -n '1,200p' solution/CSVIngester.py
+#!/usr/bin/env python3
+import argparse
+import json
+import sys
+from pathlib import Path
+from datetime import datetime
+from typing import List, Dict, Any, Optional
+import pandas as pd
+import numpy as np
+
+DATE_FORMATS = [
+    '%Y-%m-%d', '%Y/%m/%d', '%Y.%m.%d',
+    '%m/%d/%Y', '%m/%d/%y', '%m-%d-%Y', '%-m-%-d-%Y' if sys.platform != 'win32' else '%m-%d-%Y',
+    '%d/%m/%Y', '%d.%m.%Y', '%d-%m-%Y',
+    '%b %d, %Y', '%d %b %Y', '%B %d, %Y', '%d %B %Y',
+    '%b %d %Y', '%d %b, %Y'
+]
+
+class CSVIngester:
+    def __init__(self):
+        self.operations: List[Dict[str, Any]] = []
+
+    def log(self, operation: str, details: Dict[str, Any]):
+        self.operations.append({
+            'operation': operation,
+            'details': details,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+
+    def encode_process(self, file_path: str) -> str:
+        p = Path(file_path)
+        if not p.exists():
+            self.log('detect_encoding_error', {'source': str(p), 'error': 'file_not_found'})
+            raise FileNotFoundError(f"File not found: {file_path}")
+        # try utf-8 first
+        try:
+            with open(p, 'r', encoding='utf-8') as f:
+                f.read(1024)
+            enc = 'utf-8'
+        except UnicodeDecodeError:
+            enc = 'latin-1'
+        self.log('detect_encoding', {'source': str(p), 'encoding': enc})
+        return enc
+
+    @staticmethod
+    def standardize_column_name(name: str) -> str:
+        if name is None:
+            return 'unknown'
+        # Lowercase
+        s = str(name).strip().lower()
+        # Replace non-word characters with space
+        s = ''.join(ch if ch.isalnum() else ' ' for ch in s)
+        # Collapse spaces to single underscore
+        parts = [p for p in s.split() if p]
+        s = '_'.join(parts)
+        return s
+
+    def detect_column_type(self, series: pd.Series) -> str:
+        # Try numeric
+        try:
+            s_num = pd.to_numeric(series, errors='coerce')
+            num_non_nan = s_num.notna().sum()
+            if num_non_nan > 0 and num_non_nan >= 0.6 * len(series):
+                return 'numeric'
+        except Exception:
+            pass
+        # Try date by parsing sample
+        if self._is_date_series(series):
+            return 'date'
+        return 'categorical'
+
+    def _is_date_series(self, series: pd.Series) -> bool:
+        s = series.dropna().astype(str)
+        if s.empty:
+            return False
+        sample = s.head(min(10, len(s)))
+        parsed_any = 0
+        for v in sample:
+            if self._parse_date(v) is not None:
+                parsed_any += 1
+        return parsed_any >= max(1, int(0.6 * len(sample)))
+
+    def _parse_date(self, value: str) -> Optional[str]:
+        v = str(value).strip()
+        if not v:
+            return None
+        # Try pandas to_datetime first with dayfirst and yearfirst heuristics
+        try:
+            dt = pd.to_datetime(v, errors='raise', dayfirst=False, yearfirst=False)
+            return dt.date().isoformat()
+        except Exception:
+            pass
+        try:
+            dt = pd.to_datetime(v, errors='raise', dayfirst=True, yearfirst=False)
+            return dt.date().isoformat()
+        except Exception:
+            pass
+        # Fallback to manual list
+        for fmt in DATE_FORMATS:
+            try:
+                dt = datetime.strptime(v, fmt)
+                return dt.date().isoformat()
+            except Exception:
+                continue
+        return None
+
+    def date_parser(self, series: pd.Series) -> pd.Series:
+        def parse(v):
+            if pd.isna(v):
+                return pd.NaT
+            iso = self._parse_date(str(v))
+            return iso if iso is not None else pd.NaT
+        parsed = series.apply(parse)
+        self.log('parse_dates', {
+            'column': getattr(series, 'name', None),
+            'parsed_count': int(parsed.notna().sum()),
+            'total': int(len(parsed))
+        })
+        return parsed
+
+    def outlier_truncate(self, series: pd.Series) -> Dict[str, Any]:
+        s = pd.to_numeric(series, errors='coerce')
+        if s.dropna().empty:
+            return {
+                'lower_bound': None,
+                'upper_bound': None,
+                'original_min': None,
+                'original_max': None,
+                'clipped_min': None,
+                'clipped_max': None
+            }
+        lower = float(np.nanpercentile(s, 1))
+        upper = float(np.nanpercentile(s, 99))
+        original_min = float(np.nanmin(s))
+        original_max = float(np.nanmax(s))
+        clipped = s.clip(lower, upper)
+        result = {
+            'lower_bound': lower,
+            'upper_bound': upper,
+            'original_min': original_min,
+            'original_max': original_max,
+            'clipped_min': float(np.nanmin(clipped)),
+            'clipped_max': float(np.nanmax(clipped))
+        }
+        self.log('clip_outliers
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+ut CSV path')
+>     p.add_argument('-l', '--log', default='cleaning_log.json', help='Log JSON path')
+>     p.add_argument('--summary', help='Print summary for a CSV file and exit')
+>     p.add_argument('--get-operations', dest='get_operations', action='store_true', help='Print operations log JSON and exit')
+>     return p
+>
+>
+> def csv_summary(path: str) -> Dict[str, Any]:
+>     ing = CSVIngester()
+>     try:
+>         enc = ing.encode_process(path)
+>         df = pd.read_csv(path, encoding=enc)
+>     except FileNotFoundError:
+>         return {'file': path, 'error': 'file_not_found'}
+>     return {
+>         'file': path,
+>         'rows': int(df.shape[0]),
+>         'columns': int(df.shape[1]),
+>         'column_names': list(map(str, df.columns)),
+>         'missing_values': {str(c): int(df[c].isna().sum()) for c in df.columns}
+>     }
+>
+>
+> def main(argv=None):
+>     argv = argv or sys.argv[1:]
+>     parser = build_arg_parser()
+>     args = parser.parse_args(argv)
+>     ing = CSVIngester()
+>
+>     if args.summary:
+>         s = csv_summary(args.summary)
+>         print(json.dumps(s, indent=2))
+>         return 0
+>
+>     if not args.files:
+>         print('No input files provided', file=sys.stderr)
+>         return 1
+>
+>     ing.file_processor(args.output, args.log, args.files)
+>
+>     if args.get_operations:
+>         print(json.dumps(ing.get_operations_log(), indent=2))
+>     return 0
+>
+>
+> if __name__ == '__main__':
+>     sys.exit(main())
+> PY
+(venv) root@e011675799ef:/app# printf '' > solution/__init__.py
+(venv) root@e011675799ef:/app# chmod +x solution/CSVIngester.py
+(venv) root@e011675799ef:/app# source venv/bin/activate
+(venv) root@e011675799ef:/app# python solution/CSVIngester.py src/sample1_data.csv src/sample2_data.csv -o cleaned_data.csv -l cleaning_log.json
+/app/solution/CSVIngester.py:85: UserWarning: Parsing dates in %d.%m.%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+a format to silence this warning.
+  dt = pd.to_datetime(v, errors='raise', dayfirst=dayfirst, yearfirst=False)
+/app/solution/CSVIngester.py:85: UserWarning: Parsing dates in %d-%m-%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+a format to silence this warning.
+  dt = pd.to_datetime(v, errors='raise', dayfirst=dayfirst, yearfirst=False)
+/app/solution/CSVIngester.py:85: UserWarning: Parsing dates in %d.%m.%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+a format to silence this warning.
+  dt = pd.to_datetime(v, errors='raise', dayfirst=dayfirst, yearfirst=False)
+/app/solution/CSVIngester.py:85: UserWarning: Parsing dates in %d.%m.%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+a format to silence this warning.
+  dt = pd.to_datetime(v, errors='raise', dayfirst=dayfirst, yearfirst=False)
+/app/solution/CSVIngester.py:85: UserWarning: Parsing dates in %d-%m-%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+a format to silence this warning.
+  dt = pd.to_datetime(v, errors='raise', dayfirst=dayfirst, yearfirst=False)
+/app/solution/CSVIngester.py:85: UserWarning: Parsing dates in %d-%m-%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+a format to silence this warning.
+  dt = pd.to_datetime(v, errors='raise', dayfirst=dayfirst, yearfirst=False)
+/app/solution/CSVIngester.py:85: UserWarning: Parsing dates in %d-%m-%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+a format to silence this warning.
+  dt = pd.to_datetime(v, errors='raise', dayfirst=dayfirst, yearfirst=False)
+(venv) root@e011675799ef:/app# head -n 5 cleaned_data.csv
+order_id,customer_name,order_date,product_price,quantity,total_amount,ship_date,status,sku,product_name,stock_qty,unit_cost,last_restock,supplier,category_type
+ORD1000,Unknown,2023-01-10,264.3134984759545,7.0,1850.194489331681,2023-09-10,Unknown,,,,,,,
+ORD1001,Unknown,2023-04-02,171.54224088174146,17.0,2916.2180949896047,,Shipped,,,,,,,
+ORD1002,Bob Johnson,2023-05-12,171.54224088174146,17.0,3317.4124189023737,2023-12-11,Unknown,,,,,,,
+ORD1003,Alice Williams,2023-08-29,70.21586678937072,10.0,702.1586678937072,2023-09-07,Unknown,,,,,,,
+(venv) root@e011675799ef:/app# jq '.operations[0:5]' cleaning_log.json | sed -n '1,120p'
+bash: jq: command not found
+(venv) root@e011675799ef:/app# source solution/solve.sh
+(venv) root@e011675799ef:/app# csv-summary src/sample1_data.csv
+{
+  "file": "src/sample1_data.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Order ID": 0,
+    "Customer Name": 3,
+    "Order Date": 0,
+    "Product Price $": 1,
+    "Quantity!!": 0,
+    "Total Amount": 0,
+    "Ship Date": 4,
+    "Status": 6
+  }
+}
+(venv) root@e011675799ef:/app#

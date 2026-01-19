@@ -1,0 +1,70 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@748a2d3420c1:/app# pip install pytest --quiet
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a v
+irtual environment instead: https://pip.pypa.io/warnings/venv
+
+[notice] A new release of pip is available: 24.0 -> 25.3
+[notice] To update, run: pip install --upgrade pip
+root@748a2d3420c1:/app# python3 -m pytest tests/test_outputs.py -v --tb=short 2>&1 | tail -50
+rootdir: /app
+collecting ... collected 25 items
+
+tests/test_outputs.py::test_standardize_spaces_col_name PASSED           [  4%]
+tests/test_outputs.py::test_standardize_any_special_chars PASSED         [  8%]
+tests/test_outputs.py::test_standardize_any_casing PASSED                [ 12%]
+tests/test_outputs.py::test_detect_date_column PASSED                    [ 16%]
+tests/test_outputs.py::test_parse_iso_dates PASSED                       [ 20%]
+tests/test_outputs.py::test_parse_mixed_date_formats PASSED              [ 24%]
+tests/test_outputs.py::test_clean_single_dataframe PASSED                [ 28%]
+tests/test_outputs.py::test_cleaned_columns_standardized PASSED          [ 32%]
+tests/test_outputs.py::test_get_unknown_for_missing PASSED               [ 36%]
+tests/test_outputs.py::test_get_median_for_missing PASSED                [ 40%]
+tests/test_outputs.py::test_clip_numeric_outliers PASSED                 [ 44%]
+tests/test_outputs.py::test_consolidate_dataframes PASSED                [ 48%]
+tests/test_outputs.py::test_should_detect_utf8_encoding PASSED           [ 52%]
+tests/test_outputs.py::test_should_detect_latin_encoding PASSED          [ 56%]
+tests/test_outputs.py::test_should_detect_encoding_nonexistent_file PASSED [ 60%]
+tests/test_outputs.py::test_process_full_pipeline PASSED                 [ 64%]
+tests/test_outputs.py::test_full_workflow PASSED                         [ 68%]
+tests/test_outputs.py::test_detect_numeric_column PASSED                 [ 72%]
+tests/test_outputs.py::test_detect_categorical_column PASSED             [ 76%]
+tests/test_outputs.py::test_detect_nonexistent_column PASSED             [ 80%]
+tests/test_outputs.py::test_get_cleaning_log_nonexistent_file PASSED     [ 84%]
+tests/test_outputs.py::test_summary_shows_missing_values PASSED          [ 88%]
+tests/test_outputs.py::test_get_csv_summary PASSED                       [ 92%]
+tests/test_outputs.py::test_get_existing_operations PASSED               [ 96%]
+tests/test_outputs.py::test_process_log_contains_operations PASSED       [100%]
+
+=============================== warnings summary ===============================
+tests/test_outputs.py: 30 warnings
+  /app/solution/CSVIngester.py:250: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace me
+thod.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a
+ copy.
+
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, t
+o perform the operation inplace on the original object.
+
+
+    df[col].fillna('Unknown', inplace=True)
+
+tests/test_outputs.py: 26 warnings
+  /app/solution/CSVIngester.py:208: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace me
+thod.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a
+ copy.
+
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, t
+o perform the operation inplace on the original object.
+
+
+    df[col].fillna(median_val, inplace=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 25 passed, 56 warnings in 1.07s ========================
+root@748a2d3420c1:/app#

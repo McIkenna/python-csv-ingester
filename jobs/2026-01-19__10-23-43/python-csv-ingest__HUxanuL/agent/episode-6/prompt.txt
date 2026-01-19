@@ -1,0 +1,270 @@
+New Terminal Output:
+
+root@c28acbfc71a0:/app# cat > tests/test_outputs.py << 'PYTEST_EOF'
+> #!/usr/bin/env python3
+> """
+> Comprehensive test suite for CSV Ingester
+> """
+>
+> import pytest
+> import pandas as pd
+> import json
+> import os
+> import sys
+> from pathlib import Path
+>
+> # Add solution directory to path
+> sys.path.insert(0, str(Path(__file__).parent.parent / 'solution'))
+>
+> from CSVIngester import CSVIngester
+>
+>
+> @pytest.fixture
+> def ingester():
+>     """Create a fresh CSVIngester instance for each test."""
+>     return CSVIngester()
+>
+>
+> @pytest.fixture
+> def test_data_path():
+>     """Path to test data directory."""
+>     return Path(__file__).parent
+>
+after processing
+        numeric_cols = df.select_dtypes(include=['number']).columns
+        for col in numeric_cols:
+            assert df[col].not>
+> class TestColumnNameStandardization:
+>     """Test column name standardization functionality."""
+ppin>
+>     def test_standardize_spaces_col_name(self, ingester):
+>         """Test standardization of column names with spaces."""
+>         assert ingester.standardize_column_name("Product Name") == "product_name"
+>         assert ingester.standardize_column_name("Customer Name") == "customer_name"
+>
+>     def test_standardize_any_special_chars(self, ingester):
+>         """Test removal of special characters."""
+>         assert ingester.standardize_column_name("Product Price $") == "product_price"
+>         assert ingester.standardize_column_name("Quantity!!") == "quantity"
+consoli>         assert ingester.standardize_column_name("SKU#") == "sku"
+>
+>     def test_standardize_any_casing(self, ingester):
+>         """Test case conversion to lowercase."""
+>         assert ingester.standardize_column_name("Order ID") == "order_id"
+>         assert ingester.standardize_column_name("ORDER_ID") == "order_id"
+>         assert ingester.standardize_column_name("OrderID") == "orderid"
+>
+>
+> class TestDateFormatDetection:
+>     """Test date detection and parsing."""
+>
+>     def test_detect_date_column(self, ingester, test_data_path):
+>         """Test detection of date columns."""
+>         df = pd.read_csv(test_data_path / 'test_data.csv')
+>         col_type = ingester.detect_column_type(df, 'Order Date')
+>         assert col_type == 'date'
+>
+>     def test_parse_iso_dates(self, ingester):
+>         """Test parsing of ISO format dates."""
+>         assert ingester.date_parser('2023-01-15') == '2023-01-15'
+>         assert ingester.date_parser('2023/01/15') == '2023-01-15'
+>
+>     def test_parse_mixed_date_formats(self, ingester):
+>         """Test parsing of various date formats."""
+>         assert ingester.date_parser('01-10-2023') == '2023-10-01'
+>         assert ingester.date_parser('05.12.2023') == '2023-12-05'
+coding detection."""
+        encoding = ingester.encode_process(str(test_data_path / 'test_data.csv'))
+        assert encoding in ['>         assert ingester.date_parser('Jan 15 2023') == '2023-01-15'
+>
+>
+> class TestColumnTypeDetection:
+>     """Test column type detection."""
+t>
+>     def test_detect_numeric_column(self, ingester, test_data_path):
+>         """Test detection of numeric columns."""
+>         df = pd.read_csv(test_data_path / 'test2_data.csv')
+>         col_type = ingester.detect_column_type(df, 'stock_qty')
+>         assert col_type == 'numeric'
+>
+>     def test_detect_categorical_column(self, ingester, test_data_path):
+>         """Test detection of categorical columns."""
+>         df = pd.read_csv(test_data_path / 'test_data.csv')
+>         col_type = ingester.detect_column_type(df, 'Status')
+>         assert col_type == 'categorical'
+>
+>     def test_detect_nonexistent_column(self, ingester, test_data_path):
+>         """Test detection on nonexistent column."""
+>         df = pd.read_csv(test_data_path / 'test_data.csv')
+>         col_type = ingester.detect_column_type(df, 'NonExistent')
+>         assert col_type == 'unknown'
+>
+>
+> class TestMissingValueImputation:
+>     """Test missing value imputation."""
+ / 'output.csv'
+        l>
+>     def test_clean_single_dataframe(self, ingester, test_data_path):
+>         """Test cleaning of a single dataframe."""
+>         df = ingester.processed_dataframe(str(test_data_path / 'test_data.csv'))
+>
+put file >         # Check that dataframe was returned
+>         assert df is not None
+>         assert len(df) > 0
+>
+eck outpu>     def test_get_unknown_for_missing(self, ingester, test_data_path):
+>         """Test that missing categoricals are filled with 'Unknown'."""
+f = pd.read_csv(output_file)
+        assert len(df) > 0
+
+        # Check log has operations
+        with open(log_>         df = ingester.processed_dataframe(str(test_data_path / 'test_data.csv'))
+>
+>         # Status column should have no NaN values and contain 'Unknown'
+>         assert df['status'].notna().all() or 'Unknown' in df['status'].values
+>
+>     def test_get_median_for_missing(self, ingester, test_data_path):
+>         """Test that missing numerics are filled 
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+1', 'cp1252']
+>
+>     def test_should_detect_latin_encoding(self, ingester, test_data_path):
+>         """Test Latin-1 encoding detection."""
+>         # Create a Latin-1 encoded file
+>         latin_file = test_data_path / 'latin1_test.csv'
+>         with open(latin_file, 'w', encoding='latin-1') as f:
+>             f.write('Name,Value\n')
+>             f.write('Test,123\n')
+>
+>         encoding = ingester.encode_process(str(latin_file))
+>         assert encoding in ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+>
+>         # Cleanup
+>         latin_file.unlink()
+>
+>     def test_should_detect_encoding_nonexistent_file(self, ingester):
+>         """Test encoding detection on nonexistent file."""
+>         result = ingester.encode_process('nonexistent.csv')
+>         assert result is None
+>
+>
+> class TestFullPipeline:
+>     """Test full pipeline execution."""
+in([__file__, '-v'])
+PYTEST_EOF
+>
+>     def test_process_full_pipeline(self, ingester, test_data_path, tmp_path):
+>         """Test complete pipeline from input to output."""
+>         output_file = tmp_path / 'output.csv'
+>         log_file = tmp_path / 'log.json'
+>
+>         files = [str(test_data_path / 'test_data.csv')]
+>
+>         ingester.file_processor(files, str(output_file), str(log_file))
+>
+>         # Check output file exists
+>         assert output_file.exists()
+>         assert log_file.exists()
+>
+>         # Check output has data
+>         df = pd.read_csv(output_file)
+>         assert len(df) > 0
+>
+>         # Check log has operations
+>         with open(log_file) as f:
+>             log_data = json.load(f)
+>         assert 'operations' in log_data
+>         assert len(log_data['operations']) > 0
+>
+>     def test_full_workflow(self, ingester, test_data_path, tmp_path):
+>         """Test full workflow with multiple files."""
+>         output_file = tmp_path / 'consolidated.csv'
+>         log_file = tmp_path / 'workflow_log.json'
+>
+>         files = [
+>             str(test_data_path / 'test_data.csv'),
+>             str(test_data_path / 'test2_data.csv'),
+>             str(test_data_path / 'test3_data.csv')
+>         ]
+>
+>         ingester.file_processor(files, str(output_file), str(log_file))
+>
+>         # Verify output
+>         assert output_file.exists()
+>         df = pd.read_csv(output_file)
+>         assert len(df) >= 30  # 10 rows from each file
+>
+>
+> class TestErrorHandling:
+>     """Test error handling."""
+>
+>     def test_get_cleaning_log_nonexistent_file(self, ingester):
+>         """Test handling of nonexistent log file."""
+>         summary = ingester.get_csv_summary('nonexistent.csv')
+>         assert 'error' in summary
+>
+>     def test_summary_shows_missing_values(self, ingester, test_data_path):
+>         """Test that summary includes missing value counts."""
+>         summary = ingester.get_csv_summary(str(test_data_path / 'test_data.csv'))
+>
+>         assert 'missing_values' in summary
+>         assert 'rows' in summary
+>         assert 'columns' in summary
+>
+>
+> class TestCSVSummary:
+>     """Test CSV summary functionality."""
+>
+>     def test_get_csv_summary(self, ingester, test_data_path):
+>         """Test CSV summary generation."""
+>         summary = ingester.get_csv_summary(str(test_data_path / 'test_data.csv'))
+>
+>         assert 'file' in summary
+>         assert 'rows' in summary
+>         assert 'columns' in summary
+>         assert 'column_names' in summary
+>         assert summary['rows'] == 10
+>         assert summary['columns'] == 8
+>
+>
+> class TestLogOperations:
+>     """Test logging operations."""
+>
+>     def test_get_existing_operations(self, ingester, test_data_path):
+>         """Test retrieval of operations log."""
+>         # Process a file to generate operations
+>         df = ingester.processed_dataframe(str(test_data_path / 'test_data.csv'))
+>
+>         # Get operations log
+>         operations = ingester.get_operations_log()
+>
+>         assert len(operations) > 0
+>         assert all('operation' in op for op in operations)
+>         assert all('details' in op for op in operations)
+>
+>     def test_process_log_contains_operations(self, ingester, test_data_path, tmp_path):
+>         """Test that processing creates operation logs."""
+>         output_file = tmp_path / 'test_output.csv'
+>         log_file = tmp_path / 'test_log.json'
+>
+>         files = [str(test_data_path / 'test_data.csv')]
+>         ingester.file_processor(files, str(output_file), str(log_file))
+>
+>         # Read log
+>         with open(log_file) as f:
+>             log_data = json.load(f)
+>
+>         assert 'timestamp' in log_data
+>         assert 'operations' in log_data
+>         assert len(log_data['operations']) > 0
+>
+>         # Check for expected operations
+>         op_types = [op['operation'] for op in log_data['operations']]
+>         assert 'load_file' in op_types
+>         assert 'standardize_columns' in op_types
+>
+>
+> if __name__ == '__main__':
+>     pytest.main([__file__, '-v'])
+> PYTEST_EOF
+root@c28acbfc71a0:/app#

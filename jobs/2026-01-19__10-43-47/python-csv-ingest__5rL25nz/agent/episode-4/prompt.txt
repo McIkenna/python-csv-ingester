@@ -1,0 +1,86 @@
+New Terminal Output:
+
+root@1b998c08ea2f:/app# python3 solution/CSVIngester.py src/sample1_data.csv src/sample2_data.csv -o tests/cleaned_default.csv -l tests/log_default.json
+usage: CSVIngester.py [-h] [-o OUTPUT] [-l LOG]
+                      {encoding-detection,name-standardization,type-detection,date-parsing,outlier-truncate,dataframe-cleaning,dataframe-consolidation,file-proc
+essing,cleaning-log,csv-summary,get-operations}
+                      ... [files ...]
+CSVIngester.py: error: argument cmd: invalid choice: 'src/sample1_data.csv' (choose from 'encoding-detection', 'name-standardization', 'type-detection', 'date-p
+arsing', 'outlier-truncate', 'dataframe-cleaning', 'dataframe-consolidation', 'file-processing', 'cleaning-log', 'csv-summary', 'get-operations')
+root@1b998c08ea2f:/app# wc -l tests/cleaned_default.csv; head -n 5 tests/cleaned_default.csv
+wc: tests/cleaned_default.csv: No such file or directory
+head: cannot open 'tests/cleaned_default.csv' for reading: No such file or directory
+root@1b998c08ea2f:/app# python3 solution/CSVIngester.py dataframe-cleaning --file src/sample1_data.csv --output tests/one.csv
+/app/solution/CSVIngester.py:67: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+/app/solution/CSVIngester.py:67: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+/app/solution/CSVIngester.py:71: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+/app/solution/CSVIngester.py:71: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+/app/solution/CSVIngester.py:67: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+/app/solution/CSVIngester.py:67: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+/app/solution/CSVIngester.py:71: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+/app/solution/CSVIngester.py:71: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+/app/solution/CSVIngester.py:67: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+/app/solution/CSVIngester.py:71: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+/app/solution/CSVIngester.py:67: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+/app/solution/CSVIngester.py:71: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+/app/solution/CSVIngester.py:67: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+/app/solution/CSVIngester.py:67: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  dt = pd.to_datetime(s, errors='coerce', infer_datetime_format=True)
+/app/solution/CSVIngester.py:71: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it
+ is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+/app/solution/CSVIngester.py:71: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing
+ is consistent and as-expected, please specify a format.
+  dt = pd.to_datetime(head, errors='coerce', dayfirst=True, infer_datetime_format=True)
+tests/one.csv
+root@1b998c08ea2f:/app# wc -l tests/one.csv; head -n 5 tests/one.csv
+11 tests/one.csv
+order_id,customer_name,order_date,product_price,quantity,total_amount,ship_date,status
+ORD1000,Unknown,01-10-2023,264.3134984759545,7.0,1850.194489331681,09-10-2023,Unknown
+ORD1001,Unknown,2023-04-02,171.54224088174146,17.0,2916.2180949896047,Unknown,Shipped
+ORD1002,Bob Johnson,05.12.2023,171.54224088174146,17.0,3317.4124189023737,2023-12-11,Unknown
+ORD1003,Alice Williams,29.08.2023,70.21586678937072,10.0,702.1586678937072,09/07/2023,Unknown
+root@1b998c08ea2f:/app# python3 solution/CSVIngester.py dataframe-consolidation --output tests/cons.csv src/sample1_data.csv src/sample2_data.csv
+tests/cons.csv
+root@1b998c08ea2f:/app# wc -l tests/cons.csv; head -n 5 tests/cons.csv
+1 tests/cons.csv
+
+root@1b998c08ea2f:/app# python3 solution/CSVIngester.py cleaning-log --log tests/log_default.json | sed -n '1,200p'
+Traceback (most recent call last):
+  File "/app/solution/CSVIngester.py", line 353, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/app/solution/CSVIngester.py", line 330, in main
+    print(json.dumps(ing.get_operations_log(args.log), indent=2))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/solution/CSVIngester.py", line 181, in get_operations_log
+    raise FileNotFoundError(f"Log file not found: {log_file}")
+FileNotFoundError: Log file not found: tests/log_default.json
+root@1b998c08ea2f:/app#

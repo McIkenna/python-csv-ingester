@@ -1,0 +1,43 @@
+Current Terminal Screen:
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+Processing complete!
+Output: output.csv
+Log: operations_log.json
+root@c28acbfc71a0:/app# head -5 output.csv && echo '---' && wc -l output.csv
+order_id,customer_name,order_date,product_price,quantity,total_amount,ship_date,status,sku,product_name,stock_qty,unit_cost,last_restock,supplier,category_type
+ORD1000,Unknown,2023-10-01,264.3134984759545,7.0,1850.194489331681,2023-10-09,Unknown,,,,,,,
+ORD1001,Unknown,2023-04-02,171.54224088174146,17.0,2916.2180949896047,,Shipped,,,,,,,
+ORD1002,Bob Johnson,2023-05-12,171.54224088174146,17.0,3317.4124189023737,2023-12-11,Unknown,,,,,,,
+ORD1003,Alice Williams,2023-08-29,70.21586678937072,10.0,702.1586678937072,2023-07-09,Unknown,,,,,,,
+---
+21 output.csv
+root@c28acbfc71a0:/app# echo 'Log operations:' && cat operations_log.json | grep '"operation"' | head -10
+Log operations:
+      "operation": "load_file",
+      "operation": "standardize_columns",
+      "operation": "impute_categorical",
+      "operation": "parse_dates",
+      "operation": "clip_outliers",
+      "operation": "impute_numeric",
+      "operation": "clip_outliers",
+      "operation": "clip_outliers",
+      "operation": "parse_dates",
+      "operation": "impute_categorical",
+root@c28acbfc71a0:/app# rm -f tests/cleaned_data.csv tests/cleaning_log.json output.csv operations_log.json
+root@c28acbfc71a0:/app# ls -lah
+total 20K
+drwxr-xr-x 1 root root 4.0K Jan 19 16:30 .
+drwxr-xr-x 1 root root 4.0K Jan 19 16:23 ..
+drwxr-xr-x 3 root root 4.0K Jan 19 16:29 solution
+drwxr-xr-x 2 root root 4.0K Jan 19 16:09 src
+drwxr-xr-x 4 root root 4.0K Jan 19 16:30 tests
+root@c28acbfc71a0:/app#

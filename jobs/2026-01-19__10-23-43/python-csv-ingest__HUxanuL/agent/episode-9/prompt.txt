@@ -1,0 +1,233 @@
+New Terminal Output:
+
+root@c28acbfc71a0:/app# cat > solution/CSVIngester.py << 'PYTHON_FIX_EOF'
+lean = col_data.> #!/usr/bin/env python3
+> """
+> CSV Ingester - Data Cleaning and Consolidation Tool
+> Handles multiple CSV files with inconsistent schemas, encodings, and formats.
+> """
+>
+> import pandas as pd
+an.quantile(0.01)
+        upper_bound = col_data_clean.quantil> import numpy as np
+> import re
+> import json
+> import argparse
+> import sys
+> from pathlib import Path
+> from datetime import datetime
+()
+
+        c> from typing import Dict, List, Tuple, Any, Optional
+>
+>
+> class CSVIngester:
+>     """Main class for CSV data ingestion and cleaning."""
+>
+ped_min = clipped.min()
+        clipped_max = clipped.>     def __init__(self):
+max()
+
+        r>         self.operations_log = []
+>         self.date_formats = [
+>             '%Y-%m-%d', '%Y/%m/%d', '%Y.%m.%d',
+>             '%d-%m-%Y', '%d/%m/%Y', '%d.%m.%d',
+>             '%m-%d-%Y', '%m/%d/%Y', '%m.%d.%Y',
+float(original_min),
+            'original_max': float(original_max),
+       >             '%d-%m-%y', '%d/%m/%y',
+>             '%m-%d-%y', '%m/%d/%y',
+>             '%b %d, %Y', '%d %b %Y', '%B %d, %Y',
+>             '%d %B %Y', '%b %d %Y'
+>         ]
+     'clipped_min': float(clipped_min),
+            'clipped_max': float(clipped_max)
+        }
+
+    def logging_process(self, operation: str, details: Dict[str, A>
+>     def encode_process(self, filepath: str) -> Optional[str]:
+>         """Auto-detect file encoding."""
+>         encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+>
+>         if not Path(filepath).exists():
+).isoformat()
+        }
+        self.ope>             return None
+>
+>         for encoding in encodings:
+>             try:
+>                 with open(filepath, 'r', encoding=encoding) as f:
+return se>                     f.read()
+>                 return encoding
+>             except (UnicodeDecodeError, FileNotFoundError):
+>                 continue
+>
+>         return 'utf-8'  # Default fallback
+>
+>     def standardize_column_name(self, col_name: str) -> str:
+>         """Convert column names to snake_case."""
+>         # Remove special characters except spaces and underscores
+>         col_name = re.sub(r'[^a-zA-Z0-9\s_]', '', col_name)
+>         # Replace spaces with underscores
+>         col_name = re.sub(r'\s+', '_', col_name)
+>         # Convert to lowercase
+>         col_name = col_name.lower()
+ardize column names
+        column_m>         # Remove leading/trailing underscores
+>         col_name = col_name.strip('_')
+>         return col_name
+>
+>     def detect_column_type(self, df: pd.DataFrame, col_name: str) -> str:
+ppings[col] = standardized
+          >         """Identify column type: numeric, date, or categorical."""
+  new_columns.append(standardized)
+
+        df.columns = ne>         if col_name not in df.columns:
+      self.logging>             return 'unknown'
+>
+>         col_data = df[col_name].dropna()
+>
+>         if len(col_data) == 0:
+>             return 'categorical'
+>
+>         # Check if numeric
+>         try:
+>             pd.to_numeric(col_data, errors='raise')
+>             return 'numeric'
+>         except (ValueError, TypeError):
+>             pass
+>
+>         # Check if date
+>         date_count = 0
+>         sample_size = min(20, len(col_data))
+
+            >         for value in col_data.head(sample_size):
+>             try:
+>                 if self.date_parser(str(value)) is not None:
+>                     date_count += 1
+    # Clip outliers
+                if df[col].notna().sum() > 0:
+                    lower = df[col].quantile(0.01)
+                    upper = df[col].quantile(0>             except Exception:
+>                 # Skip problematic values
+>                 pass
+>
+>         if sample_size > 0 and date_count / sample_size > 0.5:
+>             return 'date'
+>
+e': filepath,
+ >         return 'categorical'
+>
+>     def date_parser(self, date_str: str) -> Optional[str]:
+                       'column': col,
+                        'lower_percentile': float(lower>         """Parse various date formats to ISO-8601."""
+>         if pd.isna(date_str) or date_str == '' or date_str == 'nan':
+>             return None
+>
+>         date_str = str(date_str).strip()
+>
+>         for fmt in self.date_formats:
+>             try:
+>                 parsed_date = datetime.strptime(date_str, fmt)
+>                 return parsed_date.strftime('%Y-%m-%d')
+>             except (ValueError, TypeError, re.error):
+>                 continue
+>
+>         # Try pandas datetime parser as fallback
+>         try:
+>             parsed_date = pd.to_datetime(date_str, errors='coerce')
+>             if pd.notna(parsed_date):
+>                 return parsed_date.strftime('%Y-%m-%d')
+>         except Exception:
+>             pass
+>
+>         return None
+>
+>     def outlier_truncate(self, df: pd.DataFrame, col_name: str) -> Dict[str, float]:
+>         """Clip values at 1st/99th percentiles and return statistics."""
+>  
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+     main()
+> PYTHON_FIX_EOF
+root@c28acbfc71a0:/app# chmod +x solution/CSVIngester.py
+root@c28acbfc71a0:/app# python3 solution/CSVIngester.py tests/test_data.csv tests/test2_data.csv -o tests/cleaned_data.csv -l tests/cleaning_log.json
+/app/solution/CSVIngester.py:245: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:111: UserWarning: Parsing dates in %d.%m.%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+ a format to silence this warning.
+  parsed_date = pd.to_datetime(date_str, errors='coerce')
+/app/solution/CSVIngester.py:220: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:220: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:111: UserWarning: Parsing dates in %d.%m.%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify
+ a format to silence this warning.
+  parsed_date = pd.to_datetime(date_str, errors='coerce')
+/app/solution/CSVIngester.py:245: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:245: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:220: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:245: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+Processing complete!
+Output saved to: tests/cleaned_data.csv
+Log saved to: tests/cleaning_log.json
+root@c28acbfc71a0:/app#

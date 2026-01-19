@@ -1,0 +1,290 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 26,
+            "passed": 0,
+            "failed": 26,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1768845049.8332853,
+            "stop": 1768845050.0697076
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::test_should_detect_utf8_encoding",
+                "status": "failed",
+                "duration": 0.00029408299906208413,
+                "start": 1768845049.8752627,
+                "stop": 1768845049.887106,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data_two():\n        filepath = os.path.join('tests', 'test2_data.csv')\n        data = [\n        [\"SKU#\", \"Product  Name\", \"stock_qty\", \"Unit Cost ($)\", \"Last Restock\", \"Supplier\", \"Category Type\"],\n        [\"SKU-3000\", \"Monitor\", \"261\", \"32.30900302329\", \"2023-11-11\", \"\", \"Accessories\"],\n        [\"SKU-3001\", \"Mouse\", \"431\", \"194.71833117751393\", \"23-09-2023\", \"MegaStore\", \"Accessories\"],\n        [\"SKU-3002\", \"Chair\", \"406\", \"1994.9345575090506\", \"2023/10/15\", \"\", \"Electronics\"],\n        [\"SKU-3003\", \"Monitor\", \"411\", \"1763.1557275063572\", \"2023/11/08\", \"GlobalTech\", \"Accessories\"],\n        [\"SKU-3004\", \"Mouse\", \"124\", \"1402.7151131444941\", \"2023-10-28\", \"GlobalTech\", \"Accessories\"],\n        [\"SKU-3005\", \"Keyboard\", \"375\", \"1195.107567789151\", \"04-08-2023\", \"OfficeSupply Inc\", \"\"],\n        [\"SKU-3006\", \"Monitor\", \"43\", \"1893.1068424782395\", \"05-12-2023\", \"GlobalTech\", \"Electronics\"],\n        [\"SKU-3007\", \"Mouse\", \"13930\", \"399.4540451996029\", \"08/04/2023\", \"TechCorp\", \"Accessories\"],\n        [\"SKU-3008\", \"Laptop\", \"266\", \"1170.1888689891994\", \"2023/11/24\", \"\", \"\"],\n        [\"SKU-3009\", \"Desk\", \"6\", \"32.92113306832887\", \"08/22/2023\", \"OfficeSupply Inc\", \"Accessories\"],\n    ]\n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test2_data.csv'\n\n/tests/test_outputs.py:102: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_should_detect_latin_encoding",
+                "status": "failed",
+                "duration": 0.00020924999989802018,
+                "start": 1768845049.887718,
+                "stop": 1768845049.8934364,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_latin1_data():\n        filepath = os.path.join('tests', 'latin1_data.csv')\n        latin1_bytes = (\n        b\"Order Date,Product Price \\xa3,Quantity!!,Total Amount,Ship Date\\n\"\n        b\"01-10-2023,264.31,7,1850.19,09-10-2023\\n\"\n        b\"2023-04-02,171.54,17,2916.21,\\n\"\n        b\"05.12.2023,195.14,17,3317.41,2023-12-11\\n\"\n        b\"29.08.2023,70.21,10,702.15,09/07/2023\\n\"\n        b\"2023/01/09,318.75,8,2550.02,\\n\"\n        b\"14-02-2023,90.52,14,1267.33,\\n\"\n        b\"20.04.2023,432.02,2,864.05,21.04.2023\\n\"\n        b\"11/24/2023,68.48,7,479.39,2023/11/29\\n\"\n        b\"03/22/2023,481.85,15,7227.81,\\n\"\n        b\"25.07.2023,111.05,11,1221.60,03-08-2023\\n\"\n    )\n        csv_text = [line.decode('latin-1').split(',') for line in latin1_bytes.split(b'\\n') if line]\n>       with open(filepath, 'w', newline='', encoding='latin-1') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/latin1_data.csv'\n\n/tests/test_outputs.py:53: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_should_detect_encoding_nonexistent_file",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.003852206999908958,
+                "start": 1768845049.8943994,
+                "stop": 1768845049.904389,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "solve_sh_path = 'solution/solve.sh'\n\n    def test_should_detect_encoding_nonexistent_file(solve_sh_path):\n        \"\"\"Test with non-existent file\"\"\"\n        fake_file = os.path.join('tests', \"nonexistent.csv\")\n        stdout, stderr, returncode = run_bash_command(\n            \"encoding-detection\",\n            f'\"{fake_file}\"',\n            solve_sh_path\n        )\n>       assert returncode != 0\nE       assert 0 != 0\n\n/tests/test_outputs.py:199: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_standardize_spaces_col_name",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0025937510008589015,
+                "start": 1768845049.9045043,
+                "stop": 1768845049.9123256,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "solve_sh_path = 'solution/solve.sh'\n\n    def test_standardize_spaces_col_name(solve_sh_path):\n            \"\"\"Test standardizing column with spaces\"\"\"\n            stdout, stderr, returncode = run_bash_command(\n                \"name-standardization\",\n                '\"Order Date\"',\n                solve_sh_path\n            )\n            assert returncode == 0\n>           assert stdout.strip() == \"order_date\"\nE           AssertionError: assert '' == 'order_date'\nE             \nE             - order_date\n\n/tests/test_outputs.py:209: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_standardize_any_special_chars",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.003156959000079951,
+                "start": 1768845049.9124424,
+                "stop": 1768845049.920605,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "solve_sh_path = 'solution/solve.sh'\n\n    def test_standardize_any_special_chars(solve_sh_path):\n            \"\"\"Test standardizing column with special characters\"\"\"\n            stdout, stderr, returncode = run_bash_command(\n                \"name-standardization\",\n                '\"Price $!!\"',\n                solve_sh_path\n            )\n            assert returncode == 0\n>           assert stdout.strip() == \"price\"\nE           AssertionError: assert '' == 'price'\nE             \nE             - price\n\n/tests/test_outputs.py:219: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_standardize_any_casing",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0027540000000954024,
+                "start": 1768845049.9209476,
+                "stop": 1768845049.9287848,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "solve_sh_path = 'solution/solve.sh'\n\n    def test_standardize_any_casing(solve_sh_path):\n            \"\"\"Test standardizing column with special characters\"\"\"\n            stdout, stderr, returncode = run_bash_command(\n                \"name-standardization\",\n                '\"ProductPrice\"',\n                solve_sh_path\n            )\n            assert returncode == 0\n>           assert stdout.strip() == \"product_price\"\nE           AssertionError: assert '' == 'product_price'\nE             \nE             - product_price\n\n/tests/test_outputs.py:229: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_detect_numeric_column",
+                "status": "failed",
+                "duration": 0.0007393749992843368,
+                "start": 1768845049.9295459,
+                "stop": 1768845049.9355793,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data():\n        filepath = os.path.join('tests', 'test_data.csv')\n        data = [\n        [\"Order ID\", \"Customer Name\", \"Order Date\", \"Product Price $\", \"Quantity!!\", \"Total Amount\", \"Ship Date\", \"Status\"],\n        [\"ORD1000\", \"\", \"01-10-2023\", \"264.3134984759545\", \"7\", \"1850.1944893316813\", \"09-10-2023\", \"\"],\n        [\"ORD1001\", \"\", \"2023-04-02\", \"171.54224088174146\", \"17\", \"2916.2180949896047\", \"\", \"Shipped\"],\n        [\"ORD1002\", \"Bob Johnson\", \"05.12.2023\",\"\" , \"17\", \"3317.4124189023737\", \"2023-12-11\", \"\"],\n        [\"ORD1003\", \"Alice Williams\", \"29.08.2023\", \"70.21586678937072\", \"10\", \"702.1586678937072\", \"09/07/2023\", \"\"],\n        [\"ORD1004\", \"John Smith\", \"2023/01/09\", \"318.7528395915485\", \"8\", \"2550.022716732388\", \"\", \"\"],\n        [\"ORD1005\", \"Alice Williams\", \"14-02-2023\", \"90.523993705531\", \"14\", \"1267.335911877434\", \"\", \"Cancelled\"],\n        [\"ORD1006\", \"Alice Williams\", \"20.04.2023\", \"432.0255346209029\", \"2\", \"864.0510692418057\", \"21.04.2023\", \"Cancelled\"],\n        [\"ORD1007\", \"\", \"11/24/2023\", \"68.48485841399017\", \"7\", \"479.39400889793114\", \"2023/11/29\", \"\"],\n        [\"ORD1008\", \"Jane Doe\", \"03/22/2023\", \"481.85449697522034\", \"15\", \"7227.817454628305\", \"\", \"\"],\n        [\"ORD1009\", \"Alice Williams\", \"25.07.2023\", \"111.05535490816476\", \"11\", \"1221.6089039898125\", \"03-08-2023\", \"Shipped\"],\n    ]\n    \n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test_data.csv'\n\n/tests/test_outputs.py:78: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_detect_date_column",
+                "status": "failed",
+                "duration": 0.00031895800020720344,
+                "start": 1768845049.9358175,
+                "stop": 1768845049.942065,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data_two():\n        filepath = os.path.join('tests', 'test2_data.csv')\n        data = [\n        [\"SKU#\", \"Product  Name\", \"stock_qty\", \"Unit Cost ($)\", \"Last Restock\", \"Supplier\", \"Category Type\"],\n        [\"SKU-3000\", \"Monitor\", \"261\", \"32.30900302329\", \"2023-11-11\", \"\", \"Accessories\"],\n        [\"SKU-3001\", \"Mouse\", \"431\", \"194.71833117751393\", \"23-09-2023\", \"MegaStore\", \"Accessories\"],\n        [\"SKU-3002\", \"Chair\", \"406\", \"1994.9345575090506\", \"2023/10/15\", \"\", \"Electronics\"],\n        [\"SKU-3003\", \"Monitor\", \"411\", \"1763.1557275063572\", \"2023/11/08\", \"GlobalTech\", \"Accessories\"],\n        [\"SKU-3004\", \"Mouse\", \"124\", \"1402.7151131444941\", \"2023-10-28\", \"GlobalTech\", \"Accessories\"],\n        [\"SKU-3005\", \"Keyboard\", \"375\", \"1195.107567789151\", \"04-08-2023\", \"OfficeSupply Inc\", \"\"],\n        [\"SKU-3006\", \"Monitor\", \"43\", \"1893.1068424782395\", \"05-12-2023\", \"GlobalTech\", \"Electronics\"],\n        [\"SKU-3007\", \"Mouse\", \"13930\", \"399.4540451996029\", \"08/04/2023\", \"TechCorp\", \"Accessories\"],\n        [\"SKU-3008\", \"Laptop\", \"266\", \"1170.1888689891994\", \"2023/11/24\", \"\", \"\"],\n        [\"SKU-3009\", \"Desk\", \"6\", \"32.92113306832887\", \"08/22/2023\", \"OfficeSupply Inc\", \"Accessories\"],\n    ]\n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test2_data.csv'\n\n/tests/test_outputs.py:102: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_detect_categorical_column",
+                "status": "failed",
+                "duration": 0.0001623739990463946,
+                "start": 1768845049.9422395,
+                "stop": 1768845049.9475572,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data_two():\n        filepath = os.path.join('tests', 'test2_data.csv')\n        data = [\n        [\"SKU#\", \"Product  Name\", \"stock_qty\", \"Unit Cost ($)\", \"Last Restock\", \"Supplier\", \"Category Type\"],\n        [\"SKU-3000\", \"Monitor\", \"261\", \"32.30900302329\", \"2023-11-11\", \"\", \"Accessories\"],\n        [\"SKU-3001\", \"Mouse\", \"431\", \"194.71833117751393\", \"23-09-2023\", \"MegaStore\", \"Accessories\"],\n        [\"SKU-3002\", \"Chair\", \"406\", \"1994.9345575090506\", \"2023/10/15\", \"\", \"Electronics\"],\n        [\"SKU-3003\", \"Monitor\", \"411\", \"1763.1557275063572\", \"2023/11/08\", \"GlobalTech\", \"Accessories\"],\n        [\"SKU-3004\", \"Mouse\", \"124\", \"1402.7151131444941\", \"2023-10-28\", \"GlobalTech\", \"Accessories\"],\n        [\"SKU-3005\", \"Keyboard\", \"375\", \"1195.107567789151\", \"04-08-2023\", \"OfficeSupply Inc\", \"\"],\n        [\"SKU-3006\", \"Monitor\", \"43\", \"1893.1068424782395\", \"05-12-2023\", \"GlobalTech\", \"Electronics\"],\n        [\"SKU-3007\", \"Mouse\", \"13930\", \"399.4540451996029\", \"08/04/2023\", \"TechCorp\", \"Accessories\"],\n        [\"SKU-3008\", \"Laptop\", \"266\", \"1170.1888689891994\", \"2023/11/24\", \"\", \"\"],\n        [\"SKU-3009\", \"Desk\", \"6\", \"32.92113306832887\", \"08/22/2023\", \"OfficeSupply Inc\", \"Accessories\"],\n    ]\n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test2_data.csv'\n\n/tests/test_outputs.py:102: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_detect_nonexistent_column",
+                "status": "failed",
+                "duration": 0.000789373999396048,
+                "start": 1768845049.9476461,
+                "stop": 1768845049.953814,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data_three():\n        filepath = os.path.join('tests', 'test3_data.csv')\n        data = [\n        [\"EMP_ID\", \"Full Name\", \"hire-date\", \"Department Name\", \"Annual_Salary\", \"Performance Score\", \"Email Address\"],\n        [\"E2000\", \"David Wilson\", \"12/11/21\", \"Finance\", \"114970.72704852688\", \"2\", \"david.wilson@company.com\"],\n        [\"E2001\", \"Olivia Davis\", \"2022.09.21\", \"\", \"100384.15881094255\", \"6\", \"olivia.davis@company.com\"],\n        [\"E2002\", \"Sarah Wilson\", \"24/07/2017\", \"HR\", \"93612.46734951547\", \"1\", \"sarah.wilson@company.com\"],\n        [\"E2003\", \"David Moore\", \"\", \"Finance\", \"44620.187981135394\", \"6\", \"david.moore@company.com\"],\n        [\"E2004\", \"Michael Wilson\", \"11/07/2022\", \"\", \"139059.60025167133\", \"10\", \"michael.wilson@company.com\"],\n        [\"E2005\", \"Michael Miller\", \"2019.11.14\", \"Sales\", \"60261.168774296195\", \"3\", \"michael.miller@company.com\"],\n        [\"E2006\", \"\", \"2022.06.14\", \"HR\", \"89472.57725628052\", \"10\", \"\"],\n        [\"E2007\", \"Michael Taylor\", \"08/21/17\", \"HR\", \"131550.1613921459\", \"5\", \"michael.taylor@company.com\"],\n        [\"E2008\", \"Emma Davis\", \"2020.11.24\", \"HR\", \"149362.38813439483\", \"7\", \"emma.davis@company.com\"],\n        [\"E2009\", \"David Moore\", \"2022-04-03\", \"\", \"81289.58900750658\", \"10\", \"david.moore@company.com\"],\n    ]\n>       with open(filepath, 'w', newline='') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test3_data.csv'\n\n/tests/test_outputs.py:126: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_parse_iso_dates",
+                "status": "failed",
+                "duration": 0.0009361250004076282,
+                "start": 1768845049.9539032,
+                "stop": 1768845049.960104,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data():\n        filepath = os.path.join('tests', 'test_data.csv')\n        data = [\n        [\"Order ID\", \"Customer Name\", \"Order Date\", \"Product Price $\", \"Quantity!!\", \"Total Amount\", \"Ship Date\", \"Status\"],\n        [\"ORD1000\", \"\", \"01-10-2023\", \"264.3134984759545\", \"7\", \"1850.1944893316813\", \"09-10-2023\", \"\"],\n        [\"ORD1001\", \"\", \"2023-04-02\", \"171.54224088174146\", \"17\", \"2916.2180949896047\", \"\", \"Shipped\"],\n        [\"ORD1002\", \"Bob Johnson\", \"05.12.2023\",\"\" , \"17\", \"3317.4124189023737\", \"2023-12-11\", \"\"],\n        [\"ORD1003\", \"Alice Williams\", \"29.08.2023\", \"70.21586678937072\", \"10\", \"702.1586678937072\", \"09/07/2023\", \"\"],\n        [\"ORD1004\", \"John Smith\", \"2023/01/09\", \"318.7528395915485\", \"8\", \"2550.022716732388\", \"\", \"\"],\n        [\"ORD1005\", \"Alice Williams\", \"14-02-2023\", \"90.523993705531\", \"14\", \"1267.335911877434\", \"\", \"Cancelled\"],\n        [\"ORD1006\", \"Alice Williams\", \"20.04.2023\", \"432.0255346209029\", \"2\", \"864.0510692418057\", \"21.04.2023\", \"Cancelled\"],\n        [\"ORD1007\", \"\", \"11/24/2023\", \"68.48485841399017\", \"7\", \"479.39400889793114\", \"2023/11/29\", \"\"],\n        [\"ORD1008\", \"Jane Doe\", \"03/22/2023\", \"481.85449697522034\", \"15\", \"7227.817454628305\", \"\", \"\"],\n        [\"ORD1009\", \"Alice Williams\", \"25.07.2023\", \"111.05535490816476\", \"11\", \"1221.6089039898125\", \"03-08-2023\", \"Shipped\"],\n    ]\n    \n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test_data.csv'\n\n/tests/test_outputs.py:78: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_parse_mixed_date_formats",
+                "status": "failed",
+                "duration": 0.00015929100027278764,
+                "start": 1768845049.960343,
+                "stop": 1768845049.9660726,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data_two():\n        filepath = os.path.join('tests', 'test2_data.csv')\n        data = [\n        [\"SKU#\", \"Product  Name\", \"stock_qty\", \"Unit Cost ($)\", \"Last Restock\", \"Supplier\", \"Category Type\"],\n        [\"SKU-3000\", \"Monitor\", \"261\", \"32.30900302329\", \"2023-11-11\", \"\", \"Accessories\"],\n        [\"SKU-3001\", \"Mouse\", \"431\", \"194.71833117751393\", \"23-09-2023\", \"MegaStore\", \"Accessories\"],\n        [\"SKU-3002\", \"Chair\", \"406\", \"1994.9345575090506\", \"2023/10/15\", \"\", \"Electronics\"],\n        [\"SKU-3003\", \"Monitor\", \"411\", \"1763.1557275063572\", \"2023/11/08\", \"GlobalTech\", \"Accessories\"],\n        [\"SKU-3004\", \"Mouse\", \"124\", \"1402.7151131444941\", \"2023-10-28\", \"GlobalTech\", \"Accessories\"],\n        [\"SKU-3005\", \"Keyboard\", \"375\", \"1195.107567789151\", \"04-08-2023\", \"OfficeSupply Inc\", \"\"],\n        [\"SKU-3006\", \"Monitor\", \"43\", \"1893.1068424782395\", \"05-12-2023\", \"GlobalTech\", \"Electronics\"],\n        [\"SKU-3007\", \"Mouse\", \"13930\", \"399.4540451996029\", \"08/04/2023\", \"TechCorp\", \"Accessories\"],\n        [\"SKU-3008\", \"Laptop\", \"266\", \"1170.1888689891994\", \"2023/11/24\", \"\", \"\"],\n        [\"SKU-3009\", \"Desk\", \"6\", \"32.92113306832887\", \"08/22/2023\", \"OfficeSupply Inc\", \"Accessories\"],\n    ]\n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test2_data.csv'\n\n/tests/test_outputs.py:102: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_clip_numeric_outliers",
+                "status": "failed",
+                "duration": 0.0002927920004367479,
+                "start": 1768845049.9666963,
+                "stop": 1768845049.9725404,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data():\n        filepath = os.path.join('tests', 'test_data.csv')\n        data = [\n        [\"Order ID\", \"Customer Name\", \"Order Date\", \"Product Price $\", \"Quantity!!\", \"Total Amount\", \"Ship Date\", \"Status\"],\n        [\"ORD1000\", \"\", \"01-10-2023\", \"264.3134984759545\", \"7\", \"1850.1944893316813\", \"09-10-2023\", \"\"],\n        [\"ORD1001\", \"\", \"2023-04-02\", \"171.54224088174146\", \"17\", \"2916.2180949896047\", \"\", \"Shipped\"],\n        [\"ORD1002\", \"Bob Johnson\", \"05.12.2023\",\"\" , \"17\", \"3317.4124189023737\", \"2023-12-11\", \"\"],\n        [\"ORD1003\", \"Alice Williams\", \"29.08.2023\", \"70.21586678937072\", \"10\", \"702.1586678937072\", \"09/07/2023\", \"\"],\n        [\"ORD1004\", \"John Smith\", \"2023/01/09\", \"318.7528395915485\", \"8\", \"2550.022716732388\", \"\", \"\"],\n        [\"ORD1005\", \"Alice Williams\", \"14-02-2023\", \"90.523993705531\", \"14\", \"1267.335911877434\", \"\", \"Cancelled\"],\n        [\"ORD1006\", \"Alice Williams\", \"20.04.2023\", \"432.0255346209029\", \"2\", \"864.0510692418057\", \"21.04.2023\", \"Cancelled\"],\n        [\"ORD1007\", \"\", \"11/24/2023\", \"68.48485841399017\", \"7\", \"479.39400889793114\", \"2023/11/29\", \"\"],\n        [\"ORD1008\", \"Jane Doe\", \"03/22/2023\", \"481.85449697522034\", \"15\", \"7227.817454628305\", \"\", \"\"],\n        [\"ORD1009\", \"Alice Williams\", \"25.07.2023\", \"111.05535490816476\", \"11\", \"1221.6089039898125\", \"03-08-2023\", \"Shipped\"],\n    ]\n    \n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test_data.csv'\n\n/tests/test_outputs.py:78: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_clean_single_dataframe",
+                "status": "failed",
+                "duration": 0.000148667000757996,
+                "start": 1768845049.9726307,
+                "stop": 1768845049.9787004,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data():\n        filepath = os.path.join('tests', 'test_data.csv')\n        data = [\n        [\"Order ID\", \"Customer Name\", \"Order Date\", \"Product Price $\", \"Quantity!!\", \"Total Amount\", \"Ship Date\", \"Status\"],\n        [\"ORD1000\", \"\", \"01-10-2023\", \"264.3134984759545\", \"7\", \"1850.1944893316813\", \"09-10-2023\", \"\"],\n        [\"ORD1001\", \"\", \"2023-04-02\", \"171.54224088174146\", \"17\", \"2916.2180949896047\", \"\", \"Shipped\"],\n        [\"ORD1002\", \"Bob Johnson\", \"05.12.2023\",\"\" , \"17\", \"3317.4124189023737\", \"2023-12-11\", \"\"],\n        [\"ORD1003\", \"Alice Williams\", \"29.08.2023\", \"70.21586678937072\", \"10\", \"702.1586678937072\", \"09/07/2023\", \"\"],\n        [\"ORD1004\", \"John Smith\", \"2023/01/09\", \"318.7528395915485\", \"8\", \"2550.022716732388\", \"\", \"\"],\n        [\"ORD1005\", \"Alice Williams\", \"14-02-2023\", \"90.523993705531\", \"14\", \"1267.335911877434\", \"\", \"Cancelled\"],\n        [\"ORD1006\", \"Alice Williams\", \"20.04.2023\", \"432.0255346209029\", \"2\", \"864.0510692418057\", \"21.04.2023\", \"Cancelled\"],\n        [\"ORD1007\", \"\", \"11/24/2023\", \"68.48485841399017\", \"7\", \"479.39400889793114\", \"2023/11/29\", \"\"],\n        [\"ORD1008\", \"Jane Doe\", \"03/22/2023\", \"481.85449697522034\", \"15\", \"7227.817454628305\", \"\", \"\"],\n        [\"ORD1009\", \"Alice Williams\", \"25.07.2023\", \"111.05535490816476\", \"11\", \"1221.6089039898125\", \"03-08-2023\", \"Shipped\"],\n    ]\n    \n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test_data.csv'\n\n/tests/test_outputs.py:78: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_cleaned_columns_standardized",
+                "status": "failed",
+                "duration": 0.0009056660001078853,
+                "start": 1768845049.9787927,
+                "stop": 1768845049.9849985,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data():\n        filepath = os.path.join('tests', 'test_data.csv')\n        data = [\n        [\"Order ID\", \"Customer Name\", \"Order Date\", \"Product Price $\", \"Quantity!!\", \"Total Amount\", \"Ship Date\", \"Status\"],\n        [\"ORD1000\", \"\", \"01-10-2023\", \"264.3134984759545\", \"7\", \"1850.1944893316813\", \"09-10-2023\", \"\"],\n        [\"ORD1001\", \"\", \"2023-04-02\", \"171.54224088174146\", \"17\", \"2916.2180949896047\", \"\", \"Shipped\"],\n        [\"ORD1002\", \"Bob Johnson\", \"05.12.2023\",\"\" , \"17\", \"3317.4124189023737\", \"2023-12-11\", \"\"],\n        [\"ORD1003\", \"Alice Williams\", \"29.08.2023\", \"70.21586678937072\", \"10\", \"702.1586678937072\", \"09/07/2023\", \"\"],\n        [\"ORD1004\", \"John Smith\", \"2023/01/09\", \"318.7528395915485\", \"8\", \"2550.022716732388\", \"\", \"\"],\n        [\"ORD1005\", \"Alice Williams\", \"14-02-2023\", \"90.523993705531\", \"14\", \"1267.335911877434\", \"\", \"Cancelled\"],\n        [\"ORD1006\", \"Alice Williams\", \"20.04.2023\", \"432.0255346209029\", \"2\", \"864.0510692418057\", \"21.04.2023\", \"Cancelled\"],\n        [\"ORD1007\", \"\", \"11/24/2023\", \"68.48485841399017\", \"7\", \"479.39400889793114\", \"2023/11/29\", \"\"],\n        [\"ORD1008\", \"Jane Doe\", \"03/22/2023\", \"481.85449697522034\", \"15\", \"7227.817454628305\", \"\", \"\"],\n        [\"ORD1009\", \"Alice Williams\", \"25.07.2023\", \"111.05535490816476\", \"11\", \"1221.6089039898125\", \"03-08-2023\", \"Shipped\"],\n    ]\n    \n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test_data.csv'\n\n/tests/test_outputs.py:78: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_consolidate_dataframes",
+                "status": "failed",
+                "duration": 0.0005035840003984049,
+                "start": 1768845049.985088,
+                "stop": 1768845049.9984748,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data():\n        filepath = os.path.join('tests', 'test_data.csv')\n        data = [\n        [\"Order ID\", \"Customer Name\", \"Order Date\", \"Product Price $\", \"Quantity!!\", \"Total Amount\", \"Ship Date\", \"Status\"],\n        [\"ORD1000\", \"\", \"01-10-2023\", \"264.3134984759545\", \"7\", \"1850.1944893316813\", \"09-10-2023\", \"\"],\n        [\"ORD1001\", \"\", \"2023-04-02\", \"171.54224088174146\", \"17\", \"2916.2180949896047\", \"\", \"Shipped\"],\n        [\"ORD1002\", \"Bob Johnson\", \"05.12.2023\",\"\" , \"17\", \"3317.4124189023737\", \"2023-12-11\", \"\"],\n        [\"ORD1003\", \"Alice Williams\", \"29.08.2023\", \"70.21586678937072\", \"10\", \"702.1586678937072\", \"09/07/2023\", \"\"],\n        [\"ORD1004\", \"John Smith\", \"2023/01/09\", \"318.7528395915485\", \"8\", \"2550.022716732388\", \"\", \"\"],\n        [\"ORD1005\", \"Alice Williams\", \"14-02-2023\", \"90.523993705531\", \"14\", \"1267.335911877434\", \"\", \"Cancelled\"],\n        [\"ORD1006\", \"Alice Williams\", \"20.04.2023\", \"432.0255346209029\", \"2\", \"864.0510692418057\", \"21.04.2023\", \"Cancelled\"],\n        [\"ORD1007\", \"\", \"11/24/2023\", \"68.48485841399017\", \"7\", \"479.39400889793114\", \"2023/11/29\", \"\"],\n        [\"ORD1008\", \"Jane Doe\", \"03/22/2023\", \"481.85449697522034\", \"15\", \"7227.817454628305\", \"\", \"\"],\n        [\"ORD1009\", \"Alice Williams\", \"25.07.2023\", \"111.05535490816476\", \"11\", \"1221.6089039898125\", \"03-08-2023\", \"Shipped\"],\n    ]\n    \n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test_data.csv'\n\n/tests/test_outputs.py:78: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_process_full_pipeline",
+                "status": "failed",
+                "duration": 0.0005955420001555467,
+                "start": 1768845049.9986281,
+                "stop": 1768845050.005596,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data():\n        filepath = os.path.join('tests', 'test_data.csv')\n        data = [\n        [\"Order ID\", \"Customer Name\", \"Order Date\", \"Product Price $\", \"Quantity!!\", \"Total Amount\", \"Ship Date\", \"Status\"],\n        [\"ORD1000\", \"\", \"01-10-2023\", \"264.3134984759545\", \"7\", \"1850.1944893316813\", \"09-10-2023\", \"\"],\n        [\"ORD1001\", \"\", \"2023-04-02\", \"171.54224088174146\", \"17\", \"2916.2180949896047\", \"\", \"Shipped\"],\n        [\"ORD1002\", \"Bob Johnson\", \"05.12.2023\",\"\" , \"17\", \"3317.4124189023737\", \"2023-12-11\", \"\"],\n        [\"ORD1003\", \"Alice Williams\", \"29.08.2023\", \"70.21586678937072\", \"10\", \"702.1586678937072\", \"09/07/2023\", \"\"],\n        [\"ORD1004\", \"John Smith\", \"2023/01/09\", \"318.7528395915485\", \"8\", \"2550.022716732388\", \"\", \"\"],\n        [\"ORD1005\", \"Alice Williams\", \"14-02-2023\", \"90.523993705531\", \"14\", \"1267.335911877434\", \"\", \"Cancelled\"],\n        [\"ORD1006\", \"Alice Williams\", \"20.04.2023\", \"432.0255346209029\", \"2\", \"864.0510692418057\", \"21.04.2023\", \"Cancelled\"],\n        [\"ORD1007\", \"\", \"11/24/2023\", \"68.48485841399017\", \"7\", \"479.39400889793114\", \"2023/11/29\", \"\"],\n        [\"ORD1008\", \"Jane Doe\", \"03/22/2023\", \"481.85449697522034\", \"15\", \"7227.817454628305\", \"\", \"\"],\n        [\"ORD1009\", \"Alice Williams\", \"25.07.2023\", \"111.05535490816476\", \"11\", \"1221.6089039898125\", \"03-08-2023\", \"Shipped\"],\n    ]\n    \n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test_data.csv'\n\n/tests/test_outputs.py:78: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_process_log_contains_operations",
+                "status": "failed",
+                "duration": 0.00020416600000316976,
+                "start": 1768845050.0057077,
+                "stop": 1768845050.013127,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data_two():\n        filepath = os.path.join('tests', 'test2_data.csv')\n        data = [\n        [\"SKU#\", \"Product  Name\", \"stock_qty\", \"Unit Cost ($)\", \"Last Restock\", \"Supplier\", \"Category Type\"],\n        [\"SKU-3000\", \"Monitor\", \"261\", \"32.30900302329\", \"2023-11-11\", \"\", \"Accessories\"],\n        [\"SKU-3001\", \"Mouse\", \"431\", \"194.71833117751393\", \"23-09-2023\", \"MegaStore\", \"Accessories\"],\n        [\"SKU-3002\", \"Chair\", \"406\", \"1994.9345575090506\", \"2023/10/15\", \"\", \"Electronics\"],\n        [\"SKU-3003\", \"Monitor\", \"411\", \"1763.1557275063572\", \"2023/11/08\", \"GlobalTech\", \"Accessories\"],\n        [\"SKU-3004\", \"Mouse\", \"124\", \"1402.7151131444941\", \"2023-10-28\", \"GlobalTech\", \"Accessories\"],\n        [\"SKU-3005\", \"Keyboard\", \"375\", \"1195.107567789151\", \"04-08-2023\", \"OfficeSupply Inc\", \"\"],\n        [\"SKU-3006\", \"Monitor\", \"43\", \"1893.1068424782395\", \"05-12-2023\", \"GlobalTech\", \"Electronics\"],\n        [\"SKU-3007\", \"Mouse\", \"13930\", \"399.4540451996029\", \"08/04/2023\", \"TechCorp\", \"Accessories\"],\n        [\"SKU-3008\", \"Laptop\", \"266\", \"1170.1888689891994\", \"2023/11/24\", \"\", \"\"],\n        [\"SKU-3009\", \"Desk\", \"6\", \"32.92113306832887\", \"08/22/2023\", \"OfficeSupply Inc\", \"Accessories\"],\n    ]\n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test2_data.csv'\n\n/tests/test_outputs.py:102: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_get_existing_operations",
+                "status": "failed",
+                "duration": 0.0002045840001301258,
+                "start": 1768845050.0132751,
+                "stop": 1768845050.0200076,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data():\n        filepath = os.path.join('tests', 'test_data.csv')\n        data = [\n        [\"Order ID\", \"Customer Name\", \"Order Date\", \"Product Price $\", \"Quantity!!\", \"Total Amount\", \"Ship Date\", \"Status\"],\n        [\"ORD1000\", \"\", \"01-10-2023\", \"264.3134984759545\", \"7\", \"1850.1944893316813\", \"09-10-2023\", \"\"],\n        [\"ORD1001\", \"\", \"2023-04-02\", \"171.54224088174146\", \"17\", \"2916.2180949896047\", \"\", \"Shipped\"],\n        [\"ORD1002\", \"Bob Johnson\", \"05.12.2023\",\"\" , \"17\", \"3317.4124189023737\", \"2023-12-11\", \"\"],\n        [\"ORD1003\", \"Alice Williams\", \"29.08.2023\", \"70.21586678937072\", \"10\", \"702.1586678937072\", \"09/07/2023\", \"\"],\n        [\"ORD1004\", \"John Smith\", \"2023/01/09\", \"318.7528395915485\", \"8\", \"2550.022716732388\", \"\", \"\"],\n        [\"ORD1005\", \"Alice Williams\", \"14-02-2023\", \"90.523993705531\", \"14\", \"1267.335911877434\", \"\", \"Cancelled\"],\n        [\"ORD1006\", \"Alice Williams\", \"20.04.2023\", \"432.0255346209029\", \"2\", \"864.0510692418057\", \"21.04.2023\", \"Cancelled\"],\n        [\"ORD1007\", \"\", \"11/24/2023\", \"68.48485841399017\", \"7\", \"479.39400889793114\", \"2023/11/29\", \"\"],\n        [\"ORD1008\", \"Jane Doe\", \"03/22/2023\", \"481.85449697522034\", \"15\", \"7227.817454628305\", \"\", \"\"],\n        [\"ORD1009\", \"Alice Williams\", \"25.07.2023\", \"111.05535490816476\", \"11\", \"1221.6089039898125\", \"03-08-2023\", \"Shipped\"],\n    ]\n    \n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test_data.csv'\n\n/tests/test_outputs.py:78: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_get_median_for_missing",
+                "status": "failed",
+                "duration": 0.0008905830000003334,
+                "start": 1768845050.0201118,
+                "stop": 1768845050.0266469,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data():\n        filepath = os.path.join('tests', 'test_data.csv')\n        data = [\n        [\"Order ID\", \"Customer Name\", \"Order Date\", \"Product Price $\", \"Quantity!!\", \"Total Amount\", \"Ship Date\", \"Status\"],\n        [\"ORD1000\", \"\", \"01-10-2023\", \"264.3134984759545\", \"7\", \"1850.1944893316813\", \"09-10-2023\", \"\"],\n        [\"ORD1001\", \"\", \"2023-04-02\", \"171.54224088174146\", \"17\", \"2916.2180949896047\", \"\", \"Shipped\"],\n        [\"ORD1002\", \"Bob Johnson\", \"05.12.2023\",\"\" , \"17\", \"3317.4124189023737\", \"2023-12-11\", \"\"],\n        [\"ORD1003\", \"Alice Williams\", \"29.08.2023\", \"70.21586678937072\", \"10\", \"702.1586678937072\", \"09/07/2023\", \"\"],\n        [\"ORD1004\", \"John Smith\", \"2023/01/09\", \"318.7528395915485\", \"8\", \"2550.022716732388\", \"\", \"\"],\n        [\"ORD1005\", \"Alice Williams\", \"14-02-2023\", \"90.523993705531\", \"14\", \"1267.335911877434\", \"\", \"Cancelled\"],\n        [\"ORD1006\", \"Alice Williams\", \"20.04.2023\", \"432.0255346209029\", \"2\", \"864.0510692418057\", \"21.04.2023\", \"Cancelled\"],\n        [\"ORD1007\", \"\", \"11/24/2023\", \"68.48485841399017\", \"7\", \"479.39400889793114\", \"2023/11/29\", \"\"],\n        [\"ORD1008\", \"Jane Doe\", \"03/22/2023\", \"481.85449697522034\", \"15\", \"7227.817454628305\", \"\", \"\"],\n        [\"ORD1009\", \"Alice Williams\", \"25.07.2023\", \"111.05535490816476\", \"11\", \"1221.6089039898125\", \"03-08-2023\", \"Shipped\"],\n    ]\n    \n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test_data.csv'\n\n/tests/test_outputs.py:78: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_get_unknown_for_missing",
+                "status": "failed",
+                "duration": 0.00018341600025451044,
+                "start": 1768845050.0272868,
+                "stop": 1768845050.0328963,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data_two():\n        filepath = os.path.join('tests', 'test2_data.csv')\n        data = [\n        [\"SKU#\", \"Product  Name\", \"stock_qty\", \"Unit Cost ($)\", \"Last Restock\", \"Supplier\", \"Category Type\"],\n        [\"SKU-3000\", \"Monitor\", \"261\", \"32.30900302329\", \"2023-11-11\", \"\", \"Accessories\"],\n        [\"SKU-3001\", \"Mouse\", \"431\", \"194.71833117751393\", \"23-09-2023\", \"MegaStore\", \"Accessories\"],\n        [\"SKU-3002\", \"Chair\", \"406\", \"1994.9345575090506\", \"2023/10/15\", \"\", \"Electronics\"],\n        [\"SKU-3003\", \"Monitor\", \"411\", \"1763.1557275063572\", \"2023/11/08\", \"GlobalTech\", \"Accessories\"],\n        [\"SKU-3004\", \"Mouse\", \"124\", \"1402.7151131444941\", \"2023-10-28\", \"GlobalTech\", \"Accessories\"],\n        [\"SKU-3005\", \"Keyboard\", \"375\", \"1195.107567789151\", \"04-08-2023\", \"OfficeSupply Inc\", \"\"],\n        [\"SKU-3006\", \"Monitor\", \"43\", \"1893.1068424782395\", \"05-12-2023\", \"GlobalTech\", \"Electronics\"],\n        [\"SKU-3007\", \"Mouse\", \"13930\", \"399.4540451996029\", \"08/04/2023\", \"TechCorp\", \"Accessories\"],\n        [\"SKU-3008\", \"Laptop\", \"266\", \"1170.1888689891994\", \"2023/11/24\", \"\", \"\"],\n        [\"SKU-3009\", \"Desk\", \"6\", \"32.92113306832887\", \"08/22/2023\", \"OfficeSupply Inc\", \"Accessories\"],\n    ]\n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test2_data.csv'\n\n/tests/test_outputs.py:102: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_get_cleaning_log",
+                "status": "failed",
+                "duration": 0.00016320800023095217,
+                "start": 1768845050.0329876,
+                "stop": 1768845050.0393467,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data():\n        filepath = os.path.join('tests', 'test_data.csv')\n        data = [\n        [\"Order ID\", \"Customer Name\", \"Order Date\", \"Product Price $\", \"Quantity!!\", \"Total Amount\", \"Ship Date\", \"Status\"],\n        [\"ORD1000\", \"\", \"01-10-2023\", \"264.3134984759545\", \"7\", \"1850.1944893316813\", \"09-10-2023\", \"\"],\n        [\"ORD1001\", \"\", \"2023-04-02\", \"171.54224088174146\", \"17\", \"2916.2180949896047\", \"\", \"Shipped\"],\n        [\"ORD1002\", \"Bob Johnson\", \"05.12.2023\",\"\" , \"17\", \"3317.4124189023737\", \"2023-12-11\", \"\"],\n        [\"ORD1003\", \"Alice Williams\", \"29.08.2023\", \"70.21586678937072\", \"10\", \"702.1586678937072\", \"09/07/2023\", \"\"],\n        [\"ORD1004\", \"John Smith\", \"2023/01/09\", \"318.7528395915485\", \"8\", \"2550.022716732388\", \"\", \"\"],\n        [\"ORD1005\", \"Alice Williams\", \"14-02-2023\", \"90.523993705531\", \"14\", \"1267.335911877434\", \"\", \"Cancelled\"],\n        [\"ORD1006\", \"Alice Williams\", \"20.04.2023\", \"432.0255346209029\", \"2\", \"864.0510692418057\", \"21.04.2023\", \"Cancelled\"],\n        [\"ORD1007\", \"\", \"11/24/2023\", \"68.48485841399017\", \"7\", \"479.39400889793114\", \"2023/11/29\", \"\"],\n        [\"ORD1008\", \"Jane Doe\", \"03/22/2023\", \"481.85449697522034\", \"15\", \"7227.817454628305\", \"\", \"\"],\n        [\"ORD1009\", \"Alice Williams\", \"25.07.2023\", \"111.05535490816476\", \"11\", \"1221.6089039898125\", \"03-08-2023\", \"Shipped\"],\n    ]\n    \n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test_data.csv'\n\n/tests/test_outputs.py:78: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_get_cleaning_log_nonexistent_file",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.002948250998997537,
+                "start": 1768845050.0397525,
+                "stop": 1768845050.0503814,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "solve_sh_path = 'solution/solve.sh'\n\n    def test_get_cleaning_log_nonexistent_file(solve_sh_path):\n            \"\"\"Test retrieval of cleaning log from non-existent file\"\"\"\n            fake_log_file = os.path.join('tests', \"nonexistent_log.json\")\n    \n            stdout, stderr, returncode = run_bash_command(\n                \"cleaning-log\",\n                f'\"{fake_log_file}\"',\n                solve_sh_path\n            )\n            assert returncode == 0\n    \n>           error_response = extract_json_from_output(stdout)\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n/tests/test_outputs.py:623: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\noutput = ''\n\n    def extract_json_from_output(output):\n        \"\"\"Extract JSON from output that may contain other text\"\"\"\n        try:\n            return json.loads(output)\n        except json.JSONDecodeError:\n            pass\n    \n        # Try to find JSON starting with { or [\n        for start_char in ['{', '[']:\n            start_idx = output.find(start_char)\n            if start_idx != -1:\n                depth = 0\n                end_char = '}' if start_char == '{' else ']'\n    \n                for i in range(start_idx, len(output)):\n                    if output[i] == start_char:\n                        depth += 1\n                    elif output[i] == end_char:\n                        depth -= 1\n                        if depth == 0:\n                            json_str = output[start_idx:i+1]\n                            try:\n                                return json.loads(json_str)\n                            except json.JSONDecodeError:\n                                continue\n    \n>       raise json.JSONDecodeError(\"No valid JSON found in output\", output, 0)\nE       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)\n\n/tests/test_outputs.py:34: JSONDecodeError",
+                "message": "The test failed in the call phase"
+            },
+            {
+                "name": "test_outputs.py::test_get_csv_summary",
+                "status": "failed",
+                "duration": 0.0006217499994818354,
+                "start": 1768845050.050757,
+                "stop": 1768845050.0566084,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data():\n        filepath = os.path.join('tests', 'test_data.csv')\n        data = [\n        [\"Order ID\", \"Customer Name\", \"Order Date\", \"Product Price $\", \"Quantity!!\", \"Total Amount\", \"Ship Date\", \"Status\"],\n        [\"ORD1000\", \"\", \"01-10-2023\", \"264.3134984759545\", \"7\", \"1850.1944893316813\", \"09-10-2023\", \"\"],\n        [\"ORD1001\", \"\", \"2023-04-02\", \"171.54224088174146\", \"17\", \"2916.2180949896047\", \"\", \"Shipped\"],\n        [\"ORD1002\", \"Bob Johnson\", \"05.12.2023\",\"\" , \"17\", \"3317.4124189023737\", \"2023-12-11\", \"\"],\n        [\"ORD1003\", \"Alice Williams\", \"29.08.2023\", \"70.21586678937072\", \"10\", \"702.1586678937072\", \"09/07/2023\", \"\"],\n        [\"ORD1004\", \"John Smith\", \"2023/01/09\", \"318.7528395915485\", \"8\", \"2550.022716732388\", \"\", \"\"],\n        [\"ORD1005\", \"Alice Williams\", \"14-02-2023\", \"90.523993705531\", \"14\", \"1267.335911877434\", \"\", \"Cancelled\"],\n        [\"ORD1006\", \"Alice Williams\", \"20.04.2023\", \"432.0255346209029\", \"2\", \"864.0510692418057\", \"21.04.2023\", \"Cancelled\"],\n        [\"ORD1007\", \"\", \"11/24/2023\", \"68.48485841399017\", \"7\", \"479.39400889793114\", \"2023/11/29\", \"\"],\n        [\"ORD1008\", \"Jane Doe\", \"03/22/2023\", \"481.85449697522034\", \"15\", \"7227.817454628305\", \"\", \"\"],\n        [\"ORD1009\", \"Alice Williams\", \"25.07.2023\", \"111.05535490816476\", \"11\", \"1221.6089039898125\", \"03-08-2023\", \"Shipped\"],\n    ]\n    \n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test_data.csv'\n\n/tests/test_outputs.py:78: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_summary_shows_missing_values",
+                "status": "failed",
+                "duration": 0.00016145900008268654,
+                "start": 1768845050.0569832,
+                "stop": 1768845050.0628138,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data_two():\n        filepath = os.path.join('tests', 'test2_data.csv')\n        data = [\n        [\"SKU#\", \"Product  Name\", \"stock_qty\", \"Unit Cost ($)\", \"Last Restock\", \"Supplier\", \"Category Type\"],\n        [\"SKU-3000\", \"Monitor\", \"261\", \"32.30900302329\", \"2023-11-11\", \"\", \"Accessories\"],\n        [\"SKU-3001\", \"Mouse\", \"431\", \"194.71833117751393\", \"23-09-2023\", \"MegaStore\", \"Accessories\"],\n        [\"SKU-3002\", \"Chair\", \"406\", \"1994.9345575090506\", \"2023/10/15\", \"\", \"Electronics\"],\n        [\"SKU-3003\", \"Monitor\", \"411\", \"1763.1557275063572\", \"2023/11/08\", \"GlobalTech\", \"Accessories\"],\n        [\"SKU-3004\", \"Mouse\", \"124\", \"1402.7151131444941\", \"2023-10-28\", \"GlobalTech\", \"Accessories\"],\n        [\"SKU-3005\", \"Keyboard\", \"375\", \"1195.107567789151\", \"04-08-2023\", \"OfficeSupply Inc\", \"\"],\n        [\"SKU-3006\", \"Monitor\", \"43\", \"1893.1068424782395\", \"05-12-2023\", \"GlobalTech\", \"Electronics\"],\n        [\"SKU-3007\", \"Mouse\", \"13930\", \"399.4540451996029\", \"08/04/2023\", \"TechCorp\", \"Accessories\"],\n        [\"SKU-3008\", \"Laptop\", \"266\", \"1170.1888689891994\", \"2023/11/24\", \"\", \"\"],\n        [\"SKU-3009\", \"Desk\", \"6\", \"32.92113306832887\", \"08/22/2023\", \"OfficeSupply Inc\", \"Accessories\"],\n    ]\n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test2_data.csv'\n\n/tests/test_outputs.py:102: FileNotFoundError"
+            },
+            {
+                "name": "test_outputs.py::test_full_workflow",
+                "status": "failed",
+                "duration": 0.00015729100050521083,
+                "start": 1768845050.0629115,
+                "stop": 1768845050.0696099,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "@pytest.fixture\n    def mock_test_data():\n        filepath = os.path.join('tests', 'test_data.csv')\n        data = [\n        [\"Order ID\", \"Customer Name\", \"Order Date\", \"Product Price $\", \"Quantity!!\", \"Total Amount\", \"Ship Date\", \"Status\"],\n        [\"ORD1000\", \"\", \"01-10-2023\", \"264.3134984759545\", \"7\", \"1850.1944893316813\", \"09-10-2023\", \"\"],\n        [\"ORD1001\", \"\", \"2023-04-02\", \"171.54224088174146\", \"17\", \"2916.2180949896047\", \"\", \"Shipped\"],\n        [\"ORD1002\", \"Bob Johnson\", \"05.12.2023\",\"\" , \"17\", \"3317.4124189023737\", \"2023-12-11\", \"\"],\n        [\"ORD1003\", \"Alice Williams\", \"29.08.2023\", \"70.21586678937072\", \"10\", \"702.1586678937072\", \"09/07/2023\", \"\"],\n        [\"ORD1004\", \"John Smith\", \"2023/01/09\", \"318.7528395915485\", \"8\", \"2550.022716732388\", \"\", \"\"],\n        [\"ORD1005\", \"Alice Williams\", \"14-02-2023\", \"90.523993705531\", \"14\", \"1267.335911877434\", \"\", \"Cancelled\"],\n        [\"ORD1006\", \"Alice Williams\", \"20.04.2023\", \"432.0255346209029\", \"2\", \"864.0510692418057\", \"21.04.2023\", \"Cancelled\"],\n        [\"ORD1007\", \"\", \"11/24/2023\", \"68.48485841399017\", \"7\", \"479.39400889793114\", \"2023/11/29\", \"\"],\n        [\"ORD1008\", \"Jane Doe\", \"03/22/2023\", \"481.85449697522034\", \"15\", \"7227.817454628305\", \"\", \"\"],\n        [\"ORD1009\", \"Alice Williams\", \"25.07.2023\", \"111.05535490816476\", \"11\", \"1221.6089039898125\", \"03-08-2023\", \"Shipped\"],\n    ]\n    \n>       with open(filepath, 'w', newline='', encoding='utf-8') as f:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'tests/test_data.csv'\n\n/tests/test_outputs.py:78: FileNotFoundError"
+            }
+        ]
+    }
+}

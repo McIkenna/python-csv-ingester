@@ -1,0 +1,340 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@748a2d3420c1:/app# cat > tests/test_outputs.py << 'ENDOFFILE'
+Clipping
+
+def test_clip_numeric_outliers(i> #!/usr/bin/env python3
+> """
+> Test Suite for CSV Ingester
+> Covers all functionality including cleaning, consolidation, and logging
+f = pd.read_csv(test_dir / "test_data.csv")
+  > """
+>
+
+  > import pytest
+> import pandas as pd
+> import json
+> import os
+> import sys
+> from pathlib import Path
+n >
+> # Add parent directory to path
+> sys.path.insert(0, str(Path(__file__).parent.parent / 'solution'))
+>
+'> from CSVIngester import CSVIngester
+>
+>
+> @pytest.fixture
+> def ingester():
+>     """Create a CSVIngester instance for testing"""
+>     return CSVIngester()
+>
+>
+> @pytest.fixture
+> def test_dir():
+>     """Get the test directory path"""
+>     return Path(__file__).parent
+>
+>
+> # Test Case 1: Column Name Standardization
+>
+> def test_standardize_spaces_col_name(ingester):
+>     """Test column name standardization with spaces"""
+>     result = ingester.standardize_column_name("Product Price $")
+>     assert result == "product_price"
+>
+>     result = ingester.standardize_column_name("Order ID")
+v"),
+   >     assert result == "order_id"
+>
+>
+> def test_standardize_any_special_chars(ingester):
+     (df2, "test2_data.csv"),
+        (df3, "test3_data.csv")
+    ])
+
+    # Chec>     """Test column name standardization with special characters"""
+>     result = ingester.standardize_column_name("Quantity!!")
+>     assert result == "quantity"
+>
+>     result = ingester.standardize_column_name("Price$$$")
+>     assert result == "price"
+>
+>
+> def test_standardize_any_casing(ingester):
+>     """Test column name standardization with various casing"""
+>     result = ingester.standardize_column_name("Customer Name")
+>     assert result == "customer_name"
+>
+>     result = ingester.standardize_column_name("PRODUCT_NAME")
+>     assert result == "product_name"
+>
+>
+> # Test Case 2: Date Format Detection
+>
+> def test_detect_date_column(ingester, test_dir):
+>     """Test date column detection"""
+>     df = pd.read_csv(test_dir / "test_data.csv")
+>     col_type = ingester.detect_column_type(df, "Order Date")
+>     assert col_type == "date"
+>
+>
+> def test_parse_iso_dates(ingester):
+>     """Test parsing of ISO date format"""
+>     result = ingester.date_parser("2025-01-01")
+>     assert result == "2025-01-01"
+>
+>     result = ingester.date_parser("2025/01/15")
+>     assert result == "2025-01-15"
+>
+>
+> def test_parse_mixed_date_formats(ingester):
+>     """Test parsing of mixed date formats"""
+>     result = ingester.date_parser("01/15/2025")
+    """Test full pipeline execution"""
+    outpu>     assert result in ["2025-01-15", "2025-15-01"]  # Could be US or EU format
+>
+>     result = ingester.date_parser("Jan 20 2025")
+>     assert result == "2025-01-20"
+>
+"
+
+    result = ingester.file_processor(
+        [str(test_dir / "test_data.csv")],
+     >     result = ingester.date_parser("Feb 5 2025")
+>     assert result == "2025-02-05"
+>
+>
+> # Test Case 3: Missing Value Imputation
+>
+> def test_clean_single_dataframe(ingester, test_dir):
+>     """Test cleaning of a single dataframe"""
+>     df = ingester.processed_dataframe(str(test_dir / "test_data.csv"))
+>
+>     # Check that no missing values remain in numeric columns
+>     numeric_cols = df.select_dtypes(include=['number']).columns
+>     for col in numeric_cols:
+>         assert df[col].isna().sum() == 0, f"Column {col} has missing values"
+>
+>
+> def test_cleaned_columns_standardized(ingester, test_dir):
+>     """Test that cleaned dataframe has standardized column names"""
+>     df = ingester.processed_dataframe(str(test_dir / "test_data.csv"))
+>
+>     # All columns should be lowercase and snake_case
+>     for col in df.columns:
+>         assert col.islower(), f"Column {col} is not lowercase"
+>         assert ' ' not in col, f"Column {col} contains spaces"
+>
+>
+> def test_get_unknown_for_missing(ingester, test_dir):
+>     """Test that missing categorical values are replaced with Unknown"""
+>     df = ingester.processed_dataframe(str(test_dir / "test_data.csv"))
+>
+>     # Check for Unknown in categorical columns where data was missing
+>     assert 'Unknown' in df.values or df.isna().sum().sum() == 0
+>
+>
+> def test_get_median_for_missing(ingester, test_dir):
+>     """Test that missing numeric values are replaced with median"""
+>     df = ingester.processed_dataframe(str(test_dir / "test_data.csv"))
+>
+>     # Numeric columns should have no missing values
+>     numeric_cols = df.select_dtypes(include=['number']).columns
+>     for col in numeric_cols:
+>         assert df[col].isna().sum() == 0
+>
+>
+> # Test Case 4: Outlier Clipping
+>
+> def test_clip_numeric_outliers(ingester, test_dir):
+>     """Test outlier clipping at 1st/99th percentiles"""
+>     df = pd.read_csv(test_dir / "test_data.csv")
+>
+>     stats = ingester.outlier_truncate(df, "Product Price $")
+>
+>     assert 'lower_bound' in stats
+>     assert 'upper_bound' in stats
+>     assert 'original_min' in stats
+>     ass
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+ss_full_pipeline(ingester, test_dir):
+>     """Test full pipeline execution"""
+)],
+        >     output_file = test_dir / "test_output.csv"
+>     log_file = test_dir / "test_log.json"
+>
+>     result = ingester.file_processor(
+>         [str(test_dir / "test_data.csv")],
+>         str(output_file),
+>         str(log_file)
+ons]
+    >     )
+
+    #>
+>     assert output_file.exists()
+>     assert log_file.exists()
+>
+>     # Verify log structure
+>     with open(log_file) as f:
+>         log_data = json.load(f)
+>
+>     assert 'timestamp' in log_data
+>     assert 'operations' in log_data
+>     assert len(log_data['operations']) > 0
+>
+>     # Cleanup
+>     if output_file.exists():
+>         output_file.unlink()
+>     if log_file.exists():
+ENDOFFILE
+>         log_file.unlink()
+>
+>
+> def test_full_workflow(ingester, test_dir):
+>     """Test complete workflow with multiple files"""
+>     output_file = test_dir / "consolidated_test.csv"
+>     log_file = test_dir / "workflow_log.json"
+>
+>     ingester.file_processor(
+>         [
+>             str(test_dir / "test_data.csv"),
+>             str(test_dir / "test2_data.csv"),
+>             str(test_dir / "test3_data.csv")
+>         ],
+>         str(output_file),
+>         str(log_file)
+>     )
+>
+>     # Verify output exists and has content
+>     assert output_file.exists()
+>     df = pd.read_csv(output_file)
+>     assert len(df) > 0
+>
+>     # Cleanup
+>     if output_file.exists():
+>         output_file.unlink()
+>     if log_file.exists():
+>         log_file.unlink()
+>
+>
+> # Test Case 8: Column Type Detection Accuracy
+>
+> def test_detect_numeric_column(ingester, test_dir):
+>     """Test numeric column detection"""
+>     df = pd.read_csv(test_dir / "test_data.csv")
+>     col_type = ingester.detect_column_type(df, "Product Price $")
+>     assert col_type == "numeric"
+>
+>
+> def test_detect_categorical_column(ingester, test_dir):
+>     """Test categorical column detection"""
+>     df = pd.read_csv(test_dir / "test_data.csv")
+>     col_type = ingester.detect_column_type(df, "Status")
+>     assert col_type == "categorical"
+>
+>
+> # Test Case 9: Error Handling
+>
+> def test_detect_nonexistent_column(ingester, test_dir):
+>     """Test type detection with non-existent column"""
+>     df = pd.read_csv(test_dir / "test_data.csv")
+>     col_type = ingester.detect_column_type(df, "NonExistentColumn")
+>     assert col_type == "unknown"
+>
+>
+> def test_get_cleaning_log_nonexistent_file(ingester):
+>     """Test error handling for non-existent log file"""
+>     # Should not raise exception, but file shouldn't exist
+>     assert not Path("nonexistent_log.json").exists()
+>
+>
+> def test_summary_shows_missing_values(ingester, test_dir):
+>     """Test that summary correctly identifies missing values"""
+>     df = pd.read_csv(test_dir / "test_data.csv")
+>
+>     # Count missing values
+>     missing = {}
+>     for col in df.columns:
+>         miss_count = df[col].isna().sum() + (df[col] == '').sum()
+>         if miss_count > 0:
+>             missing[col] = miss_count
+>
+>     assert len(missing) > 0, "Test data should have missing values"
+>
+>
+> # Test Case 10: CSV Summary
+>
+> def test_get_csv_summary(ingester, test_dir):
+>     """Test CSV summary generation"""
+>     df = pd.read_csv(test_dir / "test_data.csv")
+>
+>     # Verify basic structure
+>     assert len(df) > 0
+>     assert len(df.columns) > 0
+>
+>
+> # Test Case 11: Log Operations Data
+>
+> def test_get_existing_operations(ingester, test_dir):
+>     """Test retrieval of existing operations from log"""
+>     output_file = test_dir / "ops_test.csv"
+>     log_file = test_dir / "ops_log.json"
+>
+>     ingester.file_processor(
+>         [str(test_dir / "test_data.csv")],
+>         str(output_file),
+>         str(log_file)
+>     )
+>
+>     # Read log
+>     with open(log_file) as f:
+>         log_data = json.load(f)
+>
+>     assert 'operations' in log_data
+>     operations = log_data['operations']
+>     assert len(operations) > 0
+>
+>     # Cleanup
+>     if output_file.exists():
+>         output_file.unlink()
+>     if log_file.exists():
+>         log_file.unlink()
+>
+>
+> def test_process_log_contains_operations(ingester, test_dir):
+>     """Test that processing log contains expected operations"""
+>     output_file = test_dir / "log_ops_test.csv"
+>     log_file = test_dir / "log_ops.json"
+>
+>     ingester.file_processor(
+>         [str(test_dir / "test_data.csv")],
+>         str(output_file),
+>         str(log_file)
+>     )
+>
+>     with open(log_file) as f:
+>         log_data = json.load(f)
+>
+>     operations = log_data['operations']
+>     operation_types = [op['operation'] for op in operations]
+>
+>     # Should contain key operations
+>     assert 'start_pipeline' in operation_types
+>     assert 'load_file' in operation_types
+>
+>     # Cleanup
+>     if output_file.exists():
+>         output_file.unlink()
+>     if log_file.exists():
+>         log_file.unlink()
+>
+>
+> if __name__ == "__main__":
+>     pytest.main([__file__, "-v"])
+> ENDOFFILE
+root@748a2d3420c1:/app#

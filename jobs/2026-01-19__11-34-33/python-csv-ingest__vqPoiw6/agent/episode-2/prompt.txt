@@ -1,0 +1,65 @@
+New Terminal Output:
+
+root@720d5d598560:/app# mkdir -p solution
+root@720d5d598560:/app# cat > solution/solve.sh << 'SHEOF'
+> #!/usr/bin/env bash
+> # Shell helpers for CSVIngester CLI
+>
+> SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+> PY="python3"
+> PYAPP="$SCRIPT_DIR/CSVIngester.py"
+>
+> encoding-detection() {
+>   "$PY" "$PYAPP" encoding-detection "$@"
+> }
+>
+> name-standardization() {
+>   "$PY" "$PYAPP" name-standardization "$@"
+> }
+>
+> type-detection() {
+>   "$PY" "$PYAPP" type-detection "$@"
+> }
+>
+> date-parsing() {
+>   "$PY" "$PYAPP" date-parsing "$@"
+> }
+>
+> outlier-truncate() {
+>   "$PY" "$PYAPP" outlier-truncate "$@"
+> }
+>
+> dataframe-cleaning() {
+>   "$PY" "$PYAPP" dataframe-cleaning "$@"
+> }
+>
+> dataframe-consolidation() {
+>   "$PY" "$PYAPP" dataframe-consolidation "$@"
+> }
+>
+> file-processing() {
+>   "$PY" "$PYAPP" file-processing "$@"
+> }
+>
+> cleaning-log() {
+>   "$PY" "$PYAPP" cleaning-log "$@"
+> }
+>
+> csv-summary() {
+>   "$PY" "$PYAPP" csv-summary "$@"
+> }
+>
+> get-operations() {
+>   "$PY" "$PYAPP" get-operations "$@"
+> }
+>
+> # If executed directly, pass args to python app.
+> if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+>   "$PY" "$PYAPP" "$@"
+> fi
+> SHEOF
+root@720d5d598560:/app# chmod +x solution/CSVIngester.py solution/solve.sh
+chmod: cannot access 'solution/CSVIngester.py': No such file or directory
+root@720d5d598560:/app# python3 solution/CSVIngester.py --help
+python3: can't open file '/app/solution/CSVIngester.py': [Errno 2] No such file or directory
+root@720d5d598560:/app#

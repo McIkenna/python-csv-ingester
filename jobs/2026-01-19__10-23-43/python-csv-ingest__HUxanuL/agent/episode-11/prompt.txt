@@ -1,0 +1,92 @@
+New Terminal Output:
+
+root@c28acbfc71a0:/app/tests# pip install pytest -q
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a v
+irtual environment instead: https://pip.pypa.io/warnings/venv
+
+[notice] A new release of pip is available: 24.0 -> 25.3
+[notice] To update, run: pip install --upgrade pip
+root@c28acbfc71a0:/app/tests# pytest test_outputs.py -v 2>&1 | head -150
+============================= test session starts ==============================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app/tests
+collecting ... collected 25 items
+
+test_outputs.py::TestColumnNameStandardization::test_standardize_spaces_col_name PASSED [  4%]
+test_outputs.py::TestColumnNameStandardization::test_standardize_any_special_chars PASSED [  8%]
+test_outputs.py::TestColumnNameStandardization::test_standardize_any_casing PASSED [ 12%]
+test_outputs.py::TestDateFormatDetection::test_detect_date_column PASSED [ 16%]
+test_outputs.py::TestDateFormatDetection::test_parse_iso_dates PASSED    [ 20%]
+test_outputs.py::TestDateFormatDetection::test_parse_mixed_date_formats FAILED [ 24%]
+test_outputs.py::TestColumnTypeDetection::test_detect_numeric_column PASSED [ 28%]
+test_outputs.py::TestColumnTypeDetection::test_detect_categorical_column PASSED [ 32%]
+test_outputs.py::TestColumnTypeDetection::test_detect_nonexistent_column PASSED [ 36%]
+test_outputs.py::TestMissingValueImputation::test_clean_single_dataframe PASSED [ 40%]
+test_outputs.py::TestMissingValueImputation::test_get_unknown_for_missing PASSED [ 44%]
+test_outputs.py::TestMissingValueImputation::test_get_median_for_missing PASSED [ 48%]
+test_outputs.py::TestOutlierClipping::test_clip_numeric_outliers PASSED  [ 52%]
+test_outputs.py::TestConsolidation::test_consolidate_dataframes PASSED   [ 56%]
+test_outputs.py::TestConsolidation::test_cleaned_columns_standardized PASSED [ 60%]
+test_outputs.py::TestEncodingDetection::test_should_detect_utf8_encoding PASSED [ 64%]
+test_outputs.py::TestEncodingDetection::test_should_detect_latin_encoding PASSED [ 68%]
+test_outputs.py::TestEncodingDetection::test_should_detect_encoding_nonexistent_file PASSED [ 72%]
+test_outputs.py::TestFullPipeline::test_process_full_pipeline PASSED     [ 76%]
+test_outputs.py::TestFullPipeline::test_full_workflow PASSED             [ 80%]
+test_outputs.py::TestErrorHandling::test_get_cleaning_log_nonexistent_file PASSED [ 84%]
+test_outputs.py::TestErrorHandling::test_summary_shows_missing_values PASSED [ 88%]
+test_outputs.py::TestCSVSummary::test_get_csv_summary PASSED             [ 92%]
+test_outputs.py::TestLogOperations::test_get_existing_operations PASSED  [ 96%]
+test_outputs.py::TestLogOperations::test_process_log_contains_operations PASSED [100%]
+
+=================================== FAILURES ===================================
+____________ TestDateFormatDetection.test_parse_mixed_date_formats _____________
+
+self = <test_outputs.TestDateFormatDetection object at 0xffff9c5943d0>
+ingester = <CSVIngester.CSVIngester object at 0xffff9c5b1a90>
+
+    def test_parse_mixed_date_formats(self, ingester):
+        """Test parsing of various date formats."""
+        assert ingester.date_parser('01-10-2023') == '2023-10-01'
+>       assert ingester.date_parser('05.12.2023') == '2023-12-05'
+E       AssertionError: assert '2023-05-12' == '2023-12-05'
+E
+E         - 2023-12-05
+E         + 2023-05-12
+
+test_outputs.py:69: AssertionError
+=============================== warnings summary ===============================
+test_outputs.py: 19 warnings
+  /app/solution/CSVIngester.py:111: UserWarning: Parsing dates in %d.%m.%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or speci
+fy a format to silence this warning.
+    parsed_date = pd.to_datetime(date_str, errors='coerce')
+
+test_outputs.py: 24 warnings
+  /app/solution/CSVIngester.py:245: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace me
+thod.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a
+ copy.
+
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, t
+o perform the operation inplace on the original object.
+
+
+    df[col].fillna('Unknown', inplace=True)
+
+test_outputs.py: 22 warnings
+  /app/solution/CSVIngester.py:220: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace me
+thod.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a
+ copy.
+
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, t
+o perform the operation inplace on the original object.
+
+
+    df[col].fillna(median_val, inplace=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED test_outputs.py::TestDateFormatDetection::test_parse_mixed_date_formats
+================== 1 failed, 24 passed, 65 warnings in 1.22s ===================
+root@c28acbfc71a0:/app/tests#

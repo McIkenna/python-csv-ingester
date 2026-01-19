@@ -1,0 +1,43 @@
+New Terminal Output:
+
+root@c28acbfc71a0:/app# head -5 tests/cleaned_data.csv
+order_id,customer_name,order_date,product_price,quantity,total_amount,ship_date,status,sku,product_name,stock_qty,unit_cost,last_restock,supplier,category_type
+ORD1000,Unknown,2023-10-01,264.31,7.0,1850.19,2023-10-09,Unknown,,,,,,,
+ORD1001,John Doe,2023-04-02,171.54,17.0,2916.22,,Shipped,,,,,,,
+ORD1002,Bob Johnson,2023-05-12,171.54,17.0,3317.41,2023-12-11,Unknown,,,,,,,
+ORD1003,Alice Williams,2023-08-29,70.22,10.0,702.16,2023-07-09,Pending,,,,,,,
+root@c28acbfc71a0:/app# echo '---' && head -30 tests/cleaning_log.json
+---
+{
+  "timestamp": "2026-01-19T16:28:32.650939",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "tests/test_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T16:28:32.615763"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T16:28:32.615861"
+    },
+    {
+root@c28acbfc71a0:/app# cd tests && pytest test_outputs.py -v --tb=short 2>&1 | head -100
+bash: pytest: command not found
+root@c28acbfc71a0:/app/tests#

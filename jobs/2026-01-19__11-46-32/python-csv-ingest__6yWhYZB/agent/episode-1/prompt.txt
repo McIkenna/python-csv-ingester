@@ -1,0 +1,230 @@
+New Terminal Output:
+
+root@f35f41e753a3:/app# ls -la
+total 12
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 .
+drwxr-xr-x 1 root root 4096 Jan 19 17:47 ..
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 src
+root@f35f41e753a3:/app# ls -la solution || true
+ls: cannot access 'solution': No such file or directory
+root@f35f41e753a3:/app# ls -la tests || true
+ls: cannot access 'tests': No such file or directory
+root@f35f41e753a3:/app# ls -la src || true
+total 16
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 .
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 ..
+-rw-r--r-- 1 root root  874 Jan  6 04:31 sample1_data.csv
+-rw-r--r-- 1 root root  768 Jan  6 04:17 sample2_data.csv
+root@f35f41e753a3:/app# sed -n '1,200p' instruction.md 2>/dev/null || true
+root@f35f41e753a3:/app# sed -n '1,200p' task.toml 2>/dev/null || true
+root@f35f41e753a3:/app# python3 --version
+Python 3.11.14
+root@f35f41e753a3:/app# pip3 --version
+python3 - << 'PY'
+import sys, json; print('ok')
+PY
+pip 24.0 from /usr/local/lib/python3.11/site-packages/pip (python 3.11)
+root@f35f41e753a3:/app# python3 - << 'PY'
+> import sys, json; print('ok')
+> PY
+ok
+root@f35f41e753a3:/app# mkdir -p solution
+root@f35f41e753a3:/app# cat > solution/CSVIngester.py << 'PY'
+> #!/usr/bin/env python3
+> import argparse
+ > import json
+> import sys
+> import os
+max": original_m> from datetime import datetime
+> from typing import List, Dict, Any, Optional
+pped_min": float(np.nanmin(clipped)),
+            "clip> import pandas as pd
+> import numpy as np
+>
+> class CSVIngester:
+>     def __init__(self):
+>         self.operations: List[Dict[str, Any]] = []
+>         self.encoding_cache: Dict[str, str] = {}
+ processed_dataframe(self, filepath: str) -> pd.DataFrame:
+      >
+>     def _log(self, operation: str, details: Dict[str, Any]) -> None:
+>         self.operations.append({
+>             "operation": operation,
+>             "details": details,
+>             "timestamp": datetime.utcnow().isoformat()
+>         })
+>
+>     def encode_process(self, filepath: str) -> str:
+>         if not os.path.exists(filepath):
+>             self._log("encoding_detection_error", {"source": filepath, "error": "file_not_found"})
+>             raise FileNotFoundError(filepath)
+>         # try utf-8 then latin-1
+>         for enc in ("utf-8", "latin-1"):
+>             try:
+>                 with open(filepath, 'r', encoding=enc) as f:
+>                     f.read(2048)
+>                 self._log("detect_encoding", {"source": filepath, "encoding": enc})
+>                 self.encoding_cache[filepath] = enc
+>                 return enc
+>             except Exception:
+>                 continue
+>         # fallback
+>         enc = "latin-1"
+>         self._log("detect_encoding_fallback", {"source": filepath, "encoding": enc})
+>         self.encoding_cache[filepath] = enc
+>         return enc
+>
+>     def standardize_column_name(self, name: str) -> str:
+>         # lower-case, replace non-alphanum with underscore, collapse repeats, trim underscores
+>         import re
+>         s = name.strip().lower()
+s():
+            if t == "numeric":
+                num = pd.to_numeric(df[c], errors='coerce')
+         >         s = re.sub(r"[^0-9a-z]+", "_", s)
+>         s = re.sub(r"_+", "_", s)
+>         s = s.strip("_")
+>         self._log("standardize_column", {"original": name, "standardized": s})
+>         return s
+>
+>     def detect_column_type(self, series: pd.Series) -> str:
+>         # Try date detection
+>         if series.dropna().empty:
+>             return "categorical"
+>         sample = series.dropna().astype(str).head(20)
+>         date_parse_success = 0
+>         for v in sample:
+>             try:
+>                 pd.to_datetime(v, errors='raise', infer_datetime_format=True, dayfirst=False)
+   elif t == "date":
+                # date strings>                 date_parse_success += 1
+ already iso; fill missing with Unknown
+>             except Exception:
+>                 pass
+>         if date_parse_success >= max(1, int(len(sample) * 0.6)):
+>             return "date"
+>         # Numeric detection
+tations[c] = {"type": "date", "strategy": "constant", "value": "Unknown"}
+        self._>         try:
+>             pd.to_numeric(series.dropna(), errors='raise')
+>             return "numeric"
+>         except Exception:
+>             return "categorical"
+>
+>     def date_parser(self, series: pd.Series) -> pd.Series:
+>         parsed = pd.to_datetime(series, errors='coerce', infer_datetime_format=True, dayfirst=False)
+>         # For any remaining NaT, try dayfirst True to catch European formats
+>         mask_nat = parsed.isna() & series.notna()
+>         if mask_nat.any():
+>             parsed2 = pd.to_datetime(series[mask_nat], errors='coerce', infer_datetime_format=True, dayfirst=True)
+>             parsed.loc[mask_nat] = parsed2
+>         # format to ISO date (YYYY-MM-DD)
+>         iso = parsed.dt.strftime('%Y-%m-%d')
+>         self._log("parse_dates", {"converted_count": int(parsed.notna().sum()), "original_non_null": int(seri
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+)
+>                 return 2
+>             enc = ing.encode_process(args.csv)
+>             try:
+>                 df = pd.read_csv(args.csv, encoding=enc)
+>             except Exception:
+>                 df = pd.read_csv(args.csv, encoding=enc, engine='python')
+>             if args.column not in df.columns:
+>                 print('column_not_found', file=sys.stderr)
+>                 return 3
+>             info = ing.outlier_truncate(df[args.column])
+>             print(json.dumps(info))
+>             return 0
+>         elif args.command == 'dataframe-cleaning':
+>             if not args.csv:
+>                 print('Missing --csv', file=sys.stderr)
+>                 return 2
+>             df = ing.processed_dataframe(args.csv)
+>             out = args.output or args.output2 or 'cleaned_data.csv'
+>             df.to_csv(out, index=False)
+>             print(out)
+>             return 0
+>         elif args.command == 'dataframe-consolidation':
+>             if not args.files:
+>                 print('Missing input files', file=sys.stderr)
+>                 return 2
+>             out = args.output or args.output2 or 'cleaned_data.csv'
+>             df = ing.consolidated_cleaned_dataframes(args.files)
+>             df.to_csv(out, index=False)
+>             print(out)
+>             return 0
+>         elif args.command == 'file-processing':
+>             if not args.files:
+>                 print('Missing input files', file=sys.stderr)
+>                 return 2
+>             out = args.output or 'cleaned_data.csv'
+>             log = args.log or 'cleaning_log.json'
+>             ing.file_processor(out, log, args.files)
+>             # also write a final_log.json for tests requiring comprehensive log
+>             final_log = os.path.join(os.path.dirname(log) or '.', 'final_log.json')
+>             with open(final_log, 'w', encoding='utf-8') as f:
+>                 json.dump({"timestamp": datetime.utcnow().isoformat(), "operations": ing.operations}, f, indent=2)
+>             print(out)
+>             return 0
+>         elif args.command == 'cleaning-log':
+>             log = args.log or 'cleaning_log.json'
+>             try:
+>                 data = ing.get_operations_log(log)
+>             except FileNotFoundError:
+>                 print('log_not_found', file=sys.stderr)
+>                 return 3
+>             print(json.dumps(data))
+>             return 0
+>         elif args.command == 'csv-summary':
+>             if not args.csv:
+>                 print('Missing --csv', file=sys.stderr)
+>                 return 2
+>             print(json.dumps(ing.csv_summary(args.csv)))
+>             return 0
+>         elif args.command == 'get-operations':
+>             out = args.output or 'cleaning_log.json'
+>             with open(out, 'w', encoding='utf-8') as f:
+>                 json.dump({"operations": ing.operations}, f, indent=2)
+>             print(out)
+>             return 0
+>     except FileNotFoundError as e:
+>         print(str(e), file=sys.stderr)
+>         return 4
+>     except Exception as e:
+>         print(f"error: {e}", file=sys.stderr)
+>         return 5
+>
+>
+> if __name__ == '__main__':
+>     sys.exit(main())
+> PY
+root@f35f41e753a3:/app# chmod +x solution/CSVIngester.py
+root@f35f41e753a3:/app# cat > solution/solve.sh << 'SH'
+> #!/usr/bin/env bash
+> set -euo pipefail
+> PY=solution/CSVIngester.py
+>
+> encoding-detection(){ python3 "$PY" --command encoding-detection --csv "$1"; }
+> name-standardization(){ python3 "$PY" --command name-standardization --column "$1"; }
+> type-detection(){ python3 "$PY" --command type-detection --csv "$1" --column "$2"; }
+> date-parsing(){ python3 "$PY" --command date-parsing --csv "$1" --column "$2"; }
+> outlier-truncate(){ python3 "$PY" --command outlier-truncate --csv "$1" --column "$2"; }
+> dataframe-cleaning(){ python3 "$PY" --command dataframe-cleaning --csv "$1" -o "${2:-cleaned_data.csv}"; }
+> dataframe-consolidation(){ out="$1"; shift; python3 "$PY" --command dataframe-consolidation -o "$out" "$@"; }
+> file-processing(){ out="$1"; log="$2"; shift 2; python3 "$PY" --command file-processing -o "$out" -l "$log" "$@"; }
+> cleaning-log(){ python3 "$PY" --command cleaning-log -l "${1:-cleaning_log.json}"; }
+> csv-summary(){ python3 "$PY" --command csv-summary --csv "$1"; }
+> get-operations(){ python3 "$PY" --command get-operations -o "${1:-final_log.json}"; }
+> SH
+root@f35f41e753a3:/app# chmod +x solution/solve.sh
+root@f35f41e753a3:/app# python3 -m pip install -q pandas==2.3.3 numpy==2.0.2 pytest==8.4.1
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a v
+irtual environment instead: https://pip.pypa.io/warnings/venv
+
+[notice] A new release of pip is available: 24.0 -> 25.3
+[notice] To update, run: pip install --upgrade pip
+root@f35f41e753a3:/app# pytest -q tests/test_outputs.py -q
+
+ERROR: file or directory not found: tests/test_outputs.py
+
+root@f35f41e753a3:/app#

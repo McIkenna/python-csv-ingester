@@ -1,0 +1,29 @@
+{
+    "id": "650094d9-bd52-42fd-bf69-61852da6a410",
+    "started_at": "2026-01-19T10:43:47.962307",
+    "finished_at": "2026-01-19T10:52:49.713183",
+    "n_total_trials": 1,
+    "stats": {
+        "n_trials": 1,
+        "n_errors": 0,
+        "evals": {
+            "terminus-2__@openai-tbench-gpt-5__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 0.0
+                    }
+                ],
+                "reward_stats": {
+                    "reward": {
+                        "0.0": [
+                            "python-csv-ingest__5rL25nz"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        }
+    }
+}

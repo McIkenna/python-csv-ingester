@@ -1,0 +1,42 @@
+New Terminal Output:
+
+root@c28acbfc71a0:/app# ls -la
+total 12
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 .
+drwxr-xr-x 1 root root 4096 Jan 19 16:23 ..
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 src
+root@c28acbfc71a0:/app# find . -type f -name '*.py' -o -name '*.sh' -o -name '*.csv' 2>/dev/null | head -20
+./src/sample2_data.csv
+./src/sample1_data.csv
+root@c28acbfc71a0:/app# cat task.toml 2>/dev/null || echo 'No task.toml found'
+No task.toml found
+root@c28acbfc71a0:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

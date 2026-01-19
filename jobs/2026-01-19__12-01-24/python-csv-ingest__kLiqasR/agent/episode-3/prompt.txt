@@ -1,0 +1,43 @@
+Current Terminal Screen:
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+        "filled": 4,
+        "value": "Unknown"
+      },
+      "timestamp": "2026-01-19T18:06:13.340006"
+    },
+    {
+      "operation": "impute_categorical",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "column": "status",
+        "filled": 6,
+        "value": "Unknown"
+      },
+      "timestamp": "2026-01-19T18:06:13.340215"
+    },
+    {
+      "operation": "missing_summary",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "missing": {
+          "order_id": 0,
+          "customer_name": 0,
+          "order_date": 0,
+          "product_price": 0,
+          "quantity": 0,
+          "total_amount": 0,
+          "ship_date": 0,
+          "status": 0
+        }
+      },
+      "timestamp": "2026-01-19T18:06:13.340448"
+    },
+    {
+      "operation": "detect_encoding",
+      "details": {
+        "source": "src/sample2_data.csv",
+        "encoding": "utf-8"
+      },
+      "timestamp": "2026-01-19T18:06:13.340523"
+root@59fbec45e032:/app#

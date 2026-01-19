@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   python-csv-ingest:
-    image: ${MAIN_IMAGE_NAME}
+    image: ${MAIN_IMAGE_NAME:-pythoncsvingest}
     build:
       context: ..
       dockerfile: environment/Dockerfile

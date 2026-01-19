@@ -1,0 +1,43 @@
+Current Terminal Screen:
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+> ---
+>
+> ## License
+>
+> This is a demonstration project for CSV data cleaning and consolidation.
+>
+> ---
+>
+> ## Author
+>
+> CSV Ingester Tool - Data Cleaning Pipeline
+> DOC_EOF
+root@c28acbfc71a0:/app# tree -L 2 2>/dev/null || find . -type f -o -type d | head -30
+.
+./solution
+./solution/solve.sh
+./solution/CSVIngester.py
+./solution/__pycache__
+./solution/__pycache__/CSVIngester.cpython-311.pyc
+./tests
+./tests/.pytest_cache
+./tests/.pytest_cache/.gitignore
+./tests/.pytest_cache/README.md
+./tests/.pytest_cache/v
+./tests/.pytest_cache/v/cache
+./tests/.pytest_cache/v/cache/lastfailed
+./tests/.pytest_cache/v/cache/nodeids
+./tests/.pytest_cache/CACHEDIR.TAG
+./tests/test3_data.csv
+./tests/test_data.csv
+./tests/test.sh
+./tests/test_outputs.py
+./tests/__pycache__
+./tests/__pycache__/test_outputs.cpython-311-pytest-9.0.2.pyc
+./tests/test2_data.csv
+./instruction.md
+./src
+./src/sample2_data.csv
+./src/sample1_data.csv
+root@c28acbfc71a0:/app#

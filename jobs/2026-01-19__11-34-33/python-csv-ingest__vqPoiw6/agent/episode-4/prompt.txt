@@ -1,0 +1,43 @@
+Current terminal state:
+New Terminal Output:
+
+root@720d5d598560:/app# cat > src/sample1_data.csv << 'EOF'
+> Order ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status
+> 1,Alice,2025-01-01,100,5,500,01/05/2025,Active
+> 2,Bob,01/10/2025,150,,750,2025/01/12,Pending
+> 3,,Jan 10, 2025,200,10,2000,15-01-2025,
+> 4,Charlie,2025/01/20,9999,8,800,2025.01.22,Active
+> EOF
+root@720d5d598560:/app# cat > src/sample2_data.csv << 'EOF'
+> order-id,customer_name,date,price $,qty!!,amount,ship-date,status
+> 5,Donna,15/01/2025,120,3,360,2025-01-16,Pending
+> 6,Edgar,January 17, 2025,130,,520,17-01-2025,Active
+> 7,Fern,2025.01.18,,12,0,,
+> 8,,1-19-2025,85,1,85,2025/01/20,Cancelled
+> EOF
+root@720d5d598560:/app# python3 solution/CSVIngester.py src/sample1_data.csv src/sample2_data.csv -o cleaned.csv -l cleaning_log.json
+usage: CSVIngester.py [-h] [-o OUTPUT] [-l LOG]
+                      {encoding-detection,name-standardization,type-detection,date-parsing,outlier-truncate,dataframe-cleaning,dataframe-consolidation,file-proc
+essing,cleaning-log,csv-summary,get-operations}
+                      ... [files ...]
+CSVIngester.py: error: argument command: invalid choice: 'src/sample1_data.csv' (choose from 'encoding-detection', 'name-standardization', 'type-detection', 'da
+te-parsing', 'outlier-truncate', 'dataframe-cleaning', 'dataframe-consolidation', 'file-processing', 'cleaning-log', 'csv-summary', 'get-operations')
+root@720d5d598560:/app# head -n 5 cleaned.csv
+head: cannot open 'cleaned.csv' for reading: No such file or directory
+root@720d5d598560:/app# sed -n '1,120p' cleaning_log.json | sed -n '1,60p'
+sed: can't read cleaning_log.json: No such file or directory
+root@720d5d598560:/app# source solution/solve.sh
+root@720d5d598560:/app# csv-summary src/sample1_data.csv
+type-detection src/sample1_data.csv "Order Date"
+Error: Error tokenizing data. C error: Expected 8 fields in line 4, saw 9
+
+root@720d5d598560:/app# type-detection src/sample1_data.csv "Order Date"
+Error: Error tokenizing data. C error: Expected 8 fields in line 4, saw 9
+
+root@720d5d598560:/app# outlier-truncate src/sample1_data.csv "Product Price $"
+Error: Error tokenizing data. C error: Expected 8 fields in line 4, saw 9
+
+root@720d5d598560:/app#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

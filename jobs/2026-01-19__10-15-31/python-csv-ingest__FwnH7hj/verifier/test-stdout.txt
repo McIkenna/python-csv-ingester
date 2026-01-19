@@ -1,0 +1,1105 @@
+Hit:1 http://deb.debian.org/debian trixie InRelease
+Hit:2 http://deb.debian.org/debian trixie-updates InRelease
+Hit:3 http://deb.debian.org/debian-security trixie-security InRelease
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+curl is already the newest version (8.14.1-2+deb13u2).
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+no checksums to verify
+installing to /root/.local/bin
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+============================= test session starts ==============================
+platform linux -- Python 3.11.14, pytest-8.4.1, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.3.5
+collected 26 items
+
+../tests/test_outputs.py FFFFFFFFFFFFFFFFFFFFFFFFFF                      [100%]
+
+=================================== FAILURES ===================================
+_______________________ test_should_detect_utf8_encoding _______________________
+
+mock_test_data_two = '/tests/test2_data.csv'
+solve_sh_path = 'solution/solve.sh'
+
+    def test_should_detect_utf8_encoding(mock_test_data_two, solve_sh_path):
+        """Test for encoding detection"""
+        stdout, stderr, returncode = run_bash_command(
+                "encoding-detection",
+                f'"{mock_test_data_two}"',
+                solve_sh_path
+            )
+        assert returncode == 0
+>       assert "utf" in stdout.lower() or "utf-8" in stdout.lower()
+E       AssertionError: assert ('utf' in '' or 'utf-8' in '')
+E        +  where '' = <built-in method lower of str object at 0xffffb28f1188>()
+E        +    where <built-in method lower of str object at 0xffffb28f1188> = ''.lower
+E        +  and   '' = <built-in method lower of str object at 0xffffb28f1188>()
+E        +    where <built-in method lower of str object at 0xffffb28f1188> = ''.lower
+
+/tests/test_outputs.py:203: AssertionError
+______________________ test_should_detect_latin_encoding _______________________
+
+mock_latin1_data = '/tests/latin1_data.csv', solve_sh_path = 'solution/solve.sh'
+
+    def test_should_detect_latin_encoding(mock_latin1_data, solve_sh_path):
+        """Test for encoding detection"""
+        stdout, stderr, returncode = run_bash_command(
+                "encoding-detection",
+                f'"{mock_latin1_data}"',
+                solve_sh_path
+            )
+        assert returncode == 0
+>       assert "latin" in stdout.lower() or "latin-1" in stdout.lower()
+E       AssertionError: assert ('latin' in '' or 'latin-1' in '')
+E        +  where '' = <built-in method lower of str object at 0xffffb28f1188>()
+E        +    where <built-in method lower of str object at 0xffffb28f1188> = ''.lower
+E        +  and   '' = <built-in method lower of str object at 0xffffb28f1188>()
+E        +    where <built-in method lower of str object at 0xffffb28f1188> = ''.lower
+
+/tests/test_outputs.py:213: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+Created mock Latin-1 data file at: /tests/latin1_data.csv
+_________________ test_should_detect_encoding_nonexistent_file _________________
+
+solve_sh_path = 'solution/solve.sh'
+
+    def test_should_detect_encoding_nonexistent_file(solve_sh_path):
+        """Test with non-existent file"""
+        fake_file = os.path.join(TEST_DIR, "nonexistent.csv")
+        stdout, stderr, returncode = run_bash_command(
+            "encoding-detection",
+            f'"{fake_file}"',
+            solve_sh_path
+        )
+>       assert returncode != 0
+E       assert 0 != 0
+
+/tests/test_outputs.py:226: AssertionError
+_______________________ test_standardize_spaces_col_name _______________________
+
+solve_sh_path = 'solution/solve.sh'
+
+    def test_standardize_spaces_col_name(solve_sh_path):
+            """Test standardizing column with spaces"""
+            stdout, stderr, returncode = run_bash_command(
+                "name-standardization",
+                '"Order Date"',
+                solve_sh_path
+            )
+            assert returncode == 0
+>           assert stdout.strip() == "order_date"
+E           AssertionError: assert '' == 'order_date'
+E             
+E             - order_date
+
+/tests/test_outputs.py:236: AssertionError
+______________________ test_standardize_any_special_chars ______________________
+
+solve_sh_path = 'solution/solve.sh'
+
+    def test_standardize_any_special_chars(solve_sh_path):
+            """Test standardizing column with special characters"""
+            stdout, stderr, returncode = run_bash_command(
+                "name-standardization",
+                '"Price $!!"',
+                solve_sh_path
+            )
+            assert returncode == 0
+>           assert stdout.strip() == "price"
+E           AssertionError: assert '' == 'price'
+E             
+E             - price
+
+/tests/test_outputs.py:246: AssertionError
+_________________________ test_standardize_any_casing __________________________
+
+solve_sh_path = 'solution/solve.sh'
+
+    def test_standardize_any_casing(solve_sh_path):
+            """Test standardizing column with special characters"""
+            stdout, stderr, returncode = run_bash_command(
+                "name-standardization",
+                '"ProductPrice"',
+                solve_sh_path
+            )
+            assert returncode == 0
+>           assert stdout.strip() == "product_price"
+E           AssertionError: assert '' == 'product_price'
+E             
+E             - product_price
+
+/tests/test_outputs.py:256: AssertionError
+__________________________ test_detect_numeric_column __________________________
+
+mock_test_data = '/tests/test_data.csv', solve_sh_path = 'solution/solve.sh'
+
+    def test_detect_numeric_column(mock_test_data, solve_sh_path):
+            """Test detection of numeric column"""
+            stdout, stderr, returncode = run_bash_command(
+                "type-detection",
+                f'"{mock_test_data}" "Product Price $"',
+                solve_sh_path
+            )
+            assert returncode == 0
+>           assert stdout.strip() == "numeric"
+E           AssertionError: assert '' == 'numeric'
+E             
+E             - numeric
+
+/tests/test_outputs.py:270: AssertionError
+___________________________ test_detect_date_column ____________________________
+
+mock_test_data_two = '/tests/test2_data.csv'
+solve_sh_path = 'solution/solve.sh'
+
+    def test_detect_date_column(mock_test_data_two, solve_sh_path):
+        """Test detection of date column"""
+        stdout, stderr, returncode = run_bash_command(
+            "type-detection",
+            f'"{mock_test_data_two}" "Last Restock"',
+            solve_sh_path
+        )
+        assert returncode == 0
+>       assert stdout.strip() == "date"
+E       AssertionError: assert '' == 'date'
+E         
+E         - date
+
+/tests/test_outputs.py:280: AssertionError
+________________________ test_detect_categorical_column ________________________
+
+mock_test_data_two = '/tests/test2_data.csv'
+solve_sh_path = 'solution/solve.sh'
+
+    def test_detect_categorical_column(mock_test_data_two, solve_sh_path):
+        """Test detection of categorical column"""
+        stdout, stderr, returncode = run_bash_command(
+            "type-detection",
+            f'"{mock_test_data_two}" "Supplier"',
+            solve_sh_path
+        )
+        assert returncode == 0
+>       assert stdout.strip() == "categorical"
+E       AssertionError: assert '' == 'categorical'
+E         
+E         - categorical
+
+/tests/test_outputs.py:290: AssertionError
+________________________ test_detect_nonexistent_column ________________________
+
+mock_test_data_three = '/tests/test3_data.csv'
+solve_sh_path = 'solution/solve.sh'
+
+    def test_detect_nonexistent_column(mock_test_data_three, solve_sh_path):
+        """Test with non-existent column"""
+        stdout, stderr, returncode = run_bash_command(
+            "type-detection",
+            f'"{mock_test_data_three}" "NonExistent"',
+            solve_sh_path
+        )
+>       assert returncode == 1
+E       assert 0 == 1
+
+/tests/test_outputs.py:299: AssertionError
+_____________________________ test_parse_iso_dates _____________________________
+
+mock_test_data = '/tests/test_data.csv', solve_sh_path = 'solution/solve.sh'
+
+    def test_parse_iso_dates(mock_test_data, solve_sh_path):
+            """Test parsing of ISO format dates"""
+            stdout, stderr, returncode = run_bash_command(
+                "date-parsing",
+                f'"{mock_test_data}" "Order Date"',
+                solve_sh_path
+            )
+            assert returncode == 0
+            # Should return JSON array
+>           dates = extract_json_from_output(stdout)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:316: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+________________________ test_parse_mixed_date_formats _________________________
+
+mock_test_data_two = '/tests/test2_data.csv'
+solve_sh_path = 'solution/solve.sh'
+
+    def test_parse_mixed_date_formats( mock_test_data_two, solve_sh_path):
+        """Test parsing of mixed date formats"""
+        stdout, stderr, returncode = run_bash_command(
+            "date-parsing",
+            f'"{mock_test_data_two}" "Last Restock"',
+            solve_sh_path
+        )
+        assert returncode == 0
+>       dates = extract_json_from_output(stdout)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:328: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+__________________________ test_clip_numeric_outliers __________________________
+
+mock_test_data = '/tests/test_data.csv', solve_sh_path = 'solution/solve.sh'
+
+    def test_clip_numeric_outliers(mock_test_data, solve_sh_path):
+        print('solve_sh_path:', solve_sh_path)
+        """Test clipping of numeric outliers"""
+        stdout, stderr, returncode = run_bash_command(
+            "outlier-truncate",
+            f'"{mock_test_data}" "Total Amount"',
+            solve_sh_path
+        )
+        assert returncode == 0
+>       result = extract_json_from_output(stdout)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:346: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+----------------------------- Captured stdout call -----------------------------
+solve_sh_path: solution/solve.sh
+_________________________ test_clean_single_dataframe __________________________
+
+mock_test_data = '/tests/test_data.csv', solve_sh_path = 'solution/solve.sh'
+
+    def test_clean_single_dataframe(mock_test_data, solve_sh_path):
+        """Test cleaning of entire dataframe"""
+        output_file = os.path.join(TEST_DIR, 'cleaned_output.csv')
+        if os.path.exists(output_file):
+            os.remove(output_file)
+    
+        stdout, stderr, returncode = run_bash_command(
+            "dataframe-cleaning",
+            f'"{mock_test_data}" "{output_file}"',
+            solve_sh_path
+        )
+        assert returncode == 0
+>       assert os.path.exists(output_file)
+E       AssertionError: assert False
+E        +  where False = <function exists at 0xffffb22df420>('/tests/cleaned_output.csv')
+E        +    where <function exists at 0xffffb22df420> = <module 'posixpath' (frozen)>.exists
+E        +      where <module 'posixpath' (frozen)> = os.path
+
+/tests/test_outputs.py:373: AssertionError
+______________________ test_cleaned_columns_standardized _______________________
+
+mock_test_data = '/tests/test_data.csv', solve_sh_path = 'solution/solve.sh'
+
+    def test_cleaned_columns_standardized(mock_test_data, solve_sh_path):
+            """Test that cleaned CSV has standardized column names"""
+            output_file = os.path.join(TEST_DIR, 'cleaned_output.csv')
+            stdout, stderr, returncode = run_bash_command(
+                "dataframe-cleaning",
+                f'"{mock_test_data}" "{output_file}"',
+                solve_sh_path
+            )
+            assert returncode == 0
+>           result = extract_json_from_output(stdout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:392: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+_________________________ test_consolidate_dataframes __________________________
+
+mock_test_data = '/tests/test_data.csv'
+mock_test_data_two = '/tests/test2_data.csv'
+mock_test_data_three = '/tests/test3_data.csv'
+solve_sh_path = 'solution/solve.sh'
+
+    def test_consolidate_dataframes(mock_test_data, mock_test_data_two, mock_test_data_three, solve_sh_path):
+        """Test consolidation of multiple dataframes"""
+        output_file = os.path.join(TEST_DIR, 'consolidated_output.csv')
+    
+        stdout, stderr, returncode = run_bash_command(
+            "dataframe-consolidation",
+            f'"{output_file}" "{mock_test_data}" "{mock_test_data_two}" "{mock_test_data_three}"',
+            solve_sh_path
+        )
+        assert returncode == 0
+>       result = extract_json_from_output(stdout)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:418: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+__________________________ test_process_full_pipeline __________________________
+
+mock_test_data = '/tests/test_data.csv'
+mock_test_data_two = '/tests/test2_data.csv'
+mock_test_data_three = '/tests/test3_data.csv'
+solve_sh_path = 'solution/solve.sh'
+
+    def test_process_full_pipeline(mock_test_data, mock_test_data_two, mock_test_data_three, solve_sh_path):
+            """Test the complete processing pipeline"""
+            output_file = os.path.join(TEST_DIR, "final_output.csv")
+            log_file = os.path.join(TEST_DIR, "process_log.json")
+    
+            stdout, stderr, returncode = run_bash_command(
+                "file-processing",
+                f'"{output_file}" "{log_file}" "{mock_test_data}" "{mock_test_data_two}" "{mock_test_data_three}"',
+                solve_sh_path
+            )
+            assert returncode == 0
+    
+            # Parse the log output
+>           log = extract_json_from_output(stdout)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:444: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+_____________________ test_process_log_contains_operations _____________________
+
+mock_test_data_two = '/tests/test2_data.csv'
+solve_sh_path = 'solution/solve.sh'
+
+    def test_process_log_contains_operations(mock_test_data_two,solve_sh_path):
+            """Test that processing log contains expected operations"""
+            output_file = os.path.join(TEST_DIR, "output.csv")
+            log_file = os.path.join(TEST_DIR, "log.json")
+    
+            stdout, stderr, returncode = run_bash_command(
+                "file-processing",
+                f'"{output_file}" "{log_file}" "{mock_test_data_two}"',
+                solve_sh_path
+            )
+            assert returncode == 0
+    
+>           log = extract_json_from_output(stdout)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:471: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+_________________________ test_get_existing_operations _________________________
+
+mock_test_data = '/tests/test_data.csv', solve_sh_path = 'solution/solve.sh'
+
+    def test_get_existing_operations(mock_test_data, solve_sh_path):
+    
+            output_file = os.path.join(TEST_DIR, "output.csv")
+            log_file = os.path.join(TEST_DIR, "log.json")
+    
+            # First, run processing to generate log
+            stdout, stderr, returncode = run_bash_command(
+                "file-processing",
+                f'"{output_file}" "{log_file}" "{mock_test_data}"',
+                solve_sh_path
+            )
+            assert returncode == 0
+    
+            # Now, get existing operations
+            stdout, stderr, returncode = run_bash_command(
+                "get-operations",
+                f'"{log_file}"',
+                solve_sh_path
+            )
+            assert returncode == 0
+    
+>           operations = extract_json_from_output(stdout)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:501: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+_________________________ test_get_median_for_missing __________________________
+
+mock_test_data = '/tests/test_data.csv', solve_sh_path = 'solution/solve.sh'
+
+    def test_get_median_for_missing(mock_test_data, solve_sh_path):
+        """Test to replace missing categorical values with 'Unknown'"""
+        output_file = os.path.join(TEST_DIR, 'output.csv')
+        log_file = os.path.join(TEST_DIR, "log.json")
+        if os.path.exists(output_file):
+            os.remove(output_file)
+        with open(mock_test_data, "r", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            headers = next(reader)
+            assert "Product Price $" in headers
+            empty_data_idx = headers.index("Product Price $")
+            next(reader)
+            next(reader)
+            third_row = next(reader)
+            # test the value in the first data row
+            assert third_row[empty_data_idx] is None or third_row[empty_data_idx] == ""
+    
+        stdout, stderr, returncode = run_bash_command(
+            "file-processing",
+           f'"{output_file}" "{log_file}" "{mock_test_data}"',
+            solve_sh_path
+        )
+        assert returncode == 0
+>       log = extract_json_from_output(stdout)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:534: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+_________________________ test_get_unknown_for_missing _________________________
+
+mock_test_data_two = '/tests/test2_data.csv'
+solve_sh_path = 'solution/solve.sh'
+
+    def test_get_unknown_for_missing(mock_test_data_two, solve_sh_path):
+        """Test to replace missing categorical values with 'Unknown'"""
+        output_file = os.path.join(TEST_DIR, 'output.csv')
+        log_file = os.path.join(TEST_DIR, "log.json")
+        if os.path.exists(output_file):
+            os.remove(output_file)
+        with open(mock_test_data_two, "r", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            headers = next(reader)
+            assert "Supplier" in headers
+            empty_data_idx = headers.index("Supplier")
+            # test the value in the first data row
+            first_row = next(reader)
+            assert first_row[empty_data_idx] == ""
+    
+        stdout, stderr, returncode = run_bash_command(
+            "file-processing",
+           f'"{output_file}" "{log_file}" "{mock_test_data_two}"',
+            solve_sh_path
+        )
+        assert returncode == 0
+>       log = extract_json_from_output(stdout)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:582: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+____________________________ test_get_cleaning_log _____________________________
+
+mock_test_data = '/tests/test_data.csv', solve_sh_path = 'solution/solve.sh'
+
+    def test_get_cleaning_log(mock_test_data, solve_sh_path):
+            """Test retrieval of cleaning log"""
+            output_file = os.path.join(TEST_DIR, "output.csv")
+            log_file = os.path.join(TEST_DIR, "log.json")
+    
+            # First, run processing to generate log
+            stdout, stderr, returncode = run_bash_command(
+                "file-processing",
+                f'"{output_file}" "{log_file}" "{mock_test_data}"',
+                solve_sh_path
+            )
+            assert returncode == 0
+    
+            # Now, get cleaning log
+            stdout, stderr, returncode = run_bash_command(
+                "cleaning-log",
+                f'"{log_file}"',
+                solve_sh_path
+            )
+            assert returncode == 0
+    
+>           cleaning_log = extract_json_from_output(stdout)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:631: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+____________________ test_get_cleaning_log_nonexistent_file ____________________
+
+solve_sh_path = 'solution/solve.sh'
+
+    def test_get_cleaning_log_nonexistent_file(solve_sh_path):
+            """Test retrieval of cleaning log from non-existent file"""
+            fake_log_file = os.path.join(TEST_DIR, "nonexistent_log.json")
+    
+            stdout, stderr, returncode = run_bash_command(
+                "cleaning-log",
+                f'"{fake_log_file}"',
+                solve_sh_path
+            )
+            assert returncode == 0
+    
+>           error_response = extract_json_from_output(stdout)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:651: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+_____________________________ test_get_csv_summary _____________________________
+
+mock_test_data = '/tests/test_data.csv', solve_sh_path = 'solution/solve.sh'
+
+    def test_get_csv_summary(mock_test_data, solve_sh_path):
+    
+            # First, run processing to generate log
+            stdout, stderr, returncode = run_bash_command(
+                "csv-summary",
+                f'"{mock_test_data}"',
+                solve_sh_path
+            )
+            assert returncode == 0
+    
+>           summary = extract_json_from_output(stdout)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:668: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+______________________ test_summary_shows_missing_values _______________________
+
+mock_test_data_two = '/tests/test2_data.csv'
+solve_sh_path = 'solution/solve.sh'
+
+    def test_summary_shows_missing_values( mock_test_data_two, solve_sh_path):
+            """Test that summary correctly identifies missing values"""
+            stdout, stderr, returncode = run_bash_command(
+                "csv-summary",
+                f'"{mock_test_data_two}"',
+                solve_sh_path
+            )
+            assert returncode == 0
+    
+>           summary = extract_json_from_output(stdout)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:691: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+______________________________ test_full_workflow ______________________________
+
+mock_test_data = '/tests/test_data.csv'
+mock_test_data_two = '/tests/test2_data.csv'
+mock_test_data_three = '/tests/test3_data.csv'
+solve_sh_path = 'solution/solve.sh'
+
+    def test_full_workflow(mock_test_data, mock_test_data_two,  mock_test_data_three,
+                            solve_sh_path):
+        """Test a complete workflow using multiple functions"""
+    
+        # 1. Get summary of input files
+        stdout1, _, _ = run_bash_command(
+            "csv-summary",
+            f'"{mock_test_data}"',
+            solve_sh_path
+        )
+>       summary1 = extract_json_from_output(stdout1)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:713: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = ''
+
+    def extract_json_from_output(output):
+        """Extract JSON from output that may contain other text"""
+        try:
+            return json.loads(output)
+        except json.JSONDecodeError:
+            pass
+    
+        # Try to find JSON starting with { or [
+        for start_char in ['{', '[']:
+            start_idx = output.find(start_char)
+            if start_idx != -1:
+                depth = 0
+                end_char = '}' if start_char == '{' else ']'
+    
+                for i in range(start_idx, len(output)):
+                    if output[i] == start_char:
+                        depth += 1
+                    elif output[i] == end_char:
+                        depth -= 1
+                        if depth == 0:
+                            json_str = output[start_idx:i+1]
+                            try:
+                                return json.loads(json_str)
+                            except json.JSONDecodeError:
+                                continue
+    
+>       raise json.JSONDecodeError("No valid JSON found in output", output, 0)
+E       json.decoder.JSONDecodeError: No valid JSON found in output: line 1 column 1 (char 0)
+
+/tests/test_outputs.py:58: JSONDecodeError
+=========================== short test summary info ============================
+FAILED ../tests/test_outputs.py::test_should_detect_utf8_encoding - Assertion...
+FAILED ../tests/test_outputs.py::test_should_detect_latin_encoding - Assertio...
+FAILED ../tests/test_outputs.py::test_should_detect_encoding_nonexistent_file
+FAILED ../tests/test_outputs.py::test_standardize_spaces_col_name - Assertion...
+FAILED ../tests/test_outputs.py::test_standardize_any_special_chars - Asserti...
+FAILED ../tests/test_outputs.py::test_standardize_any_casing - AssertionError...
+FAILED ../tests/test_outputs.py::test_detect_numeric_column - AssertionError:...
+FAILED ../tests/test_outputs.py::test_detect_date_column - AssertionError: as...
+FAILED ../tests/test_outputs.py::test_detect_categorical_column - AssertionEr...
+FAILED ../tests/test_outputs.py::test_detect_nonexistent_column - assert 0 == 1
+FAILED ../tests/test_outputs.py::test_parse_iso_dates - json.decoder.JSONDeco...
+FAILED ../tests/test_outputs.py::test_parse_mixed_date_formats - json.decoder...
+FAILED ../tests/test_outputs.py::test_clip_numeric_outliers - json.decoder.JS...
+FAILED ../tests/test_outputs.py::test_clean_single_dataframe - AssertionError...
+FAILED ../tests/test_outputs.py::test_cleaned_columns_standardized - json.dec...
+FAILED ../tests/test_outputs.py::test_consolidate_dataframes - json.decoder.J...
+FAILED ../tests/test_outputs.py::test_process_full_pipeline - json.decoder.JS...
+FAILED ../tests/test_outputs.py::test_process_log_contains_operations - json....
+FAILED ../tests/test_outputs.py::test_get_existing_operations - json.decoder....
+FAILED ../tests/test_outputs.py::test_get_median_for_missing - json.decoder.J...
+FAILED ../tests/test_outputs.py::test_get_unknown_for_missing - json.decoder....
+FAILED ../tests/test_outputs.py::test_get_cleaning_log - json.decoder.JSONDec...
+FAILED ../tests/test_outputs.py::test_get_cleaning_log_nonexistent_file - jso...
+FAILED ../tests/test_outputs.py::test_get_csv_summary - json.decoder.JSONDeco...
+FAILED ../tests/test_outputs.py::test_summary_shows_missing_values - json.dec...
+FAILED ../tests/test_outputs.py::test_full_workflow - json.decoder.JSONDecode...
+============================== 26 failed in 0.44s ==============================

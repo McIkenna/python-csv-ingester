@@ -1,0 +1,254 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 26,
+            "passed": 26,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1767676869.3501487,
+            "stop": 1767676883.5116837
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::test_should_detect_utf8_encoding",
+                "status": "passed",
+                "duration": 1.6194930410056259,
+                "start": 1767676869.4485273,
+                "stop": 1767676871.0682049,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_should_detect_latin_encoding",
+                "status": "passed",
+                "duration": 0.34655024899257114,
+                "start": 1767676871.0684142,
+                "stop": 1767676871.4151542,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_should_detect_encoding_nonexistent_file",
+                "status": "passed",
+                "duration": 0.0037933330022497103,
+                "start": 1767676871.415334,
+                "stop": 1767676871.419243,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_standardize_spaces_col_name",
+                "status": "passed",
+                "duration": 0.3464404580008704,
+                "start": 1767676871.4193766,
+                "stop": 1767676871.765952,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_standardize_any_special_chars",
+                "status": "passed",
+                "duration": 0.35682574899692554,
+                "start": 1767676871.766114,
+                "stop": 1767676872.123071,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_standardize_any_casing",
+                "status": "passed",
+                "duration": 0.5994127919984749,
+                "start": 1767676872.1233332,
+                "stop": 1767676872.7229283,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_detect_numeric_column",
+                "status": "passed",
+                "duration": 0.49378095899737673,
+                "start": 1767676872.7230945,
+                "stop": 1767676873.2170706,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_detect_date_column",
+                "status": "passed",
+                "duration": 0.5522268749991781,
+                "start": 1767676873.2175279,
+                "stop": 1767676873.7704077,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_detect_categorical_column",
+                "status": "passed",
+                "duration": 0.4103798339929199,
+                "start": 1767676873.7710912,
+                "stop": 1767676874.1816392,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_detect_nonexistent_column",
+                "status": "passed",
+                "duration": 0.3762040419896948,
+                "start": 1767676874.1819158,
+                "stop": 1767676874.5582833,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_parse_iso_dates",
+                "status": "passed",
+                "duration": 0.3859326250021695,
+                "start": 1767676874.5584567,
+                "stop": 1767676874.9445438,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_parse_mixed_date_formats",
+                "status": "passed",
+                "duration": 0.3161283339941292,
+                "start": 1767676874.9449942,
+                "stop": 1767676875.261284,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_clip_numeric_outliers",
+                "status": "passed",
+                "duration": 0.6748612500086892,
+                "start": 1767676875.26159,
+                "stop": 1767676875.9370143,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_clean_single_dataframe",
+                "status": "passed",
+                "duration": 0.5786737510061357,
+                "start": 1767676875.9375398,
+                "stop": 1767676876.5164273,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_cleaned_columns_standardized",
+                "status": "passed",
+                "duration": 1.6650975009979447,
+                "start": 1767676876.5166864,
+                "stop": 1767676878.1820157,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_consolidate_dataframes",
+                "status": "passed",
+                "duration": 0.3724541679985123,
+                "start": 1767676878.1822157,
+                "stop": 1767676878.5548162,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_process_full_pipeline",
+                "status": "passed",
+                "duration": 0.5049704999983078,
+                "start": 1767676878.554961,
+                "stop": 1767676879.0604773,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_process_log_contains_operations",
+                "status": "passed",
+                "duration": 0.36651050000364194,
+                "start": 1767676879.0610166,
+                "stop": 1767676879.4276662,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_get_existing_operations",
+                "status": "passed",
+                "duration": 0.6896080399965285,
+                "start": 1767676879.428108,
+                "stop": 1767676880.1178708,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_get_median_for_missing",
+                "status": "passed",
+                "duration": 0.400248832993384,
+                "start": 1767676880.1180592,
+                "stop": 1767676880.5184665,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_get_unknown_for_missing",
+                "status": "passed",
+                "duration": 0.3256145019986434,
+                "start": 1767676880.51866,
+                "stop": 1767676880.844432,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_get_cleaning_log",
+                "status": "passed",
+                "duration": 0.42202854200149886,
+                "start": 1767676880.8446877,
+                "stop": 1767676881.2669387,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_get_cleaning_log_nonexistent_file",
+                "status": "passed",
+                "duration": 0.003612623993831221,
+                "start": 1767676881.2670882,
+                "stop": 1767676881.2708075,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_get_csv_summary",
+                "status": "passed",
+                "duration": 0.3927652499987744,
+                "start": 1767676881.2709699,
+                "stop": 1767676881.6642153,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_summary_shows_missing_values",
+                "status": "passed",
+                "duration": 0.3822628329944564,
+                "start": 1767676881.6646588,
+                "stop": 1767676882.0470593,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_full_workflow",
+                "status": "passed",
+                "duration": 1.4640658759963117,
+                "start": 1767676882.0472178,
+                "stop": 1767676883.5114315,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            }
+        ]
+    }
+}

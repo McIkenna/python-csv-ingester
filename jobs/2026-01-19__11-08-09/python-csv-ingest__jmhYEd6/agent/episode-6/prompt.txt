@@ -1,0 +1,43 @@
+Current Terminal Screen:
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+    },
+    "timestamp": "2026-01-19T17:14:17.869055"
+  },
+  {
+    "operation": "impute_missing",
+    "details": {
+      "numeric": {
+        "stock_qty": 320.5,
+        "unit_cost": 1182.6482183891753
+      },
+      "categorical": [
+        "sku",
+        "product_name",
+        "supplier",
+        "category_type"
+      ]
+    },
+    "timestamp": "2026-01-19T17:14:17.869790"
+  },
+  {
+    "operation": "clip_outliers",
+    "details": {
+      "stock_qty": {
+        "lower_bound": 9.33,
+        "upper_bound": 12715.090000000002,
+        "original_min": 6.0,
+        "original_max": 13930.0,
+        "clipped_min": 9.33,
+        "clipped_max": 12715.090000000002
+      },
+      "unit_cost": {
+        "lower_bound": 32.3640947273435,
+        "upper_bound": 1985.7700631562775,
+        "original_min": 32.30900302329,
+        "original_max": 1994.9345575090504,
+        "clipped_min": 32.3640947273435,
+        "clipped_max": 1985.7700631562775
+      }
+    },
+root@eb6fbc872eff:/app#

@@ -1,0 +1,84 @@
+{
+    "id": "263537b9-26fd-4e88-a593-3fee28741e31",
+    "task_name": "",
+    "trial_name": "python-csv-ingest__kb6dM47",
+    "trial_uri": "file:///Users/newaccount/Downloads/python-csv-ingest/jobs/2026-01-05__23-20-45/python-csv-ingest__kb6dM47",
+    "task_id": {
+        "path": "."
+    },
+    "source": null,
+    "task_checksum": "5b81102bff8e2f66e4d785cc4815b1a6b767839f5f8cfbc99aff7d166cfcef2f",
+    "config": {
+        "task": {
+            "path": ".",
+            "git_url": null,
+            "git_commit_id": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "python-csv-ingest__kb6dM47",
+        "trials_dir": "jobs/2026-01-05__23-20-45",
+        "timeout_multiplier": 1.0,
+        "agent": {
+            "name": "oracle",
+            "import_path": null,
+            "model_name": null,
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {}
+        },
+        "environment": {
+            "type": "docker",
+            "force_build": false,
+            "delete": true,
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "kwargs": {}
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "job_id": "79427acb-c122-49dd-8b0e-617838b61ef8"
+    },
+    "agent_info": {
+        "name": "oracle",
+        "version": "1.0.0",
+        "model_info": null
+    },
+    "agent_result": {
+        "n_input_tokens": null,
+        "n_cache_tokens": null,
+        "n_output_tokens": null,
+        "cost_usd": null,
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 1.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-01-05T23:20:45.914339",
+    "finished_at": "2026-01-05T23:21:34.566572",
+    "environment_setup": {
+        "started_at": "2026-01-05T23:20:47.490175",
+        "finished_at": "2026-01-05T23:20:49.811056"
+    },
+    "agent_setup": {
+        "started_at": "2026-01-05T23:20:49.811269",
+        "finished_at": "2026-01-05T23:20:49.811436"
+    },
+    "agent_execution": {
+        "started_at": "2026-01-05T23:20:49.811475",
+        "finished_at": "2026-01-05T23:20:59.374161"
+    },
+    "verifier": {
+        "started_at": "2026-01-05T23:20:59.374608",
+        "finished_at": "2026-01-05T23:21:23.602369"
+    }
+}
