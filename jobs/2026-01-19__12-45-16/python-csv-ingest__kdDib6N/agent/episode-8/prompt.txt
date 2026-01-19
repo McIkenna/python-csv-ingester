@@ -1,0 +1,74 @@
+New Terminal Output:
+
+root@19c53a573b6d:/app# cat > tests/test.sh << 'EOF'
+> #!/bin/bash
+>
+> # Test runner script for CSV Ingester
+>
+> echo "========================================"
+> echo "CSV Ingester Test Suite"
+> echo "========================================"
+> echo ""
+>
+> # Check if pytest is installed
+> if ! command -v pytest &> /dev/null; then
+>     echo "Error: pytest is not installed"
+>     echo "Please install with: pip install pytest"
+>     exit 1
+> fi
+>
+> # Check if pandas is installed
+> if ! python3 -c "import pandas" 2>/dev/null; then
+>     echo "Error: pandas is not installed"
+>     echo "Please install with: pip install pandas"
+>     exit 1
+> fi
+>
+> echo "Running tests..."
+> echo ""
+>
+> # Run pytest with verbose output
+> pytest tests/test_outputs.py -v --tb=short
+>
+> TEST_RESULT=$?
+>
+> echo ""
+> if [ $TEST_RESULT -eq 0 ]; then
+>     echo "========================================"
+>     echo "All tests passed! ✓"
+>     echo "========================================"
+> else
+>     echo "========================================"
+>     echo "Some tests failed! ✗"
+>     echo "========================================"
+>     exit 1
+> fi
+>
+> exit 0
+> EOF
+root@19c53a573b6d:/app# chmod +x tests/test.sh
+root@19c53a573b6d:/app# cat > task.toml << 'EOF'
+> [project]
+> name = "python-csv-ingest"
+> version = "1.0.0"
+> description = "A Python CLI tool for cleaning and consolidating CSV files with inconsistent schemas"
+>
+> [dependencies]
+> python = ">=3.8"
+> pandas = ">=2.0.0"
+> numpy = ">=1.24.0"
+> pytest = "8.4.1"
+>
+> [scripts]
+> test = "bash tests/test.sh"
+> generate-test-data = "python3 tests/generate_test_csvs.py"
+> EOF
+root@19c53a573b6d:/app# ls -la
+total 28
+drwxr-xr-x 1 root root 4096 Jan 19 18:49 .
+drwxr-xr-x 1 root root 4096 Jan 19 18:45 ..
+drwxr-xr-x 2 root root 4096 Jan 19 18:47 solution
+drwxr-xr-x 1 root root 4096 Jan 19 18:46 src
+-rw-r--r-- 1 root root  342 Jan 19 18:49 task.toml
+drwxr-xr-x 2 root root 4096 Jan 19 18:49 tests
+root@19c53a573b6d:/app#

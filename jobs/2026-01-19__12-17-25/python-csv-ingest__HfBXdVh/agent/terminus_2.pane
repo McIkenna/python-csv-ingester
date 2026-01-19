@@ -1,0 +1,2258 @@
+[?2004hroot@2cab8586e0e9:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@2cab8586e0e9:/app# clear
+[?2004l[H[J[3J[?2004hroot@2cab8586e0e9:/app# ls -la
+[?2004ltotal 12
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 .
+drwxr-xr-x 1 root root 4096 Jan 19 18:17 ..
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 src
+[?2004hroot@2cab8586e0e9:/app# ls -la src solution tests || true
+[?2004lls: cannot access 'solution': No such file or directory
+ls: cannot access 'tests': No such file or directory
+src:
+total 16
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 .
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 ..
+-rw-r--r-- 1 root root  874 Jan  6 04:31 sample1_data.csv
+-rw-r--r-- 1 root root  768 Jan  6 04:17 sample2_data.csv
+[?2004hroot@2cab8586e0e9:/app# mkdir -p src solution tests
+[?2004l[?2004hroot@2cab8586e0e9:/app# chmod +x src/CSVIngester.py
+[?2004lchmod: cannot access 'src/CSVIngester.py': No such file or directory
+[?2004hroot@2cab8586e0e9:/app# cat > solution/solve.sh << 'SH'
+[?2004l[?2004h> #!/usr/bin/env bash
+[?2004l[?2004h> # Sourceable helper that delegates to Python CLI
+[?2004l[?2004h> SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[?2004l[?2004h> ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+[?2004l[?2004h> PY="$ROOT_DIR/src/CSVIngester.py"
+[?2004l[?2004h> 
+[?2004l[?2004h> encoding-detection() { "$PY" encoding-detection "$1"; }
+[?2004l[?2004h> name-standardization() { "$PY" name-standardization "$1"; }
+[?2004l[?2004h> type-detection() { "$PY" type-detection "$1" "$2"; }
+[?2004l[?2004h> date-parsing() { "$PY" date-parsing "$1" "$2"; }
+[?2004l[?2004h> outlier-truncate() { "$PY" outlier-truncate "$1" "$2"; }
+[?2004l[?2004h> dataframe-cleaning() { "$PY" dataframe-cleaning "$1" ${2:+"$2"}; }
+[?2004l[?2004h> dataframe-consolidation() { local out="$1"; shift; "$PY" dataframe-consolidation "$out" "$@"; }
+[?2004l[?2004h> file-processing() { local out="$1"; local log="$2"; shift 2; "$PY" file-processing "$out" "$log" "$@"; }
+[?2004l[?2004h> cleaning_log() { "$PY" cleaning_log "$1"; }
+[?2004l[?2004h> csv-summary() { "$PY" csv-summary "$1"; }
+[?2004l[?2004h> get-operations() { "$PY" get-operations "$1"; }
+[?2004l[?2004h> SH
+[?2004l[?2004hroot@2cab8586e0e9:/app# chmod +x solution/solve.sh
+[?2004l[?2004hroot@2cab8586e0e9:/app# python3 -V
+[?2004lPython 3.11.14
+[?2004hroot@2cab8586e0e9:/app# pip -V || python3 -m ensurepip --upgrade
+[?2004lpip 24.0 from /usr/local/lib/python3.11/site-packages/pip (python 3.11)
+[?2004hroot@2cab8586e0e9:/app# python3 -m pip install --no-input --quiet pandas>=2.0.0 numpy>=1.24.0 pytest==8.4.1
+[?2004l[33mWARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv[0m[33m
+[0m
+[1m[[0m[34;49mnotice[0m[1;39;49m][0m[39;49m A new release of pip is available: [0m[31;49m24.0[0m[39;49m -> [0m[32;49m25.3[0m
+[1m[[0m[34;49mnotice[0m[1;39;49m][0m[39;49m To update, run: [0m[32;49mpip install --upgrade pip[0m
+[?2004hroot@2cab8586e0e9:/app# printf 'Order ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status\n1,Alice,2025-01-01,100,2,200,2025/01/03,Shipped\n2,Bob,01/05/2025,150,,150,01-07-2025,Pending\n3,,Jan 10, 2025,200,3,600,10-01-2025,\n4,Charlie,15-01-2025,9999,1,9999,2025.01.16,Delivered\n' > tests/test_data.csv
+[?2004l[?2004hroot@2cab8586e0e9:/app# printf 'Order ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status\n5,Dana,2025/01/20,50,4,200,20/01/2025,Shipped\n6,Ed,January 22, 2025,75,5,375,22 Jan 2025,Pending\n7,Frank,1-25-2025,10,1,10,2025-01-26,Cancelled\n8,Gina,26/01/2025,,2,,2025/01/28,\n' > tests/test2_data.csv
+[?2004l[?2004hroot@2cab8586e0e9:/app# printf 'ID,Date,Amount,Status\n1,2025-01-01,100.50,Active\n2,01/05/2025,200.75,Pending\n3,Jan 10 2025,150.25,Active\n' > tests/test3_data.csv
+[?2004l[?2004hroot@2cab8586e0e9:/app# source solution/solve.sh
+[?2004l[?2004hroot@2cab8586e0e9:/app# encoding-detection tests/test_data.csv
+[?2004lbash: /app/src/CSVIngester.py: No such file or directory
+[?2004hroot@2cab8586e0e9:/app# name-standardization "Product Price $"
+[?2004lbash: /app/src/CSVIngester.py: No such file or directory
+[?2004hroot@2cab8586e0e9:/app# type-detection tests/test3_data.csv Date
+[?2004lbash: /app/src/CSVIngester.py: No such file or directory
+[?2004hroot@2cab8586e0e9:/app# date-parsing tests/test2_data.csv "Order Date"
+[?2004lbash: /app/src/CSVIngester.py: No such file or directory
+[?2004hroot@2cab8586e0e9:/app# outlier-truncate tests/test_data.csv "Product Price $"
+[?2004lbash: /app/src/CSVIngester.py: No such file or directory
+[?2004hroot@2cab8586e0e9:/app# file-processing tests/cleaned_data.csv tests/cleaning_log.json tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+[?2004lbash: /app/src/CSVIngester.py: No such file or directory
+[?2004hroot@2cab8586e0e9:/app# cleaning_log tests/cleaning_log.json | head -n 40
+[?2004lbash: /app/src/CSVIngester.py: No such file or directory
+[?2004hroot@2cab8586e0e9:/app# csv-summary tests/test_data.csv
+[?2004lbash: /app/src/CSVIngester.py: No such file or directory
+[?2004hroot@2cab8586e0e9:/app# cat > src/CSVIngester.py << 'PY'
+[?2004l[?2004h> #!/usr/bin/env python3
+[?2004l[?2004h> import sys
+[?2004l[?2004h> import os
+[?2004l[?2004h> import json
+[?2004l[?2004h> import argparse
+[?2004l[?2004h> from datetime import datetime
+[?2004l[?2004h> from typing import List, Dict, Any, Optional, Tuple
+[?2004l[?2004h> import pandas as pd
+[?2004l       orig_min = float(numeric.min())
+        orig_max = float(numeric.max())
+        clipped = numeric.clip(lower=lower, upper=u[?2004h> import numpy as np
+[?2004l[?2004h> 
+[?2004l[?2004h> SUPPORTED_ENCODINGS = [
+[?2004l[?2004h>     'utf-8', 'utf-8-sig', 'cp1252', 'latin1', 'iso-8859-1'
+[?2004l[?2004h> ]
+[?2004l[?2004h> 
+[?2004l[?2004h> class CSVIngester:
+[?2004l[?2004h>     def __init__(self):
+[?2004l[?2004h>         self.operations: List[Dict[str, Any]] = []
+[?2004l[?2004h> 
+[?2004l[?2004h>     def _log(self, operation: str, details: Dict[str, Any]):
+[?2004l[?2004h>         self.operations.append({
+[?2004l[?2004h>             'operation': operation,
+[?2004l[?2004h>             'details': details,
+[?2004l[?2004h>             'timestamp': datetime.utcnow().isoformat()
+[?2004l[?2004h>         })
+[?2004l[?2004h> 
+[?2004l[?2004h>     def encode_process(self, filepath: str) -> Dict[str, Any]:
+[?2004l[?2004h>         result = {'file': filepath, 'encoding': None, 'status': 'failed'}
+[?2004l[?2004h>         if not os.path.exists(filepath):
+[?2004l[?2004h>             result['error'] = 'file_not_found'
+[?2004l[?2004h>             self._log('detect_encoding', result)
+[?2004l[?2004h>             return result
+[?2004l[?2004h>         for enc in SUPPORTED_ENCODINGS:
+[?2004l[?2004h>             try:
+[?2004llog(self, log_path: str) -> Dict[str, [?2004h>                 with open(filepath, 'r', encoding=enc) as f:
+[?2004l[?2004h>                     f.read(4096)
+[?2004l[?2004h>                 result['encoding'] = enc
+[?2004l[?2004h>                 result['status'] = 'ok'
+[?2004l[?2004h>                 break
+[?2004l[?2004h>             except Exception:
+[?2004l[?2004h>                 continue
+[?2004l[?2004h>         if result['encoding'] is None:
+[?2004l[?2004h>             try:
+[?2004l[?2004h>                 with open(filepath, 'rb') as f:
+[?2004l[?2004h>                     _ = f.read(4096)
+[?2004l[?2004h>                 result['encoding'] = 'latin1'
+[?2004l[?2004h>                 result['status'] = 'ok'
+[?2004l[?2004h>             except Exception as e:
+[?2004l[?2004h>                 result['error'] = str(e)
+[?2004l[?2004h>         self._log('detect_encoding', result)
+[?2004l[?2004h>         return result
+[?2004l[?2004h> 
+[?2004l[?2004h>     @staticmethod
+[?2004l[?2004h>     def standardize_column_name(name: str) -> str:
+[?2004l[?2004h>         if name is None:
+[?2004l[?2004h>             return ''
+[?2004l[?2004h>         s = str(name).strip().lower()
+[?2004l[?2004h>         import re
+[?2004l[?2004h>         s = re.sub(r'[^0-9a-z]+', '_', s)
+[?2004lcol in df.columns:
+            ctype = self.detect[?2004h>         s = re.sub(r'_+', '_', s)
+[?2004l[?2004h>         s = s.strip('_')
+[?2004lype(df[col])
+            col_types[col] = ctype
+  [?2004h>         return s
+[?2004l  self._log('[?2004h> 
+[?2004l[?2004h>     def standardize_columns(self, df: pd.DataFrame, src: Optional[str] = None) -> pd.DataFrame:
+[?2004l[?2004h>         mapping = {c: self.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         df = df.rename(columns=mapping)
+[?2004l[?2004h>         self._log('standardize_columns', {
+[?2004l      [?2004h>             'source': src,
+[?2004l[?2004h>             'mappings': mapping
+[?2004l[?2004h>         })
+[?2004l[?2004h>         return df
+[?2004l[?2004h> 
+[?2004l[?2004h>     def detect_column_type(self, series: pd.Series) -> str:
+[?2004l[?2004h>         s = series.dropna().astype(str).str.strip()
+[?2004l[?2004h>         if len(s) == 0:
+[?2004l[?2004h>             return 'categorical'
+[?2004l[?2004h>         try:
+[?2004ler_na
+                })
+  [?2004h>             parsed1 = pd.to_datetime(s, errors='coerce', infer_datetime_format=True, dayfirst=True)
+[?2004l[?2004h>             parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', infer_datetime_format=True, dayfirst=False)
+[?2004l[?2004h>             parsed = parsed1.copy()
+[?2004l[?2004h>             parsed.loc[parsed1.isna()] = parsed2
+[?2004l[?2004h>             date_ratio = parsed.notna().mean()
+[?2004l[?2004h>         except Exception:
+[?2004l[?2004h>             date_ratio = 0.0
+[?2004l[?2004h>         if date_ratio >= 0.6:
+[?2004l[?2004h>             return 'date'
+[?2004l[?2004h>         num = pd.to_numeric(s.str.replace(',', '', regex=False), errors='coerce')
+[?2004l[?2004h>         if num.notna().mean() >= 0.6:
+[?2004l[?2004h>             return 'numeric'
+[?2004l[?2004h>         return 'categorical'
+[?2004l[?2004h> 
+[?2004l[?2004h>     def date_parser(self, series: pd.Series) -> pd.Series:
+[?2004l[?2004h>         s = series.astype(str).where(~series.isna(), other=np.nan)
+[?2004l)
+                self._log('impute_numeric', {
+                    'source': filepath,
+                    'column': col,
+                    'strategy': 'median',
+                    'median': median,
+                    'missing_before': miss_before,
+                    'missing_after': miss_after
+             [?2004h>         parsed1 = pd.to_datetime(s, errors='coerce', infer_datetime_format=True, dayfirst=True)
+[?2004l[?2004h>         need = parsed1.isna()
+[?2004l[?2004h>         if need.any():
+[?2004l[?2004h>             parsed2 = pd.to_datetime(s[need], errors='coerce', infer_datetime_format=True, dayfirst=False)
+[?2004l                   **bounds
+                })
+            elif t == 'categorical':
+                miss_before = int(df[col].isn[?2004h>             parsed1.loc[need] = parsed2
+[?2004l[?2004h>         iso = parsed1.dt.strftime('%Y-%m-%d')
+[?2004l[?2004h>         iso = iso.where(~parsed1.isna(), other=np.nan)
+[?2004l[?2004h>         return iso
+[?2004l[?2004h> 
+[?2004l[?2004h>     def outlier_truncate(self, series: pd.Series) -> Tuple[pd.Series, Dict[str, Any]]:
+[?2004l[?2004h>         numeric = pd.to_numeric(series, errors='coerce')
+[?2004l[?2004h>         if numeric.notna().sum() == 0:
+[?2004l[?2004h>             bounds = {
+[?2004l[?2004h>                 'lower_bound': None,
+[?2004l[?2004h>                 'upper_bound': None,
+[?2004l[?2004h>                 'original_min': None,
+[?2004l[?2004h>                 'original_max': None,
+[?2004l[?2004h>                 'clipped_min': None,
+[?2004l[?2004h>                 'clipped_max': None
+[?2004l[?2004h>             }
+[?2004l[?2004h>             return numeric, bounds
+[?2004l[?2004h>         lower = numeric.quantile(0.01)
+[?2004l[?2004h>         upper = numeric.quantile(0.99)
+[?2004l[?2004h>         orig_min = float(numeric.min())
+[?2004l[?2004h>         orig_max = float(numeric.max())
+[?2004l[?2004h>         clipped = numeric.clip(lower=lower, upper=upper)
+[?2004l[?2004h>         bounds = {
+[?2004l[?2004h>             'lower_bound': float(lower) if pd.notna(lower) else None,
+[?2004l])
+        })
+        retu[?2004h>             'upper_bound': float(upper) if pd.notna(upper) else None,
+[?2004l[?2004h>             'original_min': orig_min,
+[?2004l[?2004h>             'original_max': orig_max,
+[?2004l[?2004h>             'clipped_min': float(clipped.min()) if clipped.notna().any() else None,
+[?2004l[?2004h>             'clipped_max': float(clipped.max()) if clipped.notna().any() else None
+[?2004l[?2004h>         }
+[?2004l[?2004h>         return clipped, bounds
+[?2004lws': int(df.shape[0]), 'columns': int(df.shape[1])})
+      [?2004h> 
+[?2004l[?2004h>     def logging_process(self, log_path: str):
+[?2004l[?2004h>         wrapper = {
+[?2004l[?2004h>             'timestamp': datetime.utcnow().isoformat(),
+[?2004l[?2004h>             'operations': self.operations
+[?2004l[?2004h>         }
+[?2004l[?2004h>         with open(log_path, 'w', encoding='utf-8') as f:
+[?2004l[?2004h>             json.dump(wrapper, f, indent=2)
+[?2004l[?2004h> 
+[?2004l[?2004h>     def get_operations_log(self, log_path: str) -> Dict[str, Any]:
+[?2004l[?2004h>         if not os.path.exists(log_path):
+[?2004l[?2004h>             return {'error': 'log_not_found', 'path': log_path}
+[?2004l[?2004h>         with open(log_path, 'r', encoding='utf-8') as f:
+[?2004l[?2004h>             return json.load(f)
+[?2004l[?2004h> 
+[?2004l[?2004h>     def processed_dataframe(self, filepath: str) -> pd.DataFrame:
+[?2004l[?2004h>         enc_info = self.encode_process(filepath)
+[?2004l[?2004h>         if enc_info.get('status') != 'ok':
+[?2004l[?2004h>             raise FileNotFoundError(f"Cannot read file: {filepath}")
+[?2004l[?2004h>         encoding = enc_info.get('encoding')
+[?2004l[?2004h>         df = pd.read_csv(filepath, encoding=encoding)
+[?2004l[?2004h>         self._log('load_file', {
+[?2004l[?2004h>             'source': filepath,
+[?2004l[?2004h>             'rows': int(df.shape[0]),
+[?2004l[?2004h>             'columns': int(df.shape[1])
+[?2004l[?2004h>         })
+[?2004l[?2004h>         df = self.standardize_columns(df, src=filepath)
+[?2004l[?2004h>         col_types: Dict[str, str] = {}
+[?2004l[?2004h>         for col in df.columns:
+[?2004lilepath')
+
+    s2 = sub.add_parser('name-standardization')
+    s2.add_[?2004h>             ctype = self.detect_column_type(df[col])
+[?2004l[?2004h>             col_types[col] = ctype
+[?2004l[?2004h>         self._log('detect_column_types', {'source': filepath, 'types': col_types})
+[?2004l[?2004h>         for col, t in col_types.items():
+[?2004l[?2004h>             if t == 'date':
+[?2004l[?2004h>                 before_na = int(df[col].isna().sum())
+[?2004l[?2004h>                 df[col] = self.date_parser(df[col])
+[?2004l[?2004h>                 after_na = int(df[col].isna().sum())
+[?2004l[?2004h>                 self._log('parse_dates', {
+[?2004l[?2004h>                     'source': filepath,
+[?2004ls='?')
+
+  [?2004h>                     'column': col,
+[?2004l[?2004h>                     'missing_before': before_na,
+[?2004l[?2004h>                     'missing_after': after_na
+[?2004l[?2004h>                 })
+[?2004l[?2004h>         for col, t in col_types.items():
+[?2004l'file-processing')
+    s8.add_argument('o[?2004h>             if t == 'numeric':
+[?2004l[?2004h>                 num = pd.to_numeric(df[col], errors='coerce')
+[?2004l[?2004h>                 median = float(num.median()) if num.notna().any() else 0.0
+[?2004l[?2004h>                 miss_before = int(num.isna().sum())
+[?2004l[?2004h>                 num = num.fillna(median)
+[?2004l[?2004h>                 clipped, bounds = self.outlier_truncate(num)
+[?2004l[?2004h>                 df[col] = clipped
+[?2004l[?2004h>                 miss_after = int(pd.isna(df[col]).sum())
+[?2004lument('[?2004h>                 self._log('impute_numeric', {
+[?2004l[?2004h>                     'source': filepath,
+[?2004l[?2004h>                     'column': col,
+[?2004l[?2004h>                     'strategy': 'median',
+[?2004l[?2004h>                     'median': median,
+[?2004l[?2004h>                     'missing_before': miss_before,
+[?2004l[?2004h>                     'missing_after': miss_after
+[?2004l[?2004h>                 })
+[?2004l[?2004h>                 self._log('clip_outliers', {
+[?2004l[?2004h>                     'source': filepath,
+[?2004l[?2004h>                     'column': col,
+[?2004l[?2004h>                     **bounds
+[?2004l[?2004h>                 })
+[?2004l[?2004h>             elif t == 'categorical':
+[?2004l[?2004h>                 miss_before = int(df[col].isna().sum())
+[?2004l[?2004h>                 df[col] = df[col].astype(object)
+[?2004l[?2004h>                 df[col] = df[col].replace('', np.nan)
+[?2004l[?2004h>                 df[col] = df[col].fillna('Unknown')
+[?2004lprocess(args.csv_file)
+        if info.get('status')[?2004h>                 miss_after = int(df[col].isna().sum())
+[?2004l[?2004h>                 self._log('impute_categorical', {
+[?2004l[?2004h>                     'source': filepath,
+[?2004l[?2004h>                     'column': col,
+[?2004l[?2004h>                     'strategy': 'fill_unknown',
+[?2004l[?2004h>                     'missing_before': miss_before,
+[?2004l[?2004h>                     'missing_after': miss_after
+[?2004l[?2004h>                 })
+[?2004l[?2004h>         return df
+[?2004l[?2004h> 
+[?2004l[?2004h>     def consolidated_cleaned_dataframes(self, files: List[str]) -> pd.DataFrame:
+[?2004l[?2004h>         cleaned = []
+[?2004ltarget_s[?2004h>         for f in files:
+[?2004l[?2004h>             cleaned.append(self.processed_dataframe(f))
+[?2004l-parsing':
+ [?2004h>         out = pd.concat(cleaned, ignore_index=True, sort=False)
+[?2004l[?2004h>         self._log('consolidate', {
+[?2004l[?2004h>             'files': files,
+[?2004l[?2004h>             'rows': int(out.shape[0]),
+[?2004l[?2004h>             'columns': int(out.shape[1])
+[?2004l[?2004h>         })
+[?2004l[?2004h>         return out
+[?2004l[?2004h> 
+[?2004l[?2004h>     def file_processor(self, output_file: str, log_file: str, files: List[str]) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+[?2004l[?2004h>         df = self.consolidated_cleaned_dataframes(files)
+[?2004let_s[?2004h>         df.to_csv(output_file, index=False)
+[?2004l[?2004h>         self._log('write_output', {'output_file': output_file, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         self.logging_process(log_file)
+[?2004l[?2004h>         return df, self.get_operations_log(log_file)
+[?2004lutlier-truncate':
+        info =[?2004h> 
+[?2004l[?2004h>     def csv_summary(self, filepath: str) -> Dict[str, Any]:
+[?2004l[?2004h>         info = self.encode_process(filepath)
+[?2004l[?2004h>         if info.get('status') != 'ok':
+[?2004let[?2004h>             return {'error': 'cannot_read', 'file': filepath}
+[?2004lencoding=info.ge[?2004h>         enc = info.get('encoding')
+[?2004l[?2004h>         try:
+[?2004l[?2004h>             df = pd.read_csv(filepath, encoding=enc)
+[?2004l[?2004h>         except Exception as e:
+[?2004l[?2004h>             return {'error': str(e)}
+[?2004l[?2004h>         missing = {str(c): int(df[c].isna().sum()) for c in df.columns}
+[?2004l[?2004h>         summary = {
+[?2004l[?2004h>             'file': filepath,
+[?2004l[?2004h>             'rows': int(df.shape[0]),
+[?2004l[?2004h>             'columns': int(df.shape[1]),
+[?2004l[?2004h>             'column_names': list(map(str, df.columns.tolist())),
+[?2004l[?2004h>             'missing_values': missing
+[?2004l[?2004h>         }
+[?2004l[?2004h>         self._log('csv_summary', summary)
+[?2004l  print(json.dumps(bounds, indent=2))
+        return 0
+    if args.command == 'dataframe-cleaning':
+        out = args.output_file or 'c[?2004h>         return summary
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def build_parser() -> argparse.ArgumentParser:
+[?2004l[?2004h>     p = argparse.ArgumentParser(description='CSV Ingester and Cleaner')
+[?2004l[?2004h>     sub = p.add_subparsers(dest='command')
+[?2004l[?2004h> 
+[?2004l[?2004h>     s1 = sub.add_parser('encoding-detection')
+[?2004llog('write_output', {'output_file': out, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+        print(out)
+[?2004h>     s1.add_argument('filepath')
+[?2004l[?2004h> 
+[?2004l[?2004h>     s2 = sub.add_parser('name-standardization')
+[?2004l[?2004h>     s2.add_argument('column_name')
+[?2004l[?2004h> 
+[?2004l[?2004h>     s3 = sub.add_parser('type-detection')
+[?2004lt_f[?2004h>     s3.add_argument('csv_file')
+[?2004l[?2004h>     s3.add_argument('column_name')
+[?2004l[?2004h> 
+[?2004l[?2004h>     s4 = sub.add_parser('date-parsing')
+[?2004l[?2004h>     s4.add_argument('csv_file')
+[?2004l[?2004h>     s4.add_argument('column_name')
+[?2004l[?2004h> 
+[?2004l[?2004h>     s5 = sub.add_parser('outlier-truncate')
+[?2004l[?2004h>     s5.add_argument('csv_file')
+[?2004l[?2004h>     s5.add_argument('column_name')
+[?2004l[?2004h> 
+[?2004l[?2004h>     s6 = sub.add_parser('dataframe-cleaning')
+[?2004l[?2004h>     s6.add_argument('csv_file')
+[?2004l[?2004h>     s6.add_argument('output_file', nargs='?')
+[?2004l[?2004h> 
+[?2004l[?2004h>     s7 = sub.add_parser('dataframe-consolidation')
+[?2004l[?2004h>     s7.add_argument('output_file')
+[?2004land == 'c[?2004h>     s7.add_argument('files', nargs='+')
+[?2004l[?2004h> 
+[?2004l[?2004h>     s8 = sub.add_parser('file-processing')
+[?2004l[?2004h>     s8.add_argument('output_file')
+[?2004lif args.c[?2004h>     s8.add_argument('log_file')
+[?2004l[?2004h>     s8.add_argument('files', nargs='+')
+[?2004lv_summary(args.c[?2004h> 
+[?2004ls[?2004h>     s9 = sub.add_parser('cleaning_log')
+[?2004l[?2004h>     s9.add_argument('log_file')
+[?2004l[?2004h> 
+[?2004l[?2004h>     s10 = sub.add_parser('csv-summary')
+[?2004l[?2004h>     s10.add_argument('csv_file')
+[?2004l[?2004h> 
+[?2004l[?2004h>     s11 = sub.add_parser('get-operations')
+[?2004l[?2004h>     s11.add_argument('log_file')
+[?2004l[?2004h> 
+[?2004l[?2004h>     p.add_argument('-o', '--output', default=None, help='Output cleaned CSV path')
+[?2004l[?2004h>     p.add_argument('-l', '--log', default=None, help='Cleaning log JSON path')
+[?2004l[?2004h>     p.add_argument('files', nargs='*', help='Input CSV files for default processing mode')
+[?2004ldent=2))
+        retur[?2004h>     return p
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def main(argv: Optional[List[str]] = None) -> int:
+[?2004l[?2004h>     argv = argv if argv is not None else sys.argv[1:]
+[?2004laise SystemExit(main())
+PY
+[?2004h>     cli = CSVIngester()
+[?2004l[?2004h>     parser = build_parser()
+[?2004l[?2004h>     args = parser.parse_args(argv)
+[?2004l[?2004h> 
+[?2004l[?2004h>     if args.command == 'encoding-detection':
+[?2004l[?2004h>         print(json.dumps(cli.encode_process(args.filepath), indent=2))
+[?2004l[?2004h>         return 0
+[?2004l[?2004h>     if args.command == 'name-standardization':
+[?2004l[?2004h>         print(cli.standardize_column_name(args.column_name))
+[?2004l[?2004h>         return 0
+[?2004l[?2004h>     if args.command == 'type-detection':
+[?2004l[?2004h>         info = cli.encode_process(args.csv_file)
+[?2004l[?2004h>         if info.get('status') != 'ok':
+[?2004l[?2004h>             print('error')
+[?2004l[?2004h>             return 1
+[?2004l[?2004h>         df = pd.read_csv(args.csv_file, encoding=info.get('encoding'))
+[?2004l[?2004h>         std = {c: cli.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         target_std = cli.standardize_column_name(args.column_name)
+[?2004l[?2004h>         col_map_rev = {v: k for k, v in std.items()}
+[?2004l[?2004h>         if target_std not in col_map_rev:
+[?2004l[?2004h>             print('error')
+[?2004l[?2004h>             return 1
+[?2004l[?2004h>         t = cli.detect_column_type(df[col_map_rev[target_std]])
+[?2004l[?2004h>         print(t)
+[?2004l[?2004h>         return 0
+[?2004l[?2004h>     if args.command == 'date-parsing':
+[?2004l[?2004h>         info = cli.encode_process(args.csv_file)
+[?2004l[?2004h>         if info.get('status') != 'ok':
+[?2004l[?2004h>             print('error')
+[?2004l[?2004h>             return 1
+[?2004l[?2004h>         df = pd.read_csv(args.csv_file, encoding=info.get('encoding'))
+[?2004l[?2004h>         std_map = {c: cli.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         target_std = cli.standardize_column_name(args.column_name)
+[?2004l[?2004h>         rev = {v: k for k, v in std_map.items()}
+[?2004l[?2004h>         if target_std not in rev:
+[?2004l[?2004h>             print('error')
+[?2004l[?2004h>             return 1
+[?2004l[?2004h>         parsed = cli.date_parser(df[rev[target_std]])
+[?2004l[?2004h>         print(json.dumps({'first_5': parsed.head(5).tolist()}))
+[?2004l[?2004h>         return 0
+[?2004l[?2004h>     if args.command == 'outlier-truncate':
+[?2004l[?2004h>         info = cli.encode_process(args.csv_file)
+[?2004l[?2004h>         if info.get('status') != 'ok':
+[?2004l[?2004h>             print(json.dumps({'error': 'cannot_read'}))
+[?2004l[?2004h>             return 1
+[?2004l[?2004h>         df = pd.read_csv(args.csv_file, encoding=info.get('encoding'))
+[?2004l[?2004h>         std_map = {c: cli.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         target_std = cli.standardize_column_name(args.column_name)
+[?2004l[?2004h>         rev = {v: k for k, v in std_map.items()}
+[?2004l[?2004h>         if target_std not in rev:
+[?2004l[?2004h>             print(json.dumps({'error': 'column_not_found'}))
+[?2004l[?2004h>             return 1
+[?2004l[?2004h>         _, bounds = cli.outlier_truncate(df[rev[target_std]])
+[?2004l[?2004h>         print(json.dumps(bounds, indent=2))
+[?2004l[?2004h>         return 0
+[?2004l[?2004h>     if args.command == 'dataframe-cleaning':
+[?2004l[?2004h>         out = args.output_file or 'cleaned_data.csv'
+[?2004l[?2004h>         df = cli.processed_dataframe(args.csv_file)
+[?2004l[?2004h>         df.to_csv(out, index=False)
+[?2004l[?2004h>         cli._log('write_output', {'output_file': out, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         print(out)
+[?2004l[?2004h>         return 0
+[?2004l[?2004h>     if args.command == 'dataframe-consolidation':
+[?2004l[?2004h>         df = cli.consolidated_cleaned_dataframes(args.files)
+[?2004l[?2004h>         df.to_csv(args.output_file, index=False)
+[?2004l[?2004h>         cli._log('write_output', {'output_file': args.output_file, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         print(args.output_file)
+[?2004l[?2004h>         return 0
+[?2004l[?2004h>     if args.command == 'file-processing':
+[?2004l[?2004h>         _, log = cli.file_processor(args.output_file, args.log_file, args.files)
+[?2004l[?2004h>         print(json.dumps({'output_file': args.output_file, 'log_file': args.log_file, 'operations': len(log.get('operations', []))}, indent=2))
+[?2004l[?2004h>         return 0
+[?2004l[?2004h>     if args.command == 'cleaning_log':
+[?2004l[?2004h>         print(json.dumps(cli.get_operations_log(args.log_file), indent=2))
+[?2004l[?2004h>         return 0
+[?2004l[?2004h>     if args.command == 'csv-summary':
+[?2004l[?2004h>         print(json.dumps(cli.csv_summary(args.csv_file), indent=2))
+[?2004l[?2004h>         return 0
+[?2004l[?2004h>     if args.command == 'get-operations':
+[?2004l[?2004h>         print(json.dumps(cli.get_operations_log(args.log_file).get('operations', []), indent=2))
+[?2004l[?2004h>         return 0
+[?2004l[?2004h> 
+[?2004l[?2004h>     if getattr(args, 'files', None):
+[?2004l[?2004h>         output = args.output or 'cleaned_data.csv'
+[?2004l[?2004h>         log = args.log or 'cleaning_log.json'
+[?2004l[?2004h>         _, _ = cli.file_processor(output, log, args.files)
+[?2004l[?2004h>         print(json.dumps({'output_file': output, 'log_file': log}, indent=2))
+[?2004l[?2004h>         return 0
+[?2004l[?2004h> 
+[?2004l[?2004h>     parser.print_help()
+[?2004l[?2004h>     return 0
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> if __name__ == '__main__':
+[?2004l[?2004h>     raise SystemExit(main())
+[?2004l[?2004h> PY
+[?2004l[?2004hroot@2cab8586e0e9:/app# chmod +x src/CSVIngester.py
+[?2004l[?2004hroot@2cab8586e0e9:/app# sed -n '1,40p' tests/test_data.csv || true
+[?2004lOrder ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status
+1,Alice,2025-01-01,100,2,200,2025/01/03,Shipped
+2,Bob,01/05/2025,150,,150,01-07-2025,Pending
+3,,Jan 10, 2025,200,3,600,10-01-2025,
+4,Charlie,15-01-2025,9999,1,9999,2025.01.16,Delivered
+[?2004hroot@2cab8586e0e9:/app# cat > tests/test_data.csv << 'CSV'
+[?2004l[?2004h> Order ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status
+[?2004l[?2004h> 1,Alice,2025-01-01,100,2,200,2025/01/03,Shipped
+[?2004l[?2004h> 2,Bob,01/05/2025,150,,150,01-07-2025,Pending
+[?2004l[?2004h> 3,,"Jan 10, 2025",200,3,600,10-01-2025,
+[?2004l[?2004h> 4,Charlie,15-01-2025,9999,1,9999,2025.01.16,Delivered
+[?2004l[?2004h> CSV
+[?2004l[?2004hroot@2cab8586e0e9:/app# cat > tests/test2_data.csv << 'CSV'
+[?2004l[?2004h> Order ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status
+[?2004l[?2004h> 5,Dana,2025/01/20,50,4,200,20/01/2025,Shipped
+[?2004l[?2004h> 6,Ed,"January 22, 2025",75,5,375,22 Jan 2025,Pending
+[?2004l[?2004h> 7,Frank,1-25-2025,10,1,10,2025-01-26,Cancelled
+[?2004l[?2004h> 8,Gina,26/01/2025,,2,,2025/01/28,
+[?2004l[?2004h> CSV
+[?2004l[?2004hroot@2cab8586e0e9:/app# sed -n '1,40p' tests/test2_data.csv
+[?2004lOrder ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status
+5,Dana,2025/01/20,50,4,200,20/01/2025,Shipped
+6,Ed,"January 22, 2025",75,5,375,22 Jan 2025,Pending
+7,Frank,1-25-2025,10,1,10,2025-01-26,Cancelled
+8,Gina,26/01/2025,,2,,2025/01/28,
+[?2004hroot@2cab8586e0e9:/app# sed -n '1,40p' tests/test3_data.csv
+[?2004lID,Date,Amount,Status
+1,2025-01-01,100.50,Active
+2,01/05/2025,200.75,Pending
+3,Jan 10 2025,150.25,Active
+[?2004hroot@2cab8586e0e9:/app# source solution/solve.sh
+[?2004l[?2004hroot@2cab8586e0e9:/app# encoding-detection tests/test_data.csv
+[?2004lname-standardization "Product Price $"
+{
+  "file": "tests/test_data.csv",
+  "encoding": "utf-8",
+  "status": "ok"
+}
+[?2004hroot@2cab8586e0e9:/app# name-standardization "Product Price $"
+[?2004ltype-detection tests/test3_data.csv Date
+product_price
+[?2004hroot@2cab8586e0e9:/app# type-detection tests/test3_data.csv Date
+[?2004ldate-parsing tests/test2_data.csv "Order Date"
+/app/src/CSVIngester.py:77: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed1 = pd.to_datetime(s, errors='coerce', infer_datetime_format=True, dayfirst=True)
+/app/src/CSVIngester.py:78: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', infer_datetime_format=True, dayfirst=False)
+date
+[?2004hroot@2cab8586e0e9:/app# date-parsing tests/test2_data.csv "Order Date"
+[?2004l/app/src/CSVIngester.py:93: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed1 = pd.to_datetime(s, errors='coerce', infer_datetime_format=True, dayfirst=True)
+/app/src/CSVIngester.py:93: UserWarning: Parsing dates in %Y/%m/%d format when dayfirst=True was specified. Pass `dayfirst=False` or specify a format to silence this warning.
+  parsed1 = pd.to_datetime(s, errors='coerce', infer_datetime_format=True, dayfirst=True)
+/app/src/CSVIngester.py:96: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it is now the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed2 = pd.to_datetime(s[need], errors='coerce', infer_datetime_format=True, dayfirst=False)
+{"first_5": ["2025-01-20", "2025-01-22", NaN, NaN]}
+[?2004hroot@2cab8586e0e9:/app# outlier-truncate tests/test_data.csv "Product Price $"
+[?2004l{
+  "lower_bound": 101.5,
+  "upper_bound": 9705.029999999997,
+  "original_min": 100.0,
+  "original_max": 9999.0,
+  "clipped_min": 101.5,
+  "clipped_max": 9705.029999999997
+}
+[?2004hroot@2cab8586e0e9:/app# file-processing tests/cleaned_data.csv tests/cleaning_log.json tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+[?2004lTraceback (most recent call last):
+  File "/app/src/CSVIngester.py", line 394, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/app/src/CSVIngester.py", line 369, in main
+    _, log = cli.file_processor(args.output_file, args.log_file, args.files)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/CSVIngester.py", line 221, in file_processor
+    df = self.consolidated_cleaned_dataframes(files)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/CSVIngester.py", line 212, in consolidated_cleaned_dataframes
+    out = pd.concat(cleaned, ignore_index=True, sort=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pandas/core/reshape/concat.py", line 382, in concat
+    op = _Concatenator(
+         ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pandas/core/reshape/concat.py", line 445, in __init__
+    objs, keys = self._clean_keys_and_objs(objs, keys)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pandas/core/reshape/concat.py", line 507, in _clean_keys_and_objs
+    raise ValueError("No objects to concatenate")
+ValueError: No objects to concatenate
+[?2004hroot@2cab8586e0e9:/app# cleaning_log tests/cleaning_log.json | head -n 40
+[?2004lcsv-summary tests/test_data.csv
+{
+  "error": "log_not_found",
+  "path": "tests/cleaning_log.json"
+}
+[?2004hroot@2cab8586e0e9:/app# csv-summary tests/test_data.csv
+[?2004l{
+  "file": "tests/test_data.csv",
+  "rows": 4,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Order ID": 0,
+    "Customer Name": 1,
+    "Order Date": 0,
+    "Product Price $": 0,
+    "Quantity!!": 1,
+    "Total Amount": 0,
+    "Ship Date": 0,
+    "Status": 1
+  }
+}
+[?2004hroot@2cab8586e0e9:/app# cat > src/CSVIngester.py << 'PY'
+[?2004l[?2004h> #!/usr/bin/env python3
+[?2004l[?2004h> import sys
+[?2004l[?2004h> import os
+[?2004l[?2004h> import json
+[?2004l[?2004h> import argparse
+[?2004l[?2004h> from datetime import datetime
+[?2004l[?2004h> from typing import List, Dict, Any, Optional, Tuple
+[?2004l[?2004h> import pandas as pd
+[?2004l[?2004h> import numpy as np
+[?2004l[?2004h> 
+[?2004l[?2004h> SUPPORTED_ENCODINGS = ['utf-8', 'utf-8-sig', 'cp1252', 'latin1', 'iso-8859-1']
+[?2004l[?2004h> 
+[?2004l[?2004h> class CSVIngester:
+[?2004l[?2004h>     def __init__(self):
+[?2004l[?2004h>         self.operations: List[Dict[str, Any]] = []
+[?2004l[?2004h> 
+[?2004l[?2004h>     def _log(self, operation: str, details: Dict[str, Any]):
+[?2004l[?2004h>         self.operations.append({
+[?2004l[?2004h>             'operation': operation,
+[?2004l[?2004h>             'details': details,
+[?2004l[?2004h>             'timestamp': datetime.utcnow().isoformat()
+[?2004l[?2004h>         })
+[?2004l_max': float(clipped.max()) if clipped.notna().any() else None
+        }
+        return clipped, bounds
+
+    def logging_process(self, log_path: str):
+        wrapper = {'timestamp': datetime.utcnow().isoformat(), 'operations': s[?2004h> 
+[?2004l[?2004h>     def encode_process(self, filepath: str) -> Dict[str, Any]:
+[?2004l[?2004h>         result = {'file': filepath, 'encoding': None, 'status': 'failed'}
+[?2004l[?2004h>         if not os.path.exists(filepath):
+[?2004l[?2004h>             result['error'] = 'file_not_found'
+[?2004l[?2004h>             self._log('detect_encoding', result)
+[?2004l[?2004h>             return result
+[?2004l[?2004h>         for enc in SUPPORTED_ENCODINGS:
+[?2004l[?2004h>             try:
+[?2004l[?2004h>                 with open(filepath, 'r', encoding=enc) as f:
+[?2004l[?2004h>                     f.read(4096)
+[?2004l[?2004h>                 result['encoding'] = enc
+[?2004l[?2004h>                 result['status'] = 'ok'
+[?2004l[?2004h>                 break
+[?2004l[?2004h>             except Exception:
+[?2004l[?2004h>                 continue
+[?2004l[?2004h>         if result['encoding'] is None:
+[?2004l[?2004h>             try:
+[?2004l[?2004h>                 with open(filepath, 'rb') as f:
+[?2004l[?2004h>                     _ = f.read(4096)
+[?2004lrce': file[?2004h>                 result['encoding'] = 'latin1'
+[?2004l[?2004h>                 result['status'] = 'ok'
+[?2004l      df = self.standa[?2004h>             except Exception as e:
+[?2004l[?2004h>                 result['error'] = str(e)
+[?2004l[?2004h>         self._log('detect_encoding', result)
+[?2004l[?2004h>         return result
+[?2004l[?2004h> 
+[?2004l[?2004h>     @staticmethod
+[?2004l[?2004h>     def standardize_column_name(name: str) -> str:
+[?2004l[?2004h>         if name is None:
+[?2004l[?2004h>             return ''
+[?2004l[?2004h>         s = str(name).strip().lower()
+[?2004l[?2004h>         import re
+[?2004l[?2004h>         s = re.sub(r'[^0-9a-z]+', '_', s)
+[?2004l[?2004h>         s = re.sub(r'_+', '_', s)
+[?2004l[?2004h>         s = s.strip('_')
+[?2004l[?2004h>         return s
+[?2004l[?2004h> 
+[?2004l[?2004h>     def standardize_columns(self, df: pd.DataFrame, src: Optional[str] = None) -> pd.DataFrame:
+[?2004l[?2004h>         mapping = {c: self.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         df = df.rename(columns=mapping)
+[?2004l[?2004h>         self._log('standardize_columns', {'source': src, 'mappings': mapping})
+[?2004l[?2004h>         return df
+[?2004l[?2004h> 
+[?2004l[?2004h>     def detect_column_type(self, series: pd.Series) -> str:
+[?2004l[?2004h>         s = series.dropna().astype(str).str.strip()
+[?2004l[?2004h>         if len(s) == 0:
+[?2004l[?2004h>             return 'categorical'
+[?2004l[?2004h>         # Try date
+[?2004l[?2004h>         try:
+[?2004l[?2004h>             parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+[?2004l[?2004h>             parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+[?2004l[?2004h>             parsed = parsed1.copy()
+[?2004l[?2004h>             parsed.loc[parsed1.isna()] = parsed2
+[?2004l[?2004h>             if parsed.notna().mean() >= 0.6:
+[?2004l[?2004h>                 return 'date'
+[?2004l[?2004h>         except Exception:
+[?2004l[?2004h>             pass
+[?2004l[?2004h>         # Try numeric
+[?2004l[?2004h>         num = pd.to_numeric(s.str.replace(',', '', regex=False), errors='coerce')
+[?2004l[?2004h>         if num.notna().mean() >= 0.6:
+[?2004l int(df[col].isna().sum())
+  [?2004h>             return 'numeric'
+[?2004l[?2004h>         return 'categorical'
+[?2004l[?2004h> 
+[?2004l[?2004h>     def date_parser(self, series: pd.Series) -> pd.Series:
+[?2004l[?2004h>         s = series.astype(str).where(~series.isna(), other=np.nan)
+[?2004l            df[col] = df[col].fillna('Unknown')
+                miss_after = int[?2004h>         parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+[?2004ll].isna().sum())
+                self._log('impute_categorical[?2004h>         need = parsed1.isna()
+[?2004l[?2004h>         if need.any():
+[?2004l[?2004h>             parsed2 = pd.to_datetime(s[need], errors='coerce', dayfirst=False)
+[?2004l[?2004h>             parsed1.loc[need] = parsed2
+[?2004l[?2004h>         iso = parsed1.dt.strftime('%Y-%m-%d')
+[?2004l[?2004h>         iso = iso.where(~parsed1.isna(), other=np.nan)
+[?2004l[?2004h>         return iso
+[?2004l[?2004h> 
+[?2004l[?2004h>     def outlier_truncate(self, series: pd.Series) -> Tuple[pd.Series, Dict[str, Any]]:
+[?2004l[?2004h>         numeric = pd.to_numeric(series, errors='coerce')
+[?2004l[?2004h>         if numeric.notna().sum() == 0:
+[?2004lelf.processed_dataframe(f))
+        if len(cleaned) == 0:
+            raise V[?2004h>             bounds = {
+[?2004l[?2004h>                 'lower_bound': None,
+[?2004l[?2004h>                 'upper_bound': None,
+[?2004l[?2004h>                 'original_min': None,
+[?2004ldex=True, sort=False)
+        self._log('consolidate',[?2004h>                 'original_max': None,
+[?2004l[?2004h>                 'clipped_min': None,
+[?2004l[?2004h>                 'clipped_max': None
+[?2004l[?2004h>             }
+[?2004l[?2004h>             return numeric, bounds
+[?2004l[?2004h>         lower = numeric.quantile(0.01)
+[?2004l[?2004h>         upper = numeric.quantile(0.99)
+[?2004l[?2004h>         orig_min = float(numeric.min())
+[?2004lDict[str, Any]]:
+        df = self.consolidated_cleaned_dataframes(files)
+     [?2004h>         orig_max = float(numeric.max())
+[?2004l[?2004h>         clipped = numeric.clip(lower=lower, upper=upper)
+[?2004l[?2004h>         bounds = {
+[?2004l[?2004h>             'lower_bound': float(lower) if pd.notna(lower) else None,
+[?2004l[?2004h>             'upper_bound': float(upper) if pd.notna(upper) else None,
+[?2004lg(log_file)
+
+    d[?2004h>             'original_min': orig_min,
+[?2004lef csv_summary(self, filepath: str) ->[?2004h>             'original_max': orig_max,
+[?2004l[?2004h>             'clipped_min': float(clipped.min()) if clipped.notna().any() else None,
+[?2004l[?2004h>             'clipped_max': float(clipped.max()) if clipped.notna().any() else None
+[?2004l[?2004h>         }
+[?2004l[?2004h>         return clipped, bounds
+[?2004l[?2004h> 
+[?2004l[?2004h>     def logging_process(self, log_path: str):
+[?2004l[?2004h>         wrapper = {'timestamp': datetime.utcnow().isoformat(), 'operations': self.operations}
+[?2004l[?2004h>         with open(log_path, 'w', encoding='utf-8') as f:
+[?2004l[?2004h>             json.dump(wrapper, f, indent=2)
+[?2004l[?2004h> 
+[?2004l[?2004h>     def get_operations_log(self, log_path: str) -> Dict[str, Any]:
+[?2004l())), 'missin[?2004h>         if not os.path.exists(log_path):
+[?2004l[?2004h>             return {'error': 'log_not_found', 'path': log_path}
+[?2004l[?2004h>         with open(log_path, 'r', encoding='utf-8') as f:
+[?2004lg_values': missing}
+        self._log('csv_summary', summary)
+        return summary
+
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentPar[?2004h>             return json.load(f)
+[?2004l[?2004h> 
+[?2004l[?2004h>     def processed_dataframe(self, filepath: str) -> pd.DataFrame:
+[?2004l[?2004h>         enc_info = self.encode_process(filepath)
+[?2004l[?2004h>         if enc_info.get('status') != 'ok':
+[?2004l[?2004h>             raise FileNotFoundError(f"Cannot read file: {filepath}")
+[?2004l[?2004h>         encoding = enc_info.get('encoding')
+[?2004l[?2004h>         df = pd.read_csv(filepath, encoding=encoding)
+[?2004l[?2004h>         self._log('load_file', {'source': filepath, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         df = self.standardize_columns(df, src=filepath)
+[?2004l[?2004h>         col_types: Dict[str, str] = {col: self.detect_column_type(df[col]) for col in df.columns}
+[?2004l[?2004h>         self._log('detect_column_types', {'source': filepath, 'types': col_types})
+[?2004l[?2004h>         # Parse dates
+[?2004l[?2004h>         for col, t in col_types.items():
+[?2004l[?2004h>             if t == 'date':
+[?2004l[?2004h>                 before_na = int(df[col].isna().sum())
+[?2004l[?2004h>                 df[col] = self.date_parser(df[col])
+[?2004l[?2004h>                 after_na = int(df[col].isna().sum())
+[?2004l[?2004h>                 self._log('parse_dates', {'source': filepath, 'column': col, 'missing_before': before_na, 'missing_after': after_na})
+[?2004l[?2004h>         # Imputation and clipping
+[?2004l[?2004h>         for col, t in col_types.items():
+[?2004l[?2004h>             if t == 'numeric':
+[?2004l[?2004h>                 num = pd.to_numeric(df[col], errors='coerce')
+[?2004l[?2004h>                 median = float(num.median()) if num.notna().any() else 0.0
+[?2004l[?2004h>                 miss_before = int(num.isna().sum())
+[?2004l[?2004h>                 num = num.fillna(median)
+[?2004l[?2004h>                 clipped, bounds = self.outlier_truncate(num)
+[?2004l[?2004h>                 df[col] = clipped
+[?2004l[?2004h>                 miss_after = int(pd.isna(df[col]).sum())
+[?2004l[?2004h>                 self._log('impute_numeric', {'source': filepath, 'column': col, 'strategy': 'median', 'median': median, 'missing_before': miss_before, 'missing_after': miss_after})
+[?2004l[?2004h>                 self._log('clip_outliers', {'source': filepath, 'column': col, **bounds})
+[?2004l[?2004h>             elif t == 'categorical':
+[?2004largs.csv_file)
+        if info.get('status') != 'ok': print('error'); retu[?2004h>                 miss_before = int(df[col].isna().sum())
+[?2004l[?2004h>                 df[col] = df[col].astype(object)
+[?2004l[?2004h>                 df[col] = df[col].replace('', np.nan)
+[?2004l[?2004h>                 df[col] = df[col].fillna('Unknown')
+[?2004l[?2004h>                 miss_after = int(df[col].isna().sum())
+[?2004l[?2004h>                 self._log('impute_categorical', {'source': filepath, 'column': col, 'strategy': 'fill_unknown', 'missing_before': miss_before, 'missing_after': miss_after})
+[?2004l[?2004h>         return df
+[?2004l[?2004h> 
+[?2004l[?2004h>     def consolidated_cleaned_dataframes(self, files: List[str]) -> pd.DataFrame:
+[?2004l[?2004h>         if not files:
+[?2004l'); return 1
+        df = pd.read_cs[?2004h>             raise ValueError('No input files provided')
+[?2004l[?2004h>         cleaned: List[pd.DataFrame] = []
+[?2004l[?2004h>         for f in files:
+[?2004l[?2004h>             cleaned.append(self.processed_dataframe(f))
+[?2004l[?2004h>         if len(cleaned) == 0:
+[?2004lv = {v: k for k, v[?2004h>             raise ValueError('No objects to concatenate')
+[?2004l rev: print('error'[?2004h>         out = pd.concat(cleaned, ignore_index=True, sort=False)
+[?2004l); return 1
+        parsed = cli.date_parser(df[rev[tstd]])
+    [?2004h>         self._log('consolidate', {'files': files, 'rows': int(out.shape[0]), 'columns': int(out.shape[1])})
+[?2004l[?2004h>         return out
+[?2004l[?2004h> 
+[?2004l[?2004h>     def file_processor(self, output_file: str, log_file: str, files: List[str]) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+[?2004l[?2004h>         df = self.consolidated_cleaned_dataframes(files)
+[?2004l[?2004h>         df.to_csv(output_file, index=False)
+[?2004l[?2004h>         self._log('write_output', {'output_file': output_file, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         self.logging_process(log_file)
+[?2004l= {v: k for k, v in std.items()}
+      [?2004h>         return df, self.get_operations_log(log_file)
+[?2004l[?2004h> 
+[?2004l if tstd not in rev: print(json.dumps({'error':'colum[?2004h>     def csv_summary(self, filepath: str) -> Dict[str, Any]:
+[?2004l[?2004h>         info = self.encode_process(filepath)
+[?2004l[?2004h>         if info.get('status') != 'ok':
+[?2004l[?2004h>             return {'error': 'cannot_read', 'file': filepath}
+[?2004l[?2004h>         enc = info.get('encoding')
+[?2004l[?2004h>         try:
+[?2004l[?2004h>             df = pd.read_csv(filepath, encoding=enc)
+[?2004l[?2004h>         except Exception as e:
+[?2004l[?2004h>             return {'error': str(e)}
+[?2004l[?2004h>         missing = {str(c): int(df[c].isna().sum()) for c in df.columns}
+[?2004l[?2004h>         summary = {'file': filepath, 'rows': int(df.shape[0]), 'columns': int(df.shape[1]), 'column_names': list(map(str, df.columns.tolist())), 'missing_values': missing}
+[?2004l[?2004h>         self._log('csv_summary', summary)
+[?2004l[?2004h>         return summary
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def build_parser() -> argparse.ArgumentParser:
+[?2004l[?2004h>     p = argparse.ArgumentParser(description='CSV Ingester and Cleaner')
+[?2004l[?2004h>     sub = p.add_subparsers(dest='command')
+[?2004l[?2004h> 
+[?2004l[?2004h>     s1 = sub.add_parser('encoding-detection'); s1.add_argument('filepath')
+[?2004l[?2004h>     s2 = sub.add_parser('name-standardization'); s2.add_argument('column_name')
+[?2004l[?2004h>     s3 = sub.add_parser('type-detection'); s3.add_argument('csv_file'); s3.add_argument('column_name')
+[?2004lions': len(log.get('operations', []))}, indent=2)); return 0
+    if args.command == 'cleaning_log':
+     [?2004h>     s4 = sub.add_parser('date-parsing'); s4.add_argument('csv_file'); s4.add_argument('column_name')
+[?2004l[?2004h>     s5 = sub.add_parser('outlier-truncate'); s5.add_argument('csv_file'); s5.add_argument('column_name')
+[?2004l[?2004h>     s6 = sub.add_parser('dataframe-cleaning'); s6.add_argument('csv_file'); s6.add_argument('output_file', nargs='?')
+[?2004l]), i[?2004h>     s7 = sub.add_parser('dataframe-consolidation'); s7.add_argument('output_file'); s7.add_argument('files', nargs='+')
+[?2004l[?2004h>     s8 = sub.add_parser('file-processing'); s8.add_argument('output_file'); s8.add_argument('log_file'); s8.add_argument('files', nargs='+')
+[?2004l, 'log_[?2004h>     s9 = sub.add_parser('cleaning_log'); s9.add_argument('log_file')
+[?2004log}, indent=2))
+        return 0
+
+    parser.print_help(); re[?2004h>     s10 = sub.add_parser('csv-summary'); s10.add_argument('csv_file')
+[?2004l[?2004h>     s11 = sub.add_parser('get-operations'); s11.add_argument('log_file')
+[?2004l[?2004h> 
+[?2004l[?2004h>     p.add_argument('-o', '--output', default=None)
+[?2004l[?2004h>     p.add_argument('-l', '--log', default=None)
+[?2004l[?2004h>     p.add_argument('files', nargs='*')
+[?2004l[?2004h>     return p
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def main(argv: Optional[List[str]] = None) -> int:
+[?2004l[?2004h>     argv = argv if argv is not None else sys.argv[1:]
+[?2004l[?2004h>     cli = CSVIngester()
+[?2004l[?2004h>     parser = build_parser()
+[?2004l[?2004h>     args = parser.parse_args(argv)
+[?2004l[?2004h> 
+[?2004l[?2004h>     if args.command == 'encoding-detection':
+[?2004l[?2004h>         print(json.dumps(cli.encode_process(args.filepath), indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'name-standardization':
+[?2004l[?2004h>         print(cli.standardize_column_name(args.column_name)); return 0
+[?2004l[?2004h>     if args.command == 'type-detection':
+[?2004l[?2004h>         info = cli.encode_process(args.csv_file)
+[?2004l[?2004h>         if info.get('status') != 'ok': print('error'); return 1
+[?2004l[?2004h>         df = pd.read_csv(args.csv_file, encoding=info.get('encoding'))
+[?2004l[?2004h>         std = {c: cli.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         target_std = cli.standardize_column_name(args.column_name)
+[?2004l[?2004h>         rev = {v: k for k, v in std.items()}
+[?2004l[?2004h>         if target_std not in rev: print('error'); return 1
+[?2004l[?2004h>         print(cli.detect_column_type(df[rev[target_std]])); return 0
+[?2004l[?2004h>     if args.command == 'date-parsing':
+[?2004l[?2004h>         info = cli.encode_process(args.csv_file)
+[?2004l[?2004h>         if info.get('status') != 'ok': print('error'); return 1
+[?2004l[?2004h>         df = pd.read_csv(args.csv_file, encoding=info.get('encoding'))
+[?2004l[?2004h>         std = {c: cli.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         tstd = cli.standardize_column_name(args.column_name)
+[?2004l[?2004h>         rev = {v: k for k, v in std.items()}
+[?2004l[?2004h>         if tstd not in rev: print('error'); return 1
+[?2004l[?2004h>         parsed = cli.date_parser(df[rev[tstd]])
+[?2004l[?2004h>         print(json.dumps({'first_5': parsed.head(5).tolist()})); return 0
+[?2004l[?2004h>     if args.command == 'outlier-truncate':
+[?2004l[?2004h>         info = cli.encode_process(args.csv_file)
+[?2004l[?2004h>         if info.get('status') != 'ok': print(json.dumps({'error':'cannot_read'})); return 1
+[?2004l[?2004h>         df = pd.read_csv(args.csv_file, encoding=info.get('encoding'))
+[?2004l[?2004h>         std = {c: cli.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         tstd = cli.standardize_column_name(args.column_name)
+[?2004l[?2004h>         rev = {v: k for k, v in std.items()}
+[?2004l[?2004h>         if tstd not in rev: print(json.dumps({'error':'column_not_found'})); return 1
+[?2004l[?2004h>         _, bounds = cli.outlier_truncate(df[rev[tstd]])
+[?2004l[?2004h>         print(json.dumps(bounds, indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'dataframe-cleaning':
+[?2004l[?2004h>         out = args.output_file or 'cleaned_data.csv'
+[?2004l[?2004h>         df = cli.processed_dataframe(args.csv_file)
+[?2004l[?2004h>         df.to_csv(out, index=False)
+[?2004l[?2004h>         cli._log('write_output', {'output_file': out, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         print(out); return 0
+[?2004l[?2004h>     if args.command == 'dataframe-consolidation':
+[?2004l[?2004h>         df = cli.consolidated_cleaned_dataframes(args.files)
+[?2004l[?2004h>         df.to_csv(args.output_file, index=False)
+[?2004l[?2004h>         cli._log('write_output', {'output_file': args.output_file, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         print(args.output_file); return 0
+[?2004l[?2004h>     if args.command == 'file-processing':
+[?2004l[?2004h>         _, log = cli.file_processor(args.output_file, args.log_file, args.files)
+[?2004l[?2004h>         print(json.dumps({'output_file': args.output_file, 'log_file': args.log_file, 'operations': len(log.get('operations', []))}, indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'cleaning_log':
+[?2004l[?2004h>         print(json.dumps(cli.get_operations_log(args.log_file), indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'csv-summary':
+[?2004l[?2004h>         print(json.dumps(cli.csv_summary(args.csv_file), indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'get-operations':
+[?2004l[?2004h>         print(json.dumps(cli.get_operations_log(args.log_file).get('operations', []), indent=2)); return 0
+[?2004l[?2004h> 
+[?2004l[?2004h>     if getattr(args, 'files', None):
+[?2004l[?2004h>         output = args.output or 'cleaned_data.csv'
+[?2004l[?2004h>         log = args.log or 'cleaning_log.json'
+[?2004l[?2004h>         cli.file_processor(output, log, args.files)
+[?2004l[?2004h>         print(json.dumps({'output_file': output, 'log_file': log}, indent=2))
+[?2004l[?2004h>         return 0
+[?2004l[?2004h> 
+[?2004l[?2004h>     parser.print_help(); return 0
+[?2004l[?2004h> 
+[?2004l[?2004h> if __name__ == '__main__':
+[?2004l[?2004h>     raise SystemExit(main())
+[?2004l[?2004h> PY
+[?2004l[?2004hroot@2cab8586e0e9:/app# chmod +x src/CSVIngester.py
+[?2004l[?2004hroot@2cab8586e0e9:/app# source solution/solve.sh
+[?2004l[?2004hroot@2cab8586e0e9:/app# dataframe-cleaning tests/test_data.csv tests/cleaned_single.csv
+[?2004l/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+tests/cleaned_single.csv
+[?2004hroot@2cab8586e0e9:/app# dataframe-consolidation tests/consolidated.csv tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+[?2004lTraceback (most recent call last):
+  File "/app/src/CSVIngester.py", line 300, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/app/src/CSVIngester.py", line 276, in main
+    df = cli.consolidated_cleaned_dataframes(args.files)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/CSVIngester.py", line 176, in consolidated_cleaned_dataframes
+    raise ValueError('No input files provided')
+ValueError: No input files provided
+[?2004hroot@2cab8586e0e9:/app# file-processing tests/cleaned_data.csv tests/cleaning_log.json tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+[?2004lTraceback (most recent call last):
+  File "/app/src/CSVIngester.py", line 300, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/app/src/CSVIngester.py", line 281, in main
+    _, log = cli.file_processor(args.output_file, args.log_file, args.files)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/CSVIngester.py", line 187, in file_processor
+    df = self.consolidated_cleaned_dataframes(files)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/CSVIngester.py", line 176, in consolidated_cleaned_dataframes
+    raise ValueError('No input files provided')
+ValueError: No input files provided
+[?2004hroot@2cab8586e0e9:/app# cleaning_log tests/cleaning_log.json | head -n 40
+[?2004lcsv-summary tests/test_data.csv
+{
+  "error": "log_not_found",
+  "path": "tests/cleaning_log.json"
+}
+[?2004hroot@2cab8586e0e9:/app# csv-summary tests/test_data.csv
+[?2004l{
+  "file": "tests/test_data.csv",
+  "rows": 4,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Order ID": 0,
+    "Customer Name": 1,
+    "Order Date": 0,
+    "Product Price $": 0,
+    "Quantity!!": 1,
+    "Total Amount": 0,
+    "Ship Date": 0,
+    "Status": 1
+  }
+}
+[?2004hroot@2cab8586e0e9:/app# cat > src/CSVIngester.py << 'PY'
+[?2004l[?2004h> #!/usr/bin/env python3
+[?2004lip(lower=lower, upper=u[?2004h> import sys
+[?2004l[?2004h> import os
+[?2004l[?2004h> import json
+[?2004l[?2004h> import argparse
+[?2004l[?2004h> from datetime import datetime
+[?2004l[?2004h> from typing import List, Dict, Any, Optional, Tuple
+[?2004lna(lower) else None,
+            'upper_bound': float(upp[?2004h> import pandas as pd
+[?2004l[?2004h> import numpy as np
+[?2004lr) else None,
+     [?2004h> 
+[?2004l[?2004h> SUPPORTED_ENCODINGS = ['utf-8', 'utf-8-sig', 'cp1252', 'latin1', 'iso-8859-1']
+[?2004l[?2004h> 
+[?2004l[?2004h> class CSVIngester:
+[?2004l[?2004h>     def __init__(self):
+[?2004l[?2004h>         self.operations: List[Dict[str, Any]] = []
+[?2004l[?2004h> 
+[?2004l[?2004h>     def _log(self, operation: str, details: Dict[str, Any]):
+[?2004l[?2004h>         self.operations.append({
+[?2004l[?2004h>             'operation': operation,
+[?2004l[?2004h>             'details': details,
+[?2004l[?2004h>             'timestamp': datetime.utcnow().isoformat()
+[?2004l[?2004h>         })
+[?2004l[?2004h> 
+[?2004l[?2004h>     def encode_process(self, filepath: str) -> Dict[str, Any]:
+[?2004l[?2004h>         result = {'file': filepath, 'encoding': None, 'status': 'failed'}
+[?2004l[?2004h>         if not os.path.exists(filepath):
+[?2004l[?2004h>             result['error'] = 'file_not_found'
+[?2004l[?2004h>             self._log('detect_encoding', result)
+[?2004l[?2004h>             return result
+[?2004l[?2004h>         for enc in SUPPORTED_ENCODINGS:
+[?2004l) [?2004h>             try:
+[?2004l[?2004h>                 with open(filepath, 'r', encoding=enc) as f:
+[?2004l[?2004h>                     f.read(4096)
+[?2004l[?2004h>                 result['encoding'] = enc
+[?2004l[?2004h>                 result['status'] = 'ok'
+[?2004l[?2004h>                 break
+[?2004l[?2004h>             except Exception:
+[?2004l[?2004h>                 continue
+[?2004l[?2004h>         if result['encoding'] is None:
+[?2004l[?2004h>             try:
+[?2004l[?2004h>                 with open(filepath, 'rb') as f:
+[?2004l[?2004h>                     _ = f.read(4096)
+[?2004l[?2004h>                 result['encoding'] = 'latin1'
+[?2004l[?2004h>                 result['status'] = 'ok'
+[?2004l[?2004h>             except Exception as e:
+[?2004l[?2004h>                 result['error'] = str(e)
+[?2004l[?2004h>         self._log('detect_encoding', result)
+[?2004l[?2004h>         return result
+[?2004l[?2004h> 
+[?2004l= self.standardize_columns(df, src=filepath)
+        col_types: Dict[str, str] = {col: self.detect_column_type(df[col]) for col in df.columns}
+        self._[?2004h>     @staticmethod
+[?2004l[?2004h>     def standardize_column_name(name: str) -> str:
+[?2004l[?2004h>         if name is None:
+[?2004l[?2004h>             return ''
+[?2004l[?2004h>         s = str(name).strip().lower()
+[?2004l[?2004h>         import re
+[?2004l[?2004h>         s = re.sub(r'[^0-9a-z]+', '_', s)
+[?2004lcol].isna().sum())
+[?2004h>         s = re.sub(r'_+', '_', s)
+[?2004l[?2004h>         s = s.strip('_')
+[?2004l[?2004h>         return s
+[?2004l[?2004h> 
+[?2004l [?2004h>     def standardize_columns(self, df: pd.DataFrame, src: Optional[str] = None) -> pd.DataFrame:
+[?2004l[?2004h>         mapping = {c: self.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         df = df.rename(columns=mapping)
+[?2004l[?2004h>         self._log('standardize_columns', {'source': src, 'mappings': mapping})
+[?2004l[?2004h>         return df
+[?2004l[?2004h> 
+[?2004l[?2004h>     def detect_column_type(self, series: pd.Series) -> str:
+[?2004l[?2004h>         s = series.dropna().astype(str).str.strip()
+[?2004l[?2004h>         if len(s) == 0:
+[?2004lmiss_before = int(num.is[?2004h>             return 'categorical'
+[?2004l[?2004h>         # Try date
+[?2004l[?2004h>         try:
+[?2004l[?2004h>             parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+[?2004l[?2004h>             parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+[?2004l[?2004h>             parsed = parsed1.copy()
+[?2004l[?2004h>             parsed.loc[parsed1.isna()] = parsed2
+[?2004l[?2004h>             if parsed.notna().mean() >= 0.6:
+[?2004l[?2004h>                 return 'date'
+[?2004l[?2004h>         except Exception:
+[?2004l   self._log([?2004h>             pass
+[?2004l[?2004h>         # Try numeric
+[?2004l[?2004h>         num = pd.to_numeric(s.str.replace(',', '', regex=False), errors='coerce')
+[?2004l[?2004h>         if num.notna().mean() >= 0.6:
+[?2004l[?2004h>             return 'numeric'
+[?2004l[?2004h>         return 'categorical'
+[?2004l[?2004h> 
+[?2004l[?2004h>     def date_parser(self, series: pd.Series) -> pd.Series:
+[?2004l[?2004h>         s = series.astype(str).where(~series.isna(), other=np.nan)
+[?2004l[?2004h>         parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+[?2004l[?2004h>         need = parsed1.isna()
+[?2004lth, 'colum[?2004h>         if need.any():
+[?2004l[?2004h>             parsed2 = pd.to_datetime(s[need], errors='coerce', dayfirst=False)
+[?2004l[?2004h>             parsed1.loc[need] = parsed2
+[?2004l[?2004h>         iso = parsed1.dt.strftime('%Y-%m-%d')
+[?2004l[?2004h>         iso = iso.where(~parsed1.isna(), other=np.nan)
+[?2004l   raise Value[?2004h>         return iso
+[?2004l[?2004h> 
+[?2004l[?2004h>     def outlier_truncate(self, series: pd.Series) -> Tuple[pd.Series, Dict[str, Any]]:
+[?2004l[?2004h>         numeric = pd.to_numeric(series, errors='coerce')
+[?2004l[?2004h>         if numeric.notna().sum() == 0:
+[?2004l[?2004h>             bounds = {
+[?2004l[?2004h>                 'lower_bound': None,
+[?2004l[?2004h>                 'upper_bound': None,
+[?2004l[?2004h>                 'original_min': None,
+[?2004l[?2004h>                 'original_max': None,
+[?2004l[?2004h>                 'clipped_min': None,
+[?2004l[?2004h>                 'clipped_max': None
+[?2004l[?2004h>             }
+[?2004l[?2004h>             return numeric, bounds
+[?2004l[?2004h>         lower = numeric.quantile(0.01)
+[?2004l[?2004h>         upper = numeric.quantile(0.99)
+[?2004l[?2004h>         orig_min = float(numeric.min())
+[?2004l[?2004h>         orig_max = float(numeric.max())
+[?2004l[?2004h>         clipped = numeric.clip(lower=lower, upper=upper)
+[?2004l[?2004h>         bounds = {
+[?2004l[?2004h>             'lower_bound': float(lower) if pd.notna(lower) else None,
+[?2004l[?2004h>             'upper_bound': float(upper) if pd.notna(upper) else None,
+[?2004l[?2004h>             'original_min': orig_min,
+[?2004l[?2004h>             'original_max': orig_max,
+[?2004l[?2004h>             'clipped_min': float(clipped.min()) if clipped.notna().any() else None,
+[?2004l[?2004h>             'clipped_max': float(clipped.max()) if clipped.notna().any() else None
+[?2004l[?2004h>         }
+[?2004l[?2004h>         return clipped, bounds
+[?2004l[?2004h> 
+[?2004l[?2004h>     def logging_process(self, log_path: str):
+[?2004l[?2004h>         wrapper = {'timestamp': datetime.utcnow().isoformat(), 'operations': self.operations}
+[?2004l[?2004h>         with open(log_path, 'w', encoding='utf-8') as f:
+[?2004l[?2004h>             json.dump(wrapper, f, indent=2)
+[?2004l[?2004h> 
+[?2004l[?2004h>     def get_operations_log(self, log_path: str) -> Dict[str, Any]:
+[?2004l[?2004h>         if not os.path.exists(log_path):
+[?2004l[?2004h>             return {'error': 'log_not_found', 'path': log_path}
+[?2004l[?2004h>         with open(log_path, 'r', encoding='utf-8') as f:
+[?2004l[?2004h>             return json.load(f)
+[?2004l[?2004h> 
+[?2004l[?2004h>     def processed_dataframe(self, filepath: str) -> pd.DataFrame:
+[?2004l[?2004h>         enc_info = self.encode_process(filepath)
+[?2004l[?2004h>         if enc_info.get('status') != 'ok':
+[?2004l[?2004h>             raise FileNotFoundError(f"Cannot read file: {filepath}")
+[?2004l[?2004h>         encoding = enc_info.get('encoding')
+[?2004l[?2004h>         df = pd.read_csv(filepath, encoding=encoding)
+[?2004l[?2004h>         self._log('load_file', {'source': filepath, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         df = self.standardize_columns(df, src=filepath)
+[?2004l[?2004h>         col_types: Dict[str, str] = {col: self.detect_column_type(df[col]) for col in df.columns}
+[?2004l[?2004h>         self._log('detect_column_types', {'source': filepath, 'types': col_types})
+[?2004l[?2004h>         # Parse dates
+[?2004l[?2004h>         for col, t in col_types.items():
+[?2004l[?2004h>             if t == 'date':
+[?2004l[?2004h>                 before_na = int(df[col].isna().sum())
+[?2004l[?2004h>                 df[col] = self.date_parser(df[col])
+[?2004l[?2004h>                 after_na = int(df[col].isna().sum())
+[?2004ls9 = sub.add_parse[?2004h>                 self._log('parse_dates', {'source': filepath, 'column': col, 'missing_before': before_na, 'missing_after': after_na})
+[?2004l[?2004h>         # Imputation and clipping
+[?2004l[?2004h>         for col, t in col_types.items():
+[?2004l[?2004h>             if t == 'numeric':
+[?2004l[?2004h>                 num = pd.to_numeric(df[col], errors='coerce')
+[?2004l[?2004h>                 median = float(num.median()) if num.notna().any() else 0.0
+[?2004l[?2004h>                 miss_before = int(num.isna().sum())
+[?2004l[?2004h>                 num = num.fillna(median)
+[?2004l[?2004h>                 clipped, bounds = self.outlier_truncate(num)
+[?2004l[?2004h>                 df[col] = clipped
+[?2004l[?2004h>                 miss_after = int(pd.isna(df[col]).sum())
+[?2004l[?2004h>                 self._log('impute_numeric', {'source': filepath, 'column': col, 'strategy': 'median', 'median': median, 'missing_before': miss_before, 'missing_after': miss_after})
+[?2004l[?2004h>                 self._log('clip_outliers', {'source': filepath, 'column': col, **bounds})
+[?2004l[?2004h>             elif t == 'categorical':
+[?2004l[?2004h>                 miss_before = int(df[col].isna().sum())
+[?2004l[?2004h>                 df[col] = df[col].astype(object)
+[?2004l[?2004h>                 df[col] = df[col].replace('', np.nan)
+[?2004l[?2004h>                 df[col] = df[col].fillna('Unknown')
+[?2004l[?2004h>                 miss_after = int(df[col].isna().sum())
+[?2004l[?2004h>                 self._log('impute_categorical', {'source': filepath, 'column': col, 'strategy': 'fill_unknown', 'missing_before': miss_before, 'missing_after': miss_after})
+[?2004l[?2004h>         return df
+[?2004l[?2004h> 
+[?2004l[?2004h>     def consolidated_cleaned_dataframes(self, files: List[str]) -> pd.DataFrame:
+[?2004l[?2004h>         if not files:
+[?2004l[?2004h>             raise ValueError('No input files provided')
+[?2004l[?2004h>         cleaned: List[pd.DataFrame] = []
+[?2004l[?2004h>         for f in files:
+[?2004l[?2004h>             cleaned.append(self.processed_dataframe(f))
+[?2004lize_column_name(c) for c in d[?2004h>         if len(cleaned) == 0:
+[?2004l[?2004h>             raise ValueError('No objects to concatenate')
+[?2004l[?2004h>         out = pd.concat(cleaned, ignore_index=True, sort=False)
+[?2004l[?2004h>         self._log('consolidate', {'files': files, 'rows': int(out.shape[0]), 'columns': int(out.shape[1])})
+[?2004l[?2004h>         return out
+[?2004l[?2004h> 
+[?2004l[?2004h>     def file_processor(self, output_file: str, log_file: str, files: List[str]) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+[?2004l[?2004h>         df = self.consolidated_cleaned_dataframes(files)
+[?2004l{'error':'cannot_[?2004h>         df.to_csv(output_file, index=False)
+[?2004lread'})); return 1
+        df = pd.read_csv([?2004h>         self._log('write_output', {'output_file': output_file, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         self.logging_process(log_file)
+[?2004le(c) for c in df.columns}
+        tstd = cli.standardize_column_name[?2004h>         return df, self.get_operations_log(log_file)
+[?2004l[?2004h> 
+[?2004l[?2004h>     def csv_summary(self, filepath: str) -> Dict[str, Any]:
+[?2004l[?2004h>         info = self.encode_process(filepath)
+[?2004l[?2004h>         if info.get('status') != 'ok':
+[?2004l[?2004h>             return {'error': 'cannot_read', 'file': filepath}
+[?2004l[?2004h>         enc = info.get('encoding')
+[?2004ljson.dumps(bounds, indent=2)); return 0
+    if args.command == 'dataframe-c[?2004h>         try:
+[?2004l[?2004h>             df = pd.read_csv(filepath, encoding=enc)
+[?2004l[?2004h>         except Exception as e:
+[?2004l[?2004h>             return {'error': str(e)}
+[?2004l[?2004h>         missing = {str(c): int(df[c].isna().sum()) for c in df.columns}
+[?2004l[?2004h>         summary = {'file': filepath, 'rows': int(df.shape[0]), 'columns': int(df.shape[1]), 'column_names': list(map(str, df.columns.tolist())), 'missing_values': missing}
+[?2004l[?2004h>         self._log('csv_summary', summary)
+[?2004l[?2004h>         return summary
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def build_parser() -> argparse.ArgumentParser:
+[?2004l[?2004h>     p = argparse.ArgumentParser(description='CSV Ingester and Cleaner')
+[?2004l[?2004h>     sub = p.add_subparsers(dest='command')
+[?2004l[?2004h> 
+[?2004l[?2004h>     s1 = sub.add_parser('encoding-detection'); s1.add_argument('filepath')
+[?2004l[?2004h>     s2 = sub.add_parser('name-standardization'); s2.add_argument('column_name')
+[?2004l[?2004h>     s3 = sub.add_parser('type-detection'); s3.add_argument('csv_file'); s3.add_argument('column_name')
+[?2004l[?2004h>     s4 = sub.add_parser('date-parsing'); s4.add_argument('csv_file'); s4.add_argument('column_name')
+[?2004lcli.get_ope[?2004h>     s5 = sub.add_parser('outlier-truncate'); s5.add_argument('csv_file'); s5.add_argument('column_name')
+[?2004l[?2004h>     s6 = sub.add_parser('dataframe-cleaning'); s6.add_argument('csv_file'); s6.add_argument('output_file', nargs='?')
+[?2004l[?2004h>     s7 = sub.add_parser('dataframe-consolidation'); s7.add_argument('output_file'); s7.add_argument('files', nargs='+')
+[?2004l[?2004h>     s8 = sub.add_parser('file-processing'); s8.add_argument('output_file'); s8.add_argument('log_file'); s8.add_argument('files', nargs='+')
+[?2004l[?2004h>     s9 = sub.add_parser('cleaning_log'); s9.add_argument('log_file')
+[?2004l[?2004h>     s10 = sub.add_parser('csv-summary'); s10.add_argument('csv_file')
+[?2004l    print(json.dumps({'output_file': output, 'log_[?2004h>     s11 = sub.add_parser('get-operations'); s11.add_argument('log_file')
+[?2004l[?2004h> 
+[?2004l[?2004h>     # Default mode positional (avoid name collision with subparsers)
+[?2004l[?2004h>     p.add_argument('-o', '--output', default=None)
+[?2004l[?2004h>     p.add_argument('-l', '--log', default=None)
+[?2004l[?2004h>     p.add_argument('inputs', nargs='*')
+[?2004l[?2004h>     return p
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def main(argv: Optional[List[str]] = None) -> int:
+[?2004l[?2004h>     argv = argv if argv is not None else sys.argv[1:]
+[?2004l[?2004h>     cli = CSVIngester()
+[?2004l[?2004h>     parser = build_parser()
+[?2004l[?2004h>     args = parser.parse_args(argv)
+[?2004l[?2004h> 
+[?2004l[?2004h>     if args.command == 'encoding-detection':
+[?2004l[?2004h>         print(json.dumps(cli.encode_process(args.filepath), indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'name-standardization':
+[?2004l[?2004h>         print(cli.standardize_column_name(args.column_name)); return 0
+[?2004l[?2004h>     if args.command == 'type-detection':
+[?2004l[?2004h>         info = cli.encode_process(args.csv_file)
+[?2004l[?2004h>         if info.get('status') != 'ok': print('error'); return 1
+[?2004l[?2004h>         df = pd.read_csv(args.csv_file, encoding=info.get('encoding'))
+[?2004l[?2004h>         std = {c: cli.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         target_std = cli.standardize_column_name(args.column_name)
+[?2004l[?2004h>         rev = {v: k for k, v in std.items()}
+[?2004l[?2004h>         if target_std not in rev: print('error'); return 1
+[?2004l[?2004h>         print(cli.detect_column_type(df[rev[target_std]])); return 0
+[?2004l[?2004h>     if args.command == 'date-parsing':
+[?2004l[?2004h>         info = cli.encode_process(args.csv_file)
+[?2004l[?2004h>         if info.get('status') != 'ok': print('error'); return 1
+[?2004l[?2004h>         df = pd.read_csv(args.csv_file, encoding=info.get('encoding'))
+[?2004l[?2004h>         std = {c: cli.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         tstd = cli.standardize_column_name(args.column_name)
+[?2004l[?2004h>         rev = {v: k for k, v in std.items()}
+[?2004l[?2004h>         if tstd not in rev: print('error'); return 1
+[?2004l[?2004h>         parsed = cli.date_parser(df[rev[tstd]])
+[?2004l[?2004h>         print(json.dumps({'first_5': parsed.head(5).tolist()})); return 0
+[?2004l[?2004h>     if args.command == 'outlier-truncate':
+[?2004l[?2004h>         info = cli.encode_process(args.csv_file)
+[?2004l[?2004h>         if info.get('status') != 'ok': print(json.dumps({'error':'cannot_read'})); return 1
+[?2004l[?2004h>         df = pd.read_csv(args.csv_file, encoding=info.get('encoding'))
+[?2004l[?2004h>         std = {c: cli.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         tstd = cli.standardize_column_name(args.column_name)
+[?2004l[?2004h>         rev = {v: k for k, v in std.items()}
+[?2004l[?2004h>         if tstd not in rev: print(json.dumps({'error':'column_not_found'})); return 1
+[?2004l[?2004h>         _, bounds = cli.outlier_truncate(df[rev[tstd]])
+[?2004l[?2004h>         print(json.dumps(bounds, indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'dataframe-cleaning':
+[?2004l[?2004h>         out = args.output_file or 'cleaned_data.csv'
+[?2004l[?2004h>         df = cli.processed_dataframe(args.csv_file)
+[?2004l[?2004h>         df.to_csv(out, index=False)
+[?2004l[?2004h>         cli._log('write_output', {'output_file': out, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         print(out); return 0
+[?2004l[?2004h>     if args.command == 'dataframe-consolidation':
+[?2004l[?2004h>         df = cli.consolidated_cleaned_dataframes(args.files)
+[?2004l[?2004h>         df.to_csv(args.output_file, index=False)
+[?2004l[?2004h>         cli._log('write_output', {'output_file': args.output_file, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         print(args.output_file); return 0
+[?2004l[?2004h>     if args.command == 'file-processing':
+[?2004l[?2004h>         _, log = cli.file_processor(args.output_file, args.log_file, args.files)
+[?2004l[?2004h>         print(json.dumps({'output_file': args.output_file, 'log_file': args.log_file, 'operations': len(log.get('operations', []))}, indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'cleaning_log':
+[?2004l[?2004h>         print(json.dumps(cli.get_operations_log(args.log_file), indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'csv-summary':
+[?2004l[?2004h>         print(json.dumps(cli.csv_summary(args.csv_file), indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'get-operations':
+[?2004l[?2004h>         print(json.dumps(cli.get_operations_log(args.log_file).get('operations', []), indent=2)); return 0
+[?2004l[?2004h> 
+[?2004l[?2004h>     # Default pipeline when no subcommand but input files provided
+[?2004l[?2004h>     if getattr(args, 'inputs', None):
+[?2004l[?2004h>         output = args.output or 'cleaned_data.csv'
+[?2004l[?2004h>         log = args.log or 'cleaning_log.json'
+[?2004l[?2004h>         cli.file_processor(output, log, args.inputs)
+[?2004l[?2004h>         print(json.dumps({'output_file': output, 'log_file': log}, indent=2))
+[?2004l[?2004h>         return 0
+[?2004l[?2004h> 
+[?2004l[?2004h>     parser.print_help(); return 0
+[?2004l[?2004h> 
+[?2004l[?2004h> if __name__ == '__main__':
+[?2004l[?2004h>     raise SystemExit(main())
+[?2004l[?2004h> PY
+[?2004l[?2004hroot@2cab8586e0e9:/app# chmod +x src/CSVIngester.py
+[?2004l[?2004hroot@2cab8586e0e9:/app# python3 src/CSVIngester.py dataframe-consolidation tests/consolidated.csv tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+[?2004l/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Parsing dates in %Y/%m/%d format when dayfirst=True was specified. Pass `dayfirst=False` or specify a format to silence this warning.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+tests/consolidated.csv
+[?2004hroot@2cab8586e0e9:/app# python3 src/CSVIngester.py file-processing tests/cleaned_data.csv tests/cleaning_log.json tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+[?2004l/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Parsing dates in %Y/%m/%d format when dayfirst=True was specified. Pass `dayfirst=False` or specify a format to silence this warning.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+{
+  "output_file": "tests/cleaned_data.csv",
+  "log_file": "tests/cleaning_log.json",
+  "operations": 44
+}
+[?2004hroot@2cab8586e0e9:/app# head -n 5 tests/cleaned_data.csv
+[?2004lorder_id,customer_name,order_date,product_price,quantity,total_amount,ship_date,status,id,date,amount
+1.03,Alice,2025-01-01,101.5,2.0,200.0,2025-03-01,Shipped,,,
+2.0,Bob,01/05/2025,150.0,2.0,151.5,2025-01-07,Pending,,,
+3.0,Unknown,"Jan 10, 2025",200.0,2.9699999999999998,600.0,2025-10-01,Unknown,,,
+3.9699999999999998,Charlie,15-01-2025,9705.029999999997,1.03,9717.029999999997,,Delivered,,,
+[?2004hroot@2cab8586e0e9:/app# sed -n '1,60p' tests/cleaning_log.json | sed -n '1,80p'
+[?2004l{
+  "timestamp": "2026-01-19T18:23:17.515266",
+  "operations": [
+    {
+      "operation": "detect_encoding",
+      "details": {
+        "file": "tests/test_data.csv",
+        "encoding": "utf-8",
+        "status": "ok"
+      },
+      "timestamp": "2026-01-19T18:23:17.456417"
+    },
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "tests/test_data.csv",
+        "rows": 4,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T18:23:17.457274"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T18:23:17.457503"
+    },
+    {
+      "operation": "detect_column_types",
+      "details": {
+        "source": "tests/test_data.csv",
+        "types": {
+          "order_id": "numeric",
+          "customer_name": "categorical",
+          "order_date": "categorical",
+          "product_price": "numeric",
+          "quantity": "numeric",
+          "total_amount": "numeric",
+          "ship_date": "date",
+          "status": "categorical"
+        }
+      },
+      "timestamp": "2026-01-19T18:23:17.474506"
+    },
+    {
+      "operation": "parse_dates",
+      "details": {
+        "source": "tests/test_data.csv",
+        "column": "ship_date",
+[?2004hroot@2cab8586e0e9:/app# source solution/solve.sh
+[?2004l[?2004hroot@2cab8586e0e9:/app# file-processing tests/cleaned_data.csv tests/cleaning_log.json tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+[?2004l/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Parsing dates in %Y/%m/%d format when dayfirst=True was specified. Pass `dayfirst=False` or specify a format to silence this warning.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+{
+  "output_file": "tests/cleaned_data.csv",
+  "log_file": "tests/cleaning_log.json",
+  "operations": 44
+}
+[?2004hroot@2cab8586e0e9:/app# cleaning_log tests/cleaning_log.json | head -n 40
+[?2004l{
+  "timestamp": "2026-01-19T18:23:19.105747",
+  "operations": [
+    {
+      "operation": "detect_encoding",
+      "details": {
+        "file": "tests/test_data.csv",
+        "encoding": "utf-8",
+        "status": "ok"
+      },
+      "timestamp": "2026-01-19T18:23:19.050143"
+    },
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "tests/test_data.csv",
+        "rows": 4,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T18:23:19.051028"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T18:23:19.051239"
+    },
+    {
+      "operation": "detect_column_types",
+[?2004hroot@2cab8586e0e9:/app# cat > src/CSVIngester.py << 'PY'
+[?2004lx())
+        clipped = numeric.cl[?2004h> #!/usr/bin/env python3
+[?2004lip(lower=lower, upper=u[?2004h> import sys
+[?2004l[?2004h> import os
+[?2004l[?2004h> import json
+[?2004l[?2004h> import argparse
+[?2004l[?2004h> from datetime import datetime
+[?2004l[?2004h> from typing import List, Dict, Any, Optional, Tuple
+[?2004l[?2004h> import pandas as pd
+[?2004l[?2004h> import numpy as np
+[?2004l[?2004h> 
+[?2004l[?2004h> SUPPORTED_ENCODINGS = ['utf-8', 'utf-8-sig', 'cp1252', 'latin1', 'iso-8859-1']
+[?2004l[?2004h> 
+[?2004l[?2004h> class CSVIngester:
+[?2004l[?2004h>     def __init__(self):
+[?2004l[?2004h>         self.operations: List[Dict[str, Any]] = []
+[?2004l[?2004h> 
+[?2004l[?2004h>     def _log(self, operation: str, details: Dict[str, Any]):
+[?2004l[?2004h>         self.operations.append({
+[?2004l[?2004h>             'operation': operation,
+[?2004l[?2004h>             'details': details,
+[?2004l[?2004h>             'timestamp': datetime.utcnow().isoformat()
+[?2004l[?2004h>         })
+[?2004l[?2004h> 
+[?2004l[?2004h>     def encode_process(self, filepath: str) -> Dict[str, Any]:
+[?2004l[?2004h>         result = {'file': filepath, 'encoding': None, 'status': 'failed'}
+[?2004l[?2004h>         if not os.path.exists(filepath):
+[?2004l[?2004h>             result['error'] = 'file_not_found'
+[?2004l[?2004h>             self._log('detect_encoding', result)
+[?2004l[?2004h>             return result
+[?2004l[?2004h>         for enc in SUPPORTED_ENCODINGS:
+[?2004l[?2004h>             try:
+[?2004l[?2004h>                 with open(filepath, 'r', encoding=enc) as f:
+[?2004l[?2004h>                     f.read(4096)
+[?2004l[?2004h>                 result['encoding'] = enc
+[?2004l[?2004h>                 result['status'] = 'ok'
+[?2004l[?2004h>                 break
+[?2004l[?2004h>             except Exception:
+[?2004l[?2004h>                 continue
+[?2004l[?2004h>         if result['encoding'] is None:
+[?2004l[?2004h>             try:
+[?2004l[?2004h>                 with open(filepath, 'rb') as f:
+[?2004l[?2004h>                     _ = f.read(4096)
+[?2004l[?2004h>                 result['encoding'] = 'latin1'
+[?2004l[?2004h>                 result['status'] = 'ok'
+[?2004l[?2004h>             except Exception as e:
+[?2004l[?2004h>                 result['error'] = str(e)
+[?2004l[?2004h>         self._log('detect_encoding', result)
+[?2004l[?2004h>         return result
+[?2004l[?2004h> 
+[?2004l[?2004h>     @staticmethod
+[?2004l[?2004h>     def standardize_column_name(name: str) -> str:
+[?2004l[?2004h>         if name is None:
+[?2004l[?2004h>             return ''
+[?2004l[?2004h>         s = str(name).strip().lower()
+[?2004l[?2004h>         import re
+[?2004l[?2004h>         s = re.sub(r'[^0-9a-z]+', '_', s)
+[?2004l[?2004h>         s = re.sub(r'_+', '_', s)
+[?2004l[?2004h>         s = s.strip('_')
+[?2004l[?2004h>         return s
+[?2004l[?2004h> 
+[?2004l[?2004h>     def standardize_columns(self, df: pd.DataFrame, src: Optional[str] = None) -> pd.DataFrame:
+[?2004l[?2004h>         mapping = {c: self.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         df = df.rename(columns=mapping)
+[?2004l[?2004h>         self._log('standardize_columns', {'source': src, 'mappings': mapping})
+[?2004l[?2004h>         return df
+[?2004l[?2004h> 
+[?2004l[?2004h>     def detect_column_type(self, series: pd.Series) -> str:
+[?2004lmedi[?2004h>         s = series.dropna().astype(str).str.strip()
+[?2004l[?2004h>         if len(s) == 0:
+[?2004l[?2004h>             return 'categorical'
+[?2004l[?2004h>         # Try date
+[?2004l[?2004h>         try:
+[?2004l[?2004h>             parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+[?2004l[?2004h>             parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+[?2004l[?2004h>             parsed = parsed1.copy()
+[?2004l[?2004h>             parsed.loc[parsed1.isna()] = parsed2
+[?2004l[?2004h>             if parsed.notna().mean() >= 0.6:
+[?2004l[?2004h>                 return 'date'
+[?2004l[?2004h>         except Exception:
+[?2004l[?2004h>             pass
+[?2004l[?2004h>         # Try numeric
+[?2004l[?2004h>         num = pd.to_numeric(s.str.replace(',', '', regex=False), errors='coerce')
+[?2004l[?2004h>         if num.notna().mean() >= 0.6:
+[?2004l[?2004h>             return 'numeric'
+[?2004l[?2004h>         return 'categorical'
+[?2004l[?2004h> 
+[?2004l[?2004h>     def date_parser(self, series: pd.Series) -> pd.Series:
+[?2004l[?2004h>         s = series.astype(str).where(~series.isna(), other=np.nan)
+[?2004l[?2004h>         parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+[?2004l[?2004h>         need = parsed1.isna()
+[?2004l[?2004h>         if need.any():
+[?2004legy': 'f[?2004h>             parsed2 = pd.to_datetime(s[need], errors='coerce', dayfirst=False)
+[?2004l[?2004h>             parsed1.loc[need] = parsed2
+[?2004l[?2004h>         iso = parsed1.dt.strftime('%Y-%m-%d')
+[?2004l[?2004h>         iso = iso.where(~parsed1.isna(), other=np.nan)
+[?2004l[?2004h>         return iso
+[?2004l[?2004h> 
+[?2004l[?2004h>     def outlier_truncate(self, series: pd.Series) -> Tuple[pd.Series, Dict[str, Any]]:
+[?2004l[?2004h>         numeric = pd.to_numeric(series, errors='coerce')
+[?2004l[?2004h>         if numeric.notna().sum() == 0:
+[?2004l[?2004h>             bounds = {
+[?2004l[?2004h>                 'lower_bound': None,
+[?2004l[?2004h>                 'upper_bound': None,
+[?2004l[?2004h>                 'original_min': None,
+[?2004l[?2004h>                 'original_max': None,
+[?2004l[?2004h>                 'clipped_min': None,
+[?2004l[?2004h>                 'clipped_max': None
+[?2004l[?2004h>             }
+[?2004l[?2004h>             return numeric, bounds
+[?2004l[?2004h>         lower = numeric.quantile(0.01)
+[?2004l[?2004h>         upper = numeric.quantile(0.99)
+[?2004lpd.DataFrame, Dict[str, Any]]:
+        df = self.cons[?2004h>         orig_min = float(numeric.min())
+[?2004l[?2004h>         orig_max = float(numeric.max())
+[?2004l[?2004h>         clipped = numeric.clip(lower=lower, upper=upper)
+[?2004l[?2004h>         bounds = {
+[?2004l[?2004h>             'lower_bound': float(lower) if pd.notna(lower) else None,
+[?2004l[?2004h>             'upper_bound': float(upper) if pd.notna(upper) else None,
+[?2004l[?2004h>             'original_min': orig_min,
+[?2004l[?2004h>             'original_max': orig_max,
+[?2004l[?2004h>             'clipped_min': float(clipped.min()) if clipped.notna().any() else None,
+[?2004l[?2004h>             'clipped_max': float(clipped.max()) if clipped.notna().any() else None
+[?2004l[?2004h>         }
+[?2004l[?2004h>         return clipped, bounds
+[?2004l[?2004h> 
+[?2004l[?2004h>     def logging_process(self, log_path: str):
+[?2004l[?2004h>         wrapper = {'timestamp': datetime.utcnow().isoformat(), 'operations': self.operations}
+[?2004l[?2004h>         with open(log_path, 'w', encoding='utf-8') as f:
+[?2004l[?2004h>             json.dump(wrapper, f, indent=2)
+[?2004l[?2004h> 
+[?2004l[?2004h>     def get_operations_log(self, log_path: str) -> Dict[str, Any]:
+[?2004l[?2004h>         if not os.path.exists(log_path):
+[?2004l[?2004h>             return {'error': 'log_not_found', 'path': log_path}
+[?2004l[?2004h>         with open(log_path, 'r', encoding='utf-8') as f:
+[?2004l[?2004h>             return json.load(f)
+[?2004l[?2004h> 
+[?2004l[?2004h>     def processed_dataframe(self, filepath: str) -> pd.DataFrame:
+[?2004l[?2004h>         enc_info = self.encode_process(filepath)
+[?2004l[?2004h>         if enc_info.get('status') != 'ok':
+[?2004l[?2004h>             raise FileNotFoundError(f"Cannot read file: {filepath}")
+[?2004l[?2004h>         encoding = enc_info.get('encoding')
+[?2004l[?2004h>         df = pd.read_csv(filepath, encoding=encoding)
+[?2004l[?2004h>         self._log('load_file', {'source': filepath, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         df = self.standardize_columns(df, src=filepath)
+[?2004l[?2004h>         col_types: Dict[str, str] = {col: self.detect_column_type(df[col]) for col in df.columns}
+[?2004l[?2004h>         self._log('detect_column_types', {'source': filepath, 'types': col_types})
+[?2004l[?2004h>         # Parse dates
+[?2004l[?2004h>         for col, t in col_types.items():
+[?2004l[?2004h>             if t == 'date':
+[?2004l[?2004h>                 before_na = int(df[col].isna().sum())
+[?2004l[?2004h>                 df[col] = self.date_parser(df[col])
+[?2004ls8.ad[?2004h>                 after_na = int(df[col].isna().sum())
+[?2004l[?2004h>                 self._log('parse_dates', {'source': filepath, 'column': col, 'missing_before': before_na, 'missing_after': after_na})
+[?2004l[?2004h>         # Imputation and clipping
+[?2004l   s11 = sub.add_parser('get-operations'); s11.add[?2004h>         for col, t in col_types.items():
+[?2004l[?2004h>             if t == 'numeric':
+[?2004l[?2004h>                 num = pd.to_numeric(df[col], errors='coerce')
+[?2004lional (avoid collision with subparsers)
+    p.add_argument('-o', '--output', default=No[?2004h>                 median = float(num.median()) if num.notna().any() else 0.0
+[?2004l[?2004h>                 miss_before = int(num.isna().sum())
+[?2004largv: Optio[?2004h>                 num = num.fillna(median)
+[?2004l[?2004h>                 clipped, bounds = self.outlier_truncate(num)
+[?2004l[?2004h>                 df[col] = clipped
+[?2004l[?2004h>                 miss_after = int(pd.isna(df[col]).sum())
+[?2004l[?2004h>                 self._log('impute_numeric', {'source': filepath, 'column': col, 'strategy': 'median', 'median': median, 'missing_before': miss_before, 'missing_after': miss_after})
+[?2004l[?2004h>                 self._log('clip_outliers', {'source': filepath, 'column': col, **bounds})
+[?2004l'type-detection':
+      [?2004h>             elif t == 'categorical':
+[?2004l[?2004h>                 miss_before = int(df[col].isna().sum())
+[?2004l[?2004h>                 df[col] = df[col].astype(object)
+[?2004l[?2004h>                 df[col] = df[col].replace('', np.nan)
+[?2004l[?2004h>                 df[col] = df[col].fillna('Unknown')
+[?2004l[?2004h>                 miss_after = int(df[col].isna().sum())
+[?2004l[?2004h>                 self._log('impute_categorical', {'source': filepath, 'column': col, 'strategy': 'fill_unknown', 'missing_before': miss_before, 'missing_after': miss_after})
+[?2004l[?2004h>         return df
+[?2004l[?2004h> 
+[?2004l[?2004h>     def consolidated_cleaned_dataframes(self, files: List[str]) -> pd.DataFrame:
+[?2004l[?2004h>         if not files:
+[?2004l[?2004h>             raise ValueError('No input files provided')
+[?2004l[?2004h>         cleaned: List[pd.DataFrame] = []
+[?2004l[?2004h>         for f in files:
+[?2004l[?2004h>             cleaned.append(self.processed_dataframe(f))
+[?2004l[?2004h>         if len(cleaned) == 0:
+[?2004l[?2004h>             raise ValueError('No objects to concatenate')
+[?2004l[?2004h>         out = pd.concat(cleaned, ignore_index=True, sort=False)
+[?2004l[?2004h>         self._log('consolidate', {'files': files, 'rows': int(out.shape[0]), 'columns': int(out.shape[1])})
+[?2004l print(json.dumps({'first_5': parsed.hea[?2004h>         return out
+[?2004l[?2004h> 
+[?2004l[?2004h>     def file_processor(self, output_file: str, log_file: str, files: List[str]) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+[?2004l[?2004h>         df = self.consolidated_cleaned_dataframes(files)
+[?2004l[?2004h>         df.to_csv(output_file, index=False)
+[?2004l_read'})); return 1
+        df = pd.read_csv(ar[?2004h>         self._log('write_output', {'output_file': output_file, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         self.logging_process(log_file)
+[?2004l[?2004h>         return df, self.get_operations_log(log_file)
+[?2004l[?2004h> 
+[?2004l[?2004h>     def csv_summary(self, filepath: str) -> Dict[str, Any]:
+[?2004l[?2004h>         info = self.encode_process(filepath)
+[?2004l rev: print(json.dumps({'error':'column_not_found'})); return 1
+        _, bou[?2004h>         if info.get('status') != 'ok':
+[?2004l[?2004h>             return {'error': 'cannot_read', 'file': filepath}
+[?2004l[?2004h>         enc = info.get('encoding')
+[?2004l[?2004h>         try:
+[?2004l[?2004h>             df = pd.read_csv(filepath, encoding=enc)
+[?2004l[?2004h>         except Exception as e:
+[?2004l[?2004h>             return {'error': str(e)}
+[?2004l[?2004h>         missing = {str(c): int(df[c].isna().sum()) for c in df.columns}
+[?2004l[?2004h>         summary = {'file': filepath, 'rows': int(df.shape[0]), 'columns': int(df.shape[1]), 'column_names': list(map(str, df.columns.tolist())), 'missing_values': missing}
+[?2004l[?2004h>         self._log('csv_summary', summary)
+[?2004l[?2004h>         return summary
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def build_parser() -> argparse.ArgumentParser:
+[?2004lo_csv(args.output_file, index=False)
+        cli._log('write_output', {'output_file'[?2004h>     p = argparse.ArgumentParser(description='CSV Ingester and Cleaner')
+[?2004l[?2004h>     sub = p.add_subparsers(dest='command')
+[?2004l[?2004h> 
+[?2004l[?2004h>     s1 = sub.add_parser('encoding-detection'); s1.add_argument('filepath')
+[?2004l[?2004h>     s2 = sub.add_parser('name-standardization'); s2.add_argument('column_name')
+[?2004l[?2004h>     s3 = sub.add_parser('type-detection'); s3.add_argument('csv_file'); s3.add_argument('column_name')
+[?2004l: args.output_file, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+        print(args.output_file); return 0
+    if args.command == 'file-processing':
+        _, log = cli.file_processor(args.output_file, args.log_file, args.files)
+        print(json.dumps({'output_file': args.output_file, 'log_file': args.log_file, 'operations': len(log.get('operations', []))}, [?2004h>     s4 = sub.add_parser('date-parsing'); s4.add_argument('csv_file'); s4.add_argument('column_name')
+[?2004l[?2004h>     s5 = sub.add_parser('outlier-truncate'); s5.add_argument('csv_file'); s5.add_argument('column_name')
+[?2004l[?2004h>     s6 = sub.add_parser('dataframe-cleaning'); s6.add_argument('csv_file'); s6.add_argument('output_file', nargs='?')
+[?2004l[?2004h>     s7 = sub.add_parser('dataframe-consolidation'); s7.add_argument('output_file'); s7.add_argument('files', nargs='+')
+[?2004l[?2004h>     s8 = sub.add_parser('file-processing'); s8.add_argument('output_file'); s8.add_argument('log_file'); s8.add_argument('files', nargs='+')
+[?2004l[?2004h>     s9 = sub.add_parser('cleaning_log'); s9.add_argument('log_file')
+[?2004l[?2004h>     s10 = sub.add_parser('csv-summary'); s10.add_argument('csv_file')
+[?2004l[?2004h>     s11 = sub.add_parser('get-operations'); s11.add_argument('log_file')
+[?2004l[?2004h> 
+[?2004l[?2004h>     # Default mode positional (avoid collision with subparsers)
+[?2004l
+
+    parser.print_help(); return 0
+
+if __name__ == '__main__':
+    raise SystemExit(main())
+PY
+[?2004h>     p.add_argument('-o', '--output', default=None)
+[?2004l[?2004h>     p.add_argument('-l', '--log', default=None)
+[?2004l[?2004h>     p.add_argument('inputs', nargs='*')
+[?2004l[?2004h>     return p
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def main(argv: Optional[List[str]] = None) -> int:
+[?2004l[?2004h>     argv = argv if argv is not None else sys.argv[1:]
+[?2004l[?2004h>     cli = CSVIngester()
+[?2004l[?2004h>     parser = build_parser()
+[?2004l[?2004h>     args = parser.parse_args(argv)
+[?2004l[?2004h> 
+[?2004l[?2004h>     if args.command == 'encoding-detection':
+[?2004l[?2004h>         print(json.dumps(cli.encode_process(args.filepath), indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'name-standardization':
+[?2004l[?2004h>         print(cli.standardize_column_name(args.column_name)); return 0
+[?2004l[?2004h>     if args.command == 'type-detection':
+[?2004l[?2004h>         info = cli.encode_process(args.csv_file)
+[?2004l[?2004h>         if info.get('status') != 'ok': print('error'); return 1
+[?2004l[?2004h>         df = pd.read_csv(args.csv_file, encoding=info.get('encoding'))
+[?2004l[?2004h>         std = {c: cli.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         target_std = cli.standardize_column_name(args.column_name)
+[?2004l[?2004h>         rev = {v: k for k, v in std.items()}
+[?2004l[?2004h>         if target_std not in rev: print('error'); return 1
+[?2004l[?2004h>         print(cli.detect_column_type(df[rev[target_std]])); return 0
+[?2004l[?2004h>     if args.command == 'date-parsing':
+[?2004l[?2004h>         info = cli.encode_process(args.csv_file)
+[?2004l[?2004h>         if info.get('status') != 'ok': print('error'); return 1
+[?2004l[?2004h>         df = pd.read_csv(args.csv_file, encoding=info.get('encoding'))
+[?2004l[?2004h>         std = {c: cli.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         tstd = cli.standardize_column_name(args.column_name)
+[?2004l[?2004h>         rev = {v: k for k, v in std.items()}
+[?2004l[?2004h>         if tstd not in rev: print('error'); return 1
+[?2004l[?2004h>         parsed = cli.date_parser(df[rev[tstd]])
+[?2004l[?2004h>         print(json.dumps({'first_5': parsed.head(5).tolist()})); return 0
+[?2004l[?2004h>     if args.command == 'outlier-truncate':
+[?2004l[?2004h>         info = cli.encode_process(args.csv_file)
+[?2004l[?2004h>         if info.get('status') != 'ok': print(json.dumps({'error':'cannot_read'})); return 1
+[?2004l[?2004h>         df = pd.read_csv(args.csv_file, encoding=info.get('encoding'))
+[?2004l[?2004h>         std = {c: cli.standardize_column_name(c) for c in df.columns}
+[?2004l[?2004h>         tstd = cli.standardize_column_name(args.column_name)
+[?2004l[?2004h>         rev = {v: k for k, v in std.items()}
+[?2004l[?2004h>         if tstd not in rev: print(json.dumps({'error':'column_not_found'})); return 1
+[?2004l[?2004h>         _, bounds = cli.outlier_truncate(df[rev[tstd]])
+[?2004l[?2004h>         print(json.dumps(bounds, indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'dataframe-cleaning':
+[?2004l[?2004h>         out = args.output_file or 'cleaned_data.csv'
+[?2004l[?2004h>         df = cli.processed_dataframe(args.csv_file)
+[?2004l[?2004h>         df.to_csv(out, index=False)
+[?2004l[?2004h>         cli._log('write_output', {'output_file': out, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         print(out); return 0
+[?2004l[?2004h>     if args.command == 'dataframe-consolidation':
+[?2004l[?2004h>         df = cli.consolidated_cleaned_dataframes(args.files)
+[?2004l[?2004h>         df.to_csv(args.output_file, index=False)
+[?2004l[?2004h>         cli._log('write_output', {'output_file': args.output_file, 'rows': int(df.shape[0]), 'columns': int(df.shape[1])})
+[?2004l[?2004h>         print(args.output_file); return 0
+[?2004l[?2004h>     if args.command == 'file-processing':
+[?2004l[?2004h>         _, log = cli.file_processor(args.output_file, args.log_file, args.files)
+[?2004l[?2004h>         print(json.dumps({'output_file': args.output_file, 'log_file': args.log_file, 'operations': len(log.get('operations', []))}, indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'cleaning_log':
+[?2004l[?2004h>         print(json.dumps(cli.get_operations_log(args.log_file), indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'csv-summary':
+[?2004l[?2004h>         print(json.dumps(cli.csv_summary(args.csv_file), indent=2)); return 0
+[?2004l[?2004h>     if args.command == 'get-operations':
+[?2004l[?2004h>         print(json.dumps(cli.get_operations_log(args.log_file).get('operations', []), indent=2)); return 0
+[?2004l[?2004h> 
+[?2004l[?2004h>     # Default pipeline when no subcommand but input files provided
+[?2004l[?2004h>     if getattr(args, 'inputs', None):
+[?2004l[?2004h>         output = args.output or 'cleaned_data.csv'
+[?2004l[?2004h>         log = args.log or 'cleaning_log.json'
+[?2004l[?2004h>         cli.file_processor(output, log, args.inputs)
+[?2004l[?2004h>         print(json.dumps({'output_file': output, 'log_file': log}, indent=2))
+[?2004l[?2004h>         return 0
+[?2004l[?2004h> 
+[?2004l[?2004h>     parser.print_help(); return 0
+[?2004l[?2004h> 
+[?2004l[?2004h> if __name__ == '__main__':
+[?2004l[?2004h>     raise SystemExit(main())
+[?2004l[?2004h> PY
+[?2004l[?2004hroot@2cab8586e0e9:/app# chmod +x src/CSVIngester.py
+[?2004l[?2004hroot@2cab8586e0e9:/app# python3 src/CSVIngester.py dataframe-consolidation tests/consolidated.csv tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+[?2004l/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Parsing dates in %Y/%m/%d format when dayfirst=True was specified. Pass `dayfirst=False` or specify a format to silence this warning.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+tests/consolidated.csv
+[?2004hroot@2cab8586e0e9:/app# python3 src/CSVIngester.py file-processing tests/cleaned_data.csv tests/cleaning_log.json tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+[?2004l/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Parsing dates in %Y/%m/%d format when dayfirst=True was specified. Pass `dayfirst=False` or specify a format to silence this warning.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+{
+  "output_file": "tests/cleaned_data.csv",
+  "log_file": "tests/cleaning_log.json",
+  "operations": 44
+}
+[?2004hroot@2cab8586e0e9:/app# head -n 5 tests/cleaned_data.csv
+[?2004lorder_id,customer_name,order_date,product_price,quantity,total_amount,ship_date,status,id,date,amount
+1.03,Alice,2025-01-01,101.5,2.0,200.0,2025-03-01,Shipped,,,
+2.0,Bob,01/05/2025,150.0,2.0,151.5,2025-01-07,Pending,,,
+3.0,Unknown,"Jan 10, 2025",200.0,2.9699999999999998,600.0,2025-10-01,Unknown,,,
+3.9699999999999998,Charlie,15-01-2025,9705.029999999997,1.03,9717.029999999997,,Delivered,,,
+[?2004hroot@2cab8586e0e9:/app# sed -n '1,60p' tests/cleaning_log.json | sed -n '1,120p'
+[?2004l{
+  "timestamp": "2026-01-19T18:24:17.177234",
+  "operations": [
+    {
+      "operation": "detect_encoding",
+      "details": {
+        "file": "tests/test_data.csv",
+        "encoding": "utf-8",
+        "status": "ok"
+      },
+      "timestamp": "2026-01-19T18:24:17.134947"
+    },
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "tests/test_data.csv",
+        "rows": 4,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T18:24:17.135828"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T18:24:17.136045"
+    },
+    {
+      "operation": "detect_column_types",
+      "details": {
+        "source": "tests/test_data.csv",
+        "types": {
+          "order_id": "numeric",
+          "customer_name": "categorical",
+          "order_date": "categorical",
+          "product_price": "numeric",
+          "quantity": "numeric",
+          "total_amount": "numeric",
+          "ship_date": "date",
+          "status": "categorical"
+        }
+      },
+      "timestamp": "2026-01-19T18:24:17.146101"
+    },
+    {
+      "operation": "parse_dates",
+      "details": {
+        "source": "tests/test_data.csv",
+        "column": "ship_date",
+[?2004hroot@2cab8586e0e9:/app# source solution/solve.sh
+[?2004l[?2004hroot@2cab8586e0e9:/app# file-processing tests/cleaned_data.csv tests/cleaning_log.json tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+[?2004l/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Parsing dates in %Y/%m/%d format when dayfirst=True was specified. Pass `dayfirst=False` or specify a format to silence this warning.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+{
+  "output_file": "tests/cleaned_data.csv",
+  "log_file": "tests/cleaning_log.json",
+  "operations": 44
+}
+[?2004hroot@2cab8586e0e9:/app# 

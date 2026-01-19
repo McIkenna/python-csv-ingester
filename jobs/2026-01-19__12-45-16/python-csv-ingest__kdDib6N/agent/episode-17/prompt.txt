@@ -1,0 +1,23 @@
+New Terminal Output:
+
+root@19c53a573b6d:/app# source solution/solve.sh
+CSV Ingester shell functions loaded.
+Available commands:
+  - encoding-detection <filepath>
+  - name-standardization <column_name>
+  - type-detection <csv_file> <column_name>
+  - date-parsing <csv_file> <column_name>
+  - outlier-truncate <csv_file> <column_name>
+  - dataframe-cleaning <csv_file> [output_file]
+  - dataframe-consolidation <output_file> <file1> <file2> ...
+  - file-processing <output_file> <log_file> <file1> <file2> ...
+  - cleaning_log [log_file]
+  - csv-summary <csv_file>
+  - get-operations <log_file>
+root@19c53a573b6d:/app# encoding-detection tests/test_data.csv
+utf-8
+root@19c53a573b6d:/app# name-standardization 'Product Price $'
+product_price
+root@19c53a573b6d:/app# type-detection tests/test_data.csv 'Order Date'
+date
+root@19c53a573b6d:/app#

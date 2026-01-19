@@ -1,0 +1,47 @@
+Current terminal state:
+Current Terminal Screen:
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+{
+  "output_file": "tests/cleaned_data.csv",
+  "log_file": "tests/cleaning_log.json",
+  "operations": 44
+}
+root@2cab8586e0e9:/app#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

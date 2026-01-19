@@ -1,0 +1,69 @@
+New Terminal Output:
+
+root@19c53a573b6d:/app# head -10 tests/demo_output.csv
+order_id,customer_name,order_date,product_price,quantity,total_amount,ship_date,status,sku,product_name,stock_qty,unit_cost,last_restock,supplier,category_type
+ORD1000,John Smith,2023-10-01,264.31,7.0,1850.19,2023-10-09,Unknown,,,,,,,
+ORD1001,Unknown,2023-04-02,171.54,17.0,2916.22,,Shipped,,,,,,,
+ORD1002,Bob Johnson,2023-12-05,171.54,17.0,3317.41,2023-12-11,Unknown,,,,,,,
+ORD1003,Alice Williams,2023-08-29,70.22,10.0,702.16,2023-07-09,Unknown,,,,,,,
+ORD1004,John Smith,2023-01-09,318.75,8.0,2550.02,,Unknown,,,,,,,
+ORD1005,Alice Williams,2023-02-14,90.52,14.0,1267.34,,Cancelled,,,,,,,
+ORD1006,Alice Williams,2023-04-20,432.03,2.45,864.05,2023-04-21,Cancelled,,,,,,,
+ORD1007,Unknown,2023-11-24,68.6366,7.0,499.4393,2023-11-29,Unknown,,,,,,,
+ORD1008,Jane Doe,2023-03-22,477.36620000000005,15.0,6875.8831,,Unknown,,,,,,,
+root@19c53a573b6d:/app# cat tests/demo_log.json | head -50
+{
+  "timestamp": "2026-01-19T18:52:02.679438",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "tests/test_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T18:52:02.656266"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T18:52:02.656531"
+    },
+    {
+      "operation": "impute_categorical",
+      "details": {
+        "source": "tests/test_data.csv",
+        "column": "customer_name",
+        "value": "Unknown",
+        "count": 2
+      },
+      "timestamp": "2026-01-19T18:52:02.662304"
+    },
+    {
+      "operation": "parse_dates",
+      "details": {
+        "source": "tests/test_data.csv",
+        "column": "order_date",
+        "format": "ISO-8601"
+      },
+      "timestamp": "2026-01-19T18:52:02.663036"
+    },
+    {
+      "operation": "impute_numeric",
+root@19c53a573b6d:/app# echo "Running test suite..."
+Running test suite...
+root@19c53a573b6d:/app# pytest tests/test_outputs.py -v --tb=short 2>&1 | head -100
+bash: pytest: command not found
+root@19c53a573b6d:/app#

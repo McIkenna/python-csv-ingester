@@ -1,0 +1,75 @@
+New Terminal Output:
+
+root@2cab8586e0e9:/app# ls -la
+total 12
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 .
+drwxr-xr-x 1 root root 4096 Jan 19 18:17 ..
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 src
+root@2cab8586e0e9:/app# ls -la src solution tests || true
+ls: cannot access 'solution': No such file or directory
+ls: cannot access 'tests': No such file or directory
+src:
+total 16
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 .
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 ..
+-rw-r--r-- 1 root root  874 Jan  6 04:31 sample1_data.csv
+-rw-r--r-- 1 root root  768 Jan  6 04:17 sample2_data.csv
+root@2cab8586e0e9:/app# mkdir -p src solution tests
+root@2cab8586e0e9:/app# chmod +x src/CSVIngester.py
+chmod: cannot access 'src/CSVIngester.py': No such file or directory
+root@2cab8586e0e9:/app# cat > solution/solve.sh << 'SH'
+> #!/usr/bin/env bash
+> # Sourceable helper that delegates to Python CLI
+> SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+> ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+> PY="$ROOT_DIR/src/CSVIngester.py"
+>
+> encoding-detection() { "$PY" encoding-detection "$1"; }
+> name-standardization() { "$PY" name-standardization "$1"; }
+> type-detection() { "$PY" type-detection "$1" "$2"; }
+> date-parsing() { "$PY" date-parsing "$1" "$2"; }
+> outlier-truncate() { "$PY" outlier-truncate "$1" "$2"; }
+> dataframe-cleaning() { "$PY" dataframe-cleaning "$1" ${2:+"$2"}; }
+> dataframe-consolidation() { local out="$1"; shift; "$PY" dataframe-consolidation "$out" "$@"; }
+> file-processing() { local out="$1"; local log="$2"; shift 2; "$PY" file-processing "$out" "$log" "$@"; }
+> cleaning_log() { "$PY" cleaning_log "$1"; }
+> csv-summary() { "$PY" csv-summary "$1"; }
+> get-operations() { "$PY" get-operations "$1"; }
+> SH
+root@2cab8586e0e9:/app# chmod +x solution/solve.sh
+root@2cab8586e0e9:/app# python3 -V
+Python 3.11.14
+root@2cab8586e0e9:/app# pip -V || python3 -m ensurepip --upgrade
+pip 24.0 from /usr/local/lib/python3.11/site-packages/pip (python 3.11)
+root@2cab8586e0e9:/app# python3 -m pip install --no-input --quiet pandas>=2.0.0 numpy>=1.24.0 pytest==8.4.1
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a v
+irtual environment instead: https://pip.pypa.io/warnings/venv
+
+[notice] A new release of pip is available: 24.0 -> 25.3
+[notice] To update, run: pip install --upgrade pip
+root@2cab8586e0e9:/app# printf 'Order ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status\n1,Alice,2025-01-01,100,2,200,2025/01
+/03,Shipped\n2,Bob,01/05/2025,150,,150,01-07-2025,Pending\n3,,Jan 10, 2025,200,3,600,10-01-2025,\n4,Charlie,15-01-2025,9999,1,9999,2025.01.16,Delivered\n' > tes
+ts/test_data.csv
+root@2cab8586e0e9:/app# printf 'Order ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status\n5,Dana,2025/01/20,50,4,200,20/01/202
+5,Shipped\n6,Ed,January 22, 2025,75,5,375,22 Jan 2025,Pending\n7,Frank,1-25-2025,10,1,10,2025-01-26,Cancelled\n8,Gina,26/01/2025,,2,,2025/01/28,\n' > tests/test
+2_data.csv
+root@2cab8586e0e9:/app# printf 'ID,Date,Amount,Status\n1,2025-01-01,100.50,Active\n2,01/05/2025,200.75,Pending\n3,Jan 10 2025,150.25,Active\n' > tests/test3_dat
+a.csv
+root@2cab8586e0e9:/app# source solution/solve.sh
+root@2cab8586e0e9:/app# encoding-detection tests/test_data.csv
+bash: /app/src/CSVIngester.py: No such file or directory
+root@2cab8586e0e9:/app# name-standardization "Product Price $"
+bash: /app/src/CSVIngester.py: No such file or directory
+root@2cab8586e0e9:/app# type-detection tests/test3_data.csv Date
+bash: /app/src/CSVIngester.py: No such file or directory
+root@2cab8586e0e9:/app# date-parsing tests/test2_data.csv "Order Date"
+bash: /app/src/CSVIngester.py: No such file or directory
+root@2cab8586e0e9:/app# outlier-truncate tests/test_data.csv "Product Price $"
+bash: /app/src/CSVIngester.py: No such file or directory
+root@2cab8586e0e9:/app# file-processing tests/cleaned_data.csv tests/cleaning_log.json tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+bash: /app/src/CSVIngester.py: No such file or directory
+root@2cab8586e0e9:/app# cleaning_log tests/cleaning_log.json | head -n 40
+bash: /app/src/CSVIngester.py: No such file or directory
+root@2cab8586e0e9:/app# csv-summary tests/test_data.csv
+bash: /app/src/CSVIngester.py: No such file or directory
+root@2cab8586e0e9:/app#

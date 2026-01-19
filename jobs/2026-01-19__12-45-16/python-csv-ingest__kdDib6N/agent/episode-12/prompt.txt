@@ -1,0 +1,46 @@
+New Terminal Output:
+
+root@19c53a573b6d:/app# python3 << 'PYEOF'
+> import sys
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> import pandas as pd
+>
+> ingester = CSVIngester()
+>
+> # Test 1: Encoding detection
+> print("Test 1: Encoding detection")
+> encoding = ingester.encode_process('tests/test_data.csv')
+> print(f"  Encoding: {encoding}")
+>
+> # Test 2: Column name standardization
+> print("\nTest 2: Column name standardization")
+> test_names = ['Product Price $', 'Quantity!!', 'Order ID']
+> for name in test_names:
+>     standard = ingester.standardize_column_name(name)
+>     print(f"  {name} -> {standard}")
+>
+> # Test 3: Load and rename columns
+> print("\nTest 3: Load and rename columns")
+> df = pd.read_csv('tests/test_data.csv', encoding=encoding)
+> print(f"  Original columns: {list(df.columns)}")
+> column_mapping = {col: ingester.standardize_column_name(col) for col in df.columns}
+> df.rename(columns=column_mapping, inplace=True)
+> print(f"  Renamed columns: {list(df.columns)}")
+>
+> print("\nAll basic tests passed!")
+> PYEOF
+Test 1: Encoding detection
+  Encoding: utf-8
+
+Test 2: Column name standardization
+  Product Price $ -> product_price
+  Quantity!! -> quantity
+  Order ID -> order_id
+
+Test 3: Load and rename columns
+  Original columns: ['Order ID', 'Customer Name', 'Order Date', 'Product Price $', 'Quantity!!', 'Total Amount', 'Ship Date', 'Status']
+  Renamed columns: ['order_id', 'customer_name', 'order_date', 'product_price', 'quantity', 'total_amount', 'ship_date', 'status']
+
+All basic tests passed!
+root@19c53a573b6d:/app#

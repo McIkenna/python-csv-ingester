@@ -1,0 +1,80 @@
+New Terminal Output:
+
+root@19c53a573b6d:/app# python3 src/CSVIngester.py tests/test_data.csv tests/test2_data.csv tests/test3_data.csv -o tests/final_output.csv -l tests/final_log.js
+on 2>&1 | grep -v FutureWarning | grep -v 'inplace method'
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+Processing complete!
+Output: tests/final_output.csv
+Log: tests/final_log.json
+Rows: 30
+Columns: 22
+root@19c53a573b6d:/app# wc -l tests/final_output.csv
+31 tests/final_output.csv
+root@19c53a573b6d:/app# echo "\nCleaning up temporary test files..."
+\nCleaning up temporary test files...
+root@19c53a573b6d:/app# rm -f tests/demo_*.* tests/ops_test_*.* tests/log_ops_*.* tests/cleaning_test_*.* tests/test_output.csv tests/test_log.json tests/full_w
+orkflow_*.* tests/latin1_test.csv 2>/dev/null
+root@19c53a573b6d:/app# echo "\nFinal project structure:"
+\nFinal project structure:
+root@19c53a573b6d:/app# tree -I '__pycache__|*.pyc' -L 2 2>/dev/null || find . -type f \( -name '*.py' -o -name '*.sh' -o -name '*.csv' -o -name '*.toml' \) | g
+rep -v '__pycache__' | sort
+./solution/solve.sh
+./src/CSVIngester.py
+./src/sample1_data.csv
+./src/sample2_data.csv
+./task.toml
+./tests/final_output.csv
+./tests/generate_test_csvs.py
+./tests/test.sh
+./tests/test2_data.csv
+./tests/test3_data.csv
+./tests/test_data.csv
+./tests/test_outputs.py
+root@19c53a573b6d:/app#

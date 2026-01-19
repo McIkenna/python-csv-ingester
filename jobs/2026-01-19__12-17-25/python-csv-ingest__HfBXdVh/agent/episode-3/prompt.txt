@@ -1,0 +1,234 @@
+New Terminal Output:
+
+root@2cab8586e0e9:/app# csv-summary tests/test_data.csv
+{
+  "file": "tests/test_data.csv",
+  "rows": 4,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Order ID": 0,
+    "Customer Name": 1,
+    "Order Date": 0,
+    "Product Price $": 0,
+    "Quantity!!": 1,
+    "Total Amount": 0,
+    "Ship Date": 0,
+    "Status": 1
+  }
+}
+root@2cab8586e0e9:/app# cat > src/CSVIngester.py << 'PY'
+> #!/usr/bin/env python3
+> import sys
+> import os
+> import json
+> import argparse
+> from datetime import datetime
+> from typing import List, Dict, Any, Optional, Tuple
+> import pandas as pd
+> import numpy as np
+>
+> SUPPORTED_ENCODINGS = ['utf-8', 'utf-8-sig', 'cp1252', 'latin1', 'iso-8859-1']
+>
+> class CSVIngester:
+>     def __init__(self):
+>         self.operations: List[Dict[str, Any]] = []
+>
+>     def _log(self, operation: str, details: Dict[str, Any]):
+>         self.operations.append({
+>             'operation': operation,
+>             'details': details,
+>             'timestamp': datetime.utcnow().isoformat()
+>         })
+_max': float(clipped.max()) if clipped.notna().any() else None
+        }
+        return clipped, bounds
+
+    def logging_process(self, log_path: str):
+        wrapper = {'timestamp': datetime.utcnow().isoformat(), 'operations': s>
+>     def encode_process(self, filepath: str) -> Dict[str, Any]:
+>         result = {'file': filepath, 'encoding': None, 'status': 'failed'}
+>         if not os.path.exists(filepath):
+>             result['error'] = 'file_not_found'
+>             self._log('detect_encoding', result)
+>             return result
+>         for enc in SUPPORTED_ENCODINGS:
+>             try:
+>                 with open(filepath, 'r', encoding=enc) as f:
+>                     f.read(4096)
+>                 result['encoding'] = enc
+>                 result['status'] = 'ok'
+>                 break
+>             except Exception:
+>                 continue
+>         if result['encoding'] is None:
+>             try:
+>                 with open(filepath, 'rb') as f:
+>                     _ = f.read(4096)
+rce': file>                 result['encoding'] = 'latin1'
+>                 result['status'] = 'ok'
+      df = self.standa>             except Exception as e:
+>                 result['error'] = str(e)
+>         self._log('detect_encoding', result)
+>         return result
+>
+>     @staticmethod
+>     def standardize_column_name(name: str) -> str:
+>         if name is None:
+>             return ''
+>         s = str(name).strip().lower()
+>         import re
+>         s = re.sub(r'[^0-9a-z]+', '_', s)
+>         s = re.sub(r'_+', '_', s)
+>         s = s.strip('_')
+>         return s
+>
+>     def standardize_columns(self, df: pd.DataFrame, src: Optional[str] = None) -> pd.DataFrame:
+>         mapping = {c: self.standardize_column_name(c) for c in df.columns}
+>         df = df.rename(columns=mapping)
+>         self._log('standardize_columns', {'source': src, 'mappings': mapping})
+>         return df
+>
+>     def detect_column_type(self, series: pd.Series) -> str:
+>         s = series.dropna().astype(str).str.strip()
+>         if len(s) == 0:
+>             return 'categorical'
+>         # Try date
+>         try:
+>             parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+>             parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+>             parsed = parsed1.copy()
+>             parsed.loc[parsed1.isna()] = parsed2
+>             if parsed.notna().mean() >= 0.6:
+>                 return 'date'
+>         except Exception:
+>             pass
+>         # Try numeric
+>         num = pd.to_numeric(s.str.replace(',', '', regex=False), errors='coerce')
+>         if num.notna().mean() >= 0.6:
+ int(df[col].isna().sum())
+  >             return 'numeric'
+>         return 'categorical'
+>
+>     def date_parser(self, series: pd.Series) -> pd.Series:
+>         s = series.astype(str).where(~series.isna(), other=np.nan)
+            df[col] = df[col].fillna('Unknown')
+                miss_after = int>         parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+l].isna().sum())
+                self._log('impute_categorical>         need = parsed1.isna()
+>         if need.any():
+>             parsed2 = pd.to_datetime(s[need], errors='coerce', dayfirst=False)
+>             parsed1.loc[need] = parsed2
+>         iso = parsed1.dt.strftime('%Y-%m-%d')
+>         iso = iso.where(~parsed1.isna(), other=np.nan)
+>         return iso
+>
+>     def outlier_truncate(self, series: pd.Series) -> Tuple[pd.Series, Dict[str, Any]]:
+>         numeric = pd.to_numeric(series, errors='coerce')
+>         if numeric.notna().sum() == 0:
+elf.processed_dataframe(f))
+        if len(cleaned) == 0:
+            raise V>             bounds = {
+>                 'lower_bound': None,
+>                 'upper_bound': None,
+>              
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+t=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+tests/cleaned_single.csv
+root@2cab8586e0e9:/app# dataframe-consolidation tests/consolidated.csv tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+Traceback (most recent call last):
+  File "/app/src/CSVIngester.py", line 300, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/app/src/CSVIngester.py", line 276, in main
+    df = cli.consolidated_cleaned_dataframes(args.files)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/CSVIngester.py", line 176, in consolidated_cleaned_dataframes
+    raise ValueError('No input files provided')
+ValueError: No input files provided
+root@2cab8586e0e9:/app# file-processing tests/cleaned_data.csv tests/cleaning_log.json tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+Traceback (most recent call last):
+  File "/app/src/CSVIngester.py", line 300, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/app/src/CSVIngester.py", line 281, in main
+    _, log = cli.file_processor(args.output_file, args.log_file, args.files)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/CSVIngester.py", line 187, in file_processor
+    df = self.consolidated_cleaned_dataframes(files)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/CSVIngester.py", line 176, in consolidated_cleaned_dataframes
+    raise ValueError('No input files provided')
+ValueError: No input files provided
+root@2cab8586e0e9:/app# cleaning_log tests/cleaning_log.json | head -n 40
+csv-summary tests/test_data.csv
+{
+  "error": "log_not_found",
+  "path": "tests/cleaning_log.json"
+}
+root@2cab8586e0e9:/app# csv-summary tests/test_data.csv
+{
+  "file": "tests/test_data.csv",
+  "rows": 4,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Order ID": 0,
+    "Customer Name": 1,
+    "Order Date": 0,
+    "Product Price $": 0,
+    "Quantity!!": 1,
+    "Total Amount": 0,
+    "Ship Date": 0,
+    "Status": 1
+  }
+}
+root@2cab8586e0e9:/app#

@@ -1,0 +1,47 @@
+New Terminal Output:
+
+root@19c53a573b6d:/app# python3 << 'PYEOF'
+> import sys
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> import pandas as pd
+>
+> ingester = CSVIngester()
+>
+> # Test date parsing
+> print("Test: Date parsing")
+> test_dates = ['01-10-2023', '2023-04-02', '05.12.2023', '11/24/2023']
+> for date_str in test_dates:
+>     try:
+>         parsed = ingester.date_parser(date_str)
+>         print(f"  {date_str} -> {parsed}")
+>     except Exception as e:
+>         print(f"  {date_str} -> ERROR: {e}")
+>
+> # Test column type detection
+> print("\nTest: Column type detection")
+> df = pd.read_csv('tests/test_data.csv')
+> for col in df.columns:
+>     try:
+>         col_type = ingester.detect_column_type(df, col)
+>         print(f"  {col}: {col_type}")
+>     except Exception as e:
+>         print(f"  {col}: ERROR: {e}")
+>
+> PYEOF
+Test: Date parsing
+  01-10-2023 -> 2023-10-01
+  2023-04-02 -> 2023-04-02
+  05.12.2023 -> ERROR: redefinition of group name 'd' as group 3; was group 1 at position 75
+  11/24/2023 -> ERROR: redefinition of group name 'd' as group 3; was group 1 at position 75
+
+Test: Column type detection
+  Order ID: ERROR: redefinition of group name 'd' as group 3; was group 1 at position 75
+  Customer Name: ERROR: redefinition of group name 'd' as group 3; was group 1 at position 75
+  Order Date: ERROR: redefinition of group name 'd' as group 3; was group 1 at position 75
+  Product Price $: numeric
+  Quantity!!: numeric
+  Total Amount: numeric
+  Ship Date: ERROR: redefinition of group name 'd' as group 3; was group 1 at position 75
+  Status: ERROR: redefinition of group name 'd' as group 3; was group 1 at position 75
+root@19c53a573b6d:/app#

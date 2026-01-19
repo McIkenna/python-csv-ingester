@@ -1,0 +1,42 @@
+New Terminal Output:
+
+root@19c53a573b6d:/app# ls -la
+total 12
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 .
+drwxr-xr-x 1 root root 4096 Jan 19 18:45 ..
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 src
+root@19c53a573b6d:/app# pwd
+/app
+root@19c53a573b6d:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,215 @@
+New Terminal Output:
+
+root@2cab8586e0e9:/app# cat > src/CSVIngester.py << 'PY'
+> #!/usr/bin/env python3
+ip(lower=lower, upper=u> import sys
+> import os
+> import json
+> import argparse
+> from datetime import datetime
+> from typing import List, Dict, Any, Optional, Tuple
+na(lower) else None,
+            'upper_bound': float(upp> import pandas as pd
+> import numpy as np
+r) else None,
+     >
+> SUPPORTED_ENCODINGS = ['utf-8', 'utf-8-sig', 'cp1252', 'latin1', 'iso-8859-1']
+>
+> class CSVIngester:
+>     def __init__(self):
+>         self.operations: List[Dict[str, Any]] = []
+>
+>     def _log(self, operation: str, details: Dict[str, Any]):
+>         self.operations.append({
+>             'operation': operation,
+>             'details': details,
+>             'timestamp': datetime.utcnow().isoformat()
+>         })
+>
+>     def encode_process(self, filepath: str) -> Dict[str, Any]:
+>         result = {'file': filepath, 'encoding': None, 'status': 'failed'}
+>         if not os.path.exists(filepath):
+>             result['error'] = 'file_not_found'
+>             self._log('detect_encoding', result)
+>             return result
+>         for enc in SUPPORTED_ENCODINGS:
+) >             try:
+>                 with open(filepath, 'r', encoding=enc) as f:
+>                     f.read(4096)
+>                 result['encoding'] = enc
+>                 result['status'] = 'ok'
+>                 break
+>             except Exception:
+>                 continue
+>         if result['encoding'] is None:
+>             try:
+>                 with open(filepath, 'rb') as f:
+>                     _ = f.read(4096)
+>                 result['encoding'] = 'latin1'
+>                 result['status'] = 'ok'
+>             except Exception as e:
+>                 result['error'] = str(e)
+>         self._log('detect_encoding', result)
+>         return result
+>
+= self.standardize_columns(df, src=filepath)
+        col_types: Dict[str, str] = {col: self.detect_column_type(df[col]) for col in df.columns}
+        self._>     @staticmethod
+>     def standardize_column_name(name: str) -> str:
+>         if name is None:
+>             return ''
+>         s = str(name).strip().lower()
+>         import re
+>         s = re.sub(r'[^0-9a-z]+', '_', s)
+col].isna().sum())
+>         s = re.sub(r'_+', '_', s)
+>         s = s.strip('_')
+>         return s
+>
+ >     def standardize_columns(self, df: pd.DataFrame, src: Optional[str] = None) -> pd.DataFrame:
+>         mapping = {c: self.standardize_column_name(c) for c in df.columns}
+>         df = df.rename(columns=mapping)
+>         self._log('standardize_columns', {'source': src, 'mappings': mapping})
+>         return df
+>
+>     def detect_column_type(self, series: pd.Series) -> str:
+>         s = series.dropna().astype(str).str.strip()
+>         if len(s) == 0:
+miss_before = int(num.is>             return 'categorical'
+>         # Try date
+>         try:
+>             parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+>             parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+>             parsed = parsed1.copy()
+>             parsed.loc[parsed1.isna()] = parsed2
+>             if parsed.notna().mean() >= 0.6:
+>                 return 'date'
+>         except Exception:
+   self._log(>             pass
+>         # Try numeric
+>         num = pd.to_numeric(s.str.replace(',', '', regex=False), errors='coerce')
+>         if num.notna().mean() >= 0.6:
+>             return 'numeric'
+>         return 'categorical'
+>
+>     def date_parser(self, series: pd.Series) -> pd.Series:
+>         s = series.astype(str).where(~series.isna(), other=np.nan)
+>         parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+>         need = parsed1.isna()
+th, 'colum>         if need.any():
+>             parsed2 = pd.to_datetime(s[need], errors='coerce', dayfirst=False)
+>             parsed1.loc[need] = parsed2
+>         iso = parsed1.dt.strftime('%Y-%m-%d')
+>         iso = iso.where(~parsed1.isna(), other=np.nan)
+   raise Value>         return iso
+>
+>     def outlier_truncate(self, series: pd.Series) -> Tuple[pd.Series, Dict[str, Any]]:
+>         numeric = pd.to_numeric(series, errors='coerce')
+>         if numeric.notna().sum() == 0:
+>             bounds = {
+>                 'lower_bound': None,
+>                 'upper_bound': None,
+>                 'original_min': None,
+>                 'original_max': None,
+>                 'clipped_min': None,
+>                 'clipped_max': None
+>             }
+>             return numeric, bounds
+>         lower = numeric.quantile(0.01)
+>         upper = numeric.quantile(0.99)
+>         orig_min = float(numeric.min())
+>         orig_max = float(numeric.max())
+>         clipped = numeric.clip(lower=lower, upper=upper)
+>         bounds = {
+>             'lower_bound': float(lower) if pd.notna(lower) else None,
+>             'upper_bound': float(upper) if pd.notna(upper) else None,
+>             'original_min': orig_min,
+>             'original_max': orig
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+arsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+/app/src/CSVIngester.py:73: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed1 = pd.to_datetime(s, errors='coerce', dayfirst=True)
+/app/src/CSVIngester.py:74: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is c
+onsistent and as-expected, please specify a format.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', dayfirst=False)
+{
+  "output_file": "tests/cleaned_data.csv",
+  "log_file": "tests/cleaning_log.json",
+  "operations": 44
+}
+root@2cab8586e0e9:/app# cleaning_log tests/cleaning_log.json | head -n 40
+{
+  "timestamp": "2026-01-19T18:23:19.105747",
+  "operations": [
+    {
+      "operation": "detect_encoding",
+      "details": {
+        "file": "tests/test_data.csv",
+        "encoding": "utf-8",
+        "status": "ok"
+      },
+      "timestamp": "2026-01-19T18:23:19.050143"
+    },
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "tests/test_data.csv",
+        "rows": 4,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T18:23:19.051028"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T18:23:19.051239"
+    },
+    {
+      "operation": "detect_column_types",
+root@2cab8586e0e9:/app#

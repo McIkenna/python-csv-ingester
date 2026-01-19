@@ -1,0 +1,87 @@
+New Terminal Output:
+
+root@19c53a573b6d:/app# cat > tests/generate_test_csvs.py << 'EOF'
+> #!/usr/bin/env python3
+> """
+> Generate test CSV files with inconsistent schemas
+> """
+>
+> import pandas as pd
+> import numpy as np
+> from datetime import datetime, timedelta
+> import random
+>
+> # Set seed for reproducibility
+> np.random.seed(42)
+> random.seed(42)
+>
+> # Generate test_data.csv (Orders with various date formats)
+> orders_data = {
+>     'Order ID': ['ORD1000', 'ORD1001', 'ORD1002', 'ORD1003', 'ORD1004',
+>                  'ORD1005', 'ORD1006', 'ORD1007', 'ORD1008', 'ORD1009'],
+>     'Customer Name': ['John Smith', None, 'Bob Johnson', 'Alice Williams', 'John Smith',
+>                       'Alice Williams', 'Alice Williams', None, 'Jane Doe', 'Alice Williams'],
+>     'Order Date': ['01-10-2023', '2023-04-02', '05.12.2023', '29.08.2023', '2023/01/09',
+>                    '14-02-2023', '20.04.2023', '11/24/2023', '03/22/2023', '25.07.2023'],
+>     'Product Price $': [264.31, 171.54, None, 70.22, 318.75,
+>                         90.52, 432.03, 68.48, 481.85, 111.06],
+>     'Quantity!!': [7, 17, 17, 10, 8, 14, 2, 7, 15, 11],
+>     'Total Amount': [1850.19, 2916.22, 3317.41, 702.16, 2550.02,
+>                      1267.34, 864.05, 479.39, 7227.82, 1221.61],
+>     'Ship Date': ['09-10-2023', None, '2023-12-11', '09/07/2023', None,
+>                   None, '21.04.2023', '2023/11/29', None, '03-08-2023'],
+>     'Status': [None, 'Shipped', None, None, None,
+>                'Cancelled', 'Cancelled', None, None, 'Shipped']
+> }
+>
+> df1 = pd.DataFrame(orders_data)
+> df1.to_csv('tests/test_data.csv', index=False)
+> print("Generated tests/test_data.csv")
+>
+> # Generate test2_data.csv (Inventory with different schema)
+> inventory_data = {
+>     'SKU#': ['SKU-3000', 'SKU-3001', 'SKU-3002', 'SKU-3003', 'SKU-3004',
+>              'SKU-3005', 'SKU-3006', 'SKU-3007', 'SKU-3008', 'SKU-3009'],
+>     'Product  Name': ['Monitor', 'Mouse', 'Chair', 'Monitor', 'Mouse',
+>                       'Keyboard', 'Monitor', 'Mouse', 'Laptop', 'Desk'],
+>     'stock_qty': [261, 431, 406, 411, 124, 375, 43, 13930, 266, 6],  # Note: 13930 is outlier
+>     'Unit Cost ($)': [32.31, 194.72, 1994.93, 1763.16, 1402.72,
+>                       1195.11, 1893.11, 399.45, 1170.19, 32.92],
+>     'Last Restock': ['2023-11-11', '23-09-2023', '2023/10/15', '2023/11/08', '2023-10-28',
+>                      '04-08-2023', '05-12-2023', '08/04/2023', '2023/11/24', '08/22/2023'],
+>     'Supplier': [None, 'MegaStore', None, 'GlobalTech', 'GlobalTech',
+>                  'OfficeSupply Inc', 'GlobalTech', 'TechCorp', None, 'OfficeSupply Inc'],
+>     'Category Type': ['Accessories', 'Accessories', 'Electronics', 'Accessories', 'Accessories',
+>                       None, 'Electronics', 'Accessories', None, 'Accessories']
+> }
+>
+> df2 = pd.DataFrame(inventory_data)
+> df2.to_csv('tests/test2_data.csv', index=False)
+> print("Generated tests/test2_data.csv")
+>
+> # Generate test3_data.csv (Employee data with yet another schema)
+> employee_data = {
+>     'EMP-ID': ['E001', 'E002', 'E003', 'E004', 'E005', 'E006', 'E007', 'E008', 'E009', 'E010'],
+>     'Full Name': ['John Doe', 'Jane Smith', None, 'Bob Wilson', 'Alice Brown',
+>                   'Charlie Davis', None, 'Eve Martinez', 'Frank Johnson', 'Grace Lee'],
+>     'Department': ['IT', 'HR', 'IT', None, 'Finance', 'IT', 'HR', 'Finance', None, 'IT'],
+>     'Salary ($)': [75000, 65000, 80000, None, 72000, 85000, 68000, 78000, 71000, 95000],
+>     'Hire-Date': ['Jan 15, 2020', '2021-03-22', '15/06/2019', '2022/01/10', '20.05.2021',
+>                   '2020-11-30', '08-07-2021', '2019/09/15', '03/12/2020', '2021.08.25'],
+>     'Performance Score': [8.5, 7.2, 9.1, 6.8, None, 8.8, 7.5, 8.2, 7.9, 9.3],
+>     'Active': ['Yes', 'Yes', 'Yes', 'No', 'Yes', 'Yes', 'Yes', None, 'Yes', 'Yes']
+> }
+>
+> df3 = pd.DataFrame(employee_data)
+> df3.to_csv('tests/test3_data.csv', index=False)
+> print("Generated tests/test3_data.csv")
+>
+> print("\nAll test CSV files generated successfully!")
+> EOF
+root@19c53a573b6d:/app# python3 tests/generate_test_csvs.py
+Generated tests/test_data.csv
+Generated tests/test2_data.csv
+Generated tests/test3_data.csv
+
+All test CSV files generated successfully!
+root@19c53a573b6d:/app#

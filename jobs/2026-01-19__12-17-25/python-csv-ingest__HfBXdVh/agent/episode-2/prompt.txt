@@ -1,0 +1,219 @@
+New Terminal Output:
+
+root@2cab8586e0e9:/app# cat > src/CSVIngester.py << 'PY'
+> #!/usr/bin/env python3
+> import sys
+> import os
+> import json
+> import argparse
+> from datetime import datetime
+> from typing import List, Dict, Any, Optional, Tuple
+> import pandas as pd
+       orig_min = float(numeric.min())
+        orig_max = float(numeric.max())
+        clipped = numeric.clip(lower=lower, upper=u> import numpy as np
+>
+> SUPPORTED_ENCODINGS = [
+>     'utf-8', 'utf-8-sig', 'cp1252', 'latin1', 'iso-8859-1'
+> ]
+>
+> class CSVIngester:
+>     def __init__(self):
+>         self.operations: List[Dict[str, Any]] = []
+>
+>     def _log(self, operation: str, details: Dict[str, Any]):
+>         self.operations.append({
+>             'operation': operation,
+>             'details': details,
+>             'timestamp': datetime.utcnow().isoformat()
+>         })
+>
+>     def encode_process(self, filepath: str) -> Dict[str, Any]:
+>         result = {'file': filepath, 'encoding': None, 'status': 'failed'}
+>         if not os.path.exists(filepath):
+>             result['error'] = 'file_not_found'
+>             self._log('detect_encoding', result)
+>             return result
+>         for enc in SUPPORTED_ENCODINGS:
+>             try:
+log(self, log_path: str) -> Dict[str, >                 with open(filepath, 'r', encoding=enc) as f:
+>                     f.read(4096)
+>                 result['encoding'] = enc
+>                 result['status'] = 'ok'
+>                 break
+>             except Exception:
+>                 continue
+>         if result['encoding'] is None:
+>             try:
+>                 with open(filepath, 'rb') as f:
+>                     _ = f.read(4096)
+>                 result['encoding'] = 'latin1'
+>                 result['status'] = 'ok'
+>             except Exception as e:
+>                 result['error'] = str(e)
+>         self._log('detect_encoding', result)
+>         return result
+>
+>     @staticmethod
+>     def standardize_column_name(name: str) -> str:
+>         if name is None:
+>             return ''
+>         s = str(name).strip().lower()
+>         import re
+>         s = re.sub(r'[^0-9a-z]+', '_', s)
+col in df.columns:
+            ctype = self.detect>         s = re.sub(r'_+', '_', s)
+>         s = s.strip('_')
+ype(df[col])
+            col_types[col] = ctype
+  >         return s
+  self._log('>
+>     def standardize_columns(self, df: pd.DataFrame, src: Optional[str] = None) -> pd.DataFrame:
+>         mapping = {c: self.standardize_column_name(c) for c in df.columns}
+>         df = df.rename(columns=mapping)
+>         self._log('standardize_columns', {
+      >             'source': src,
+>             'mappings': mapping
+>         })
+>         return df
+>
+>     def detect_column_type(self, series: pd.Series) -> str:
+>         s = series.dropna().astype(str).str.strip()
+>         if len(s) == 0:
+>             return 'categorical'
+>         try:
+er_na
+                })
+  >             parsed1 = pd.to_datetime(s, errors='coerce', infer_datetime_format=True, dayfirst=True)
+>             parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', infer_datetime_format=True, dayfirst=False)
+>             parsed = parsed1.copy()
+>             parsed.loc[parsed1.isna()] = parsed2
+>             date_ratio = parsed.notna().mean()
+>         except Exception:
+>             date_ratio = 0.0
+>         if date_ratio >= 0.6:
+>             return 'date'
+>         num = pd.to_numeric(s.str.replace(',', '', regex=False), errors='coerce')
+>         if num.notna().mean() >= 0.6:
+>             return 'numeric'
+>         return 'categorical'
+>
+>     def date_parser(self, series: pd.Series) -> pd.Series:
+>         s = series.astype(str).where(~series.isna(), other=np.nan)
+)
+                self._log('impute_numeric', {
+                    'source': filepath,
+                    'column': col,
+                    'strategy': 'median',
+                    'median': median,
+                    'missing_before': miss_before,
+                    'missing_after': miss_after
+             >         parsed1 = pd.to_datetime(s, errors='coerce', infer_datetime_format=True, dayfirst=True)
+>         need = parsed1.isna()
+>         if need.any():
+>             parsed2 = pd.to_datetime(s[need], errors='coerce', infer_datetime_format=True, dayfirst=False)
+                   **bounds
+                })
+            elif t == 'categorical':
+                miss_before = int(df[col].isn>             parsed1.loc[need] = parsed2
+>         iso = parsed1.dt.strftime('%Y-%m-%d')
+>         iso = iso.where(~parsed1.isna(), other=np.nan)
+>         return iso
+>
+>     def outlier_truncate(self, series: pd.Series) -> Tuple[pd.Series, Dict[str, Any]]:
+>         numeric = pd.to_numeric(series, errors='coerce')
+>         if numeric.notna().sum() == 0:
+>             bounds = {
+>                 'lower_bound': None,
+>                 'upper_bound': None,
+>                 'original_min': None,
+>                 'original_max': None,
+>               
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+025/01/20,50,4,200,20/01/2025,Shipped
+> 6,Ed,"January 22, 2025",75,5,375,22 Jan 2025,Pending
+> 7,Frank,1-25-2025,10,1,10,2025-01-26,Cancelled
+> 8,Gina,26/01/2025,,2,,2025/01/28,
+> CSV
+root@2cab8586e0e9:/app# sed -n '1,40p' tests/test2_data.csv
+Order ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status
+5,Dana,2025/01/20,50,4,200,20/01/2025,Shipped
+6,Ed,"January 22, 2025",75,5,375,22 Jan 2025,Pending
+7,Frank,1-25-2025,10,1,10,2025-01-26,Cancelled
+8,Gina,26/01/2025,,2,,2025/01/28,
+root@2cab8586e0e9:/app# sed -n '1,40p' tests/test3_data.csv
+ID,Date,Amount,Status
+1,2025-01-01,100.50,Active
+2,01/05/2025,200.75,Pending
+3,Jan 10 2025,150.25,Active
+root@2cab8586e0e9:/app# source solution/solve.sh
+root@2cab8586e0e9:/app# encoding-detection tests/test_data.csv
+name-standardization "Product Price $"
+{
+  "file": "tests/test_data.csv",
+  "encoding": "utf-8",
+  "status": "ok"
+}
+root@2cab8586e0e9:/app# name-standardization "Product Price $"
+type-detection tests/test3_data.csv Date
+product_price
+root@2cab8586e0e9:/app# type-detection tests/test3_data.csv Date
+date-parsing tests/test2_data.csv "Order Date"
+/app/src/CSVIngester.py:77: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it is n
+ow the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed1 = pd.to_datetime(s, errors='coerce', infer_datetime_format=True, dayfirst=True)
+/app/src/CSVIngester.py:78: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it is n
+ow the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed2 = pd.to_datetime(s[parsed1.isna()], errors='coerce', infer_datetime_format=True, dayfirst=False)
+date
+root@2cab8586e0e9:/app# date-parsing tests/test2_data.csv "Order Date"
+/app/src/CSVIngester.py:93: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it is n
+ow the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed1 = pd.to_datetime(s, errors='coerce', infer_datetime_format=True, dayfirst=True)
+/app/src/CSVIngester.py:93: UserWarning: Parsing dates in %Y/%m/%d format when dayfirst=True was specified. Pass `dayfirst=False` or specify a format to silence
+ this warning.
+  parsed1 = pd.to_datetime(s, errors='coerce', infer_datetime_format=True, dayfirst=True)
+/app/src/CSVIngester.py:96: UserWarning: The argument 'infer_datetime_format' is deprecated and will be removed in a future version. A strict version of it is n
+ow the default, see https://pandas.pydata.org/pdeps/0004-consistent-to-datetime-parsing.html. You can safely remove this argument.
+  parsed2 = pd.to_datetime(s[need], errors='coerce', infer_datetime_format=True, dayfirst=False)
+{"first_5": ["2025-01-20", "2025-01-22", NaN, NaN]}
+root@2cab8586e0e9:/app# outlier-truncate tests/test_data.csv "Product Price $"
+{
+  "lower_bound": 101.5,
+  "upper_bound": 9705.029999999997,
+  "original_min": 100.0,
+  "original_max": 9999.0,
+  "clipped_min": 101.5,
+  "clipped_max": 9705.029999999997
+}
+root@2cab8586e0e9:/app# file-processing tests/cleaned_data.csv tests/cleaning_log.json tests/test_data.csv tests/test2_data.csv tests/test3_data.csv
+Traceback (most recent call last):
+  File "/app/src/CSVIngester.py", line 394, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/app/src/CSVIngester.py", line 369, in main
+    _, log = cli.file_processor(args.output_file, args.log_file, args.files)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/CSVIngester.py", line 221, in file_processor
+    df = self.consolidated_cleaned_dataframes(files)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/CSVIngester.py", line 212, in consolidated_cleaned_dataframes
+    out = pd.concat(cleaned, ignore_index=True, sort=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pandas/core/reshape/concat.py", line 382, in concat
+    op = _Concatenator(
+         ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pandas/core/reshape/concat.py", line 445, in __init__
+    objs, keys = self._clean_keys_and_objs(objs, keys)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pandas/core/reshape/concat.py", line 507, in _clean_keys_and_objs
+    raise ValueError("No objects to concatenate")
+ValueError: No objects to concatenate
+root@2cab8586e0e9:/app# cleaning_log tests/cleaning_log.json | head -n 40
+csv-summary tests/test_data.csv
+{
+  "error": "log_not_found",
+  "path": "tests/cleaning_log.json"
+}
+root@2cab8586e0e9:/app# csv-summary tests/test_data.csv
+

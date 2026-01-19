@@ -1,0 +1,284 @@
+New Terminal Output:
+
+root@19c53a573b6d:/app# cat > solution/solve.sh << 'EOF'
+> #!/bin/bash
+>
+> # Source this file to use the functions
+> # Usage: source solution/solve.sh
+>
+> PYTHON_SCRIPT="src/CSVIngester.py"
+>
+> # Function to detect encoding
+nction to process files (full pipeline)
+file-processing() {
+    local output_file="$1"
+    local log_file="$2"
+ > encoding-detection() {
+>     local filepath="$1"
+>     if [ -z "$filepath" ]; then
+>         echo "Error: filepath required" >&2
+>         return 1
+>     fi
+>
+ut_fi>     python3 -c "
+> import sys
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> result = ingester.encode_process('$filepath')
+> if result:
+>     print(result)
+> else:
+>     print('Could not detect encoding', file=sys.stderr)
+>     sys.exit(1)
+> "
+> }
+>
+> # Function to standardize column name
+> name-standardization() {
+>     local column_name="$1"
+>     if [ -z "$column_name" ]; then
+>         echo "Error: column_name required" >&2
+>         return 1
+>     fi
+>
+>     python3 -c "
+> import sys
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> result = ingester.standardize_column_name('$column_name')
+> print(result)
+> "
+> }
+>
+> # Function to detect column type
+> type-detection() {
+nsert(0, '>     local csv_file="$1"
+>     local column_name="$2"
+>
+>     if [ -z "$csv_file" ] || [ -z "$column_name" ]; then
+>         echo "Error: csv_file and column_name required" >&2
+>         return 1
+>     fi
+>
+>     python3 -c "
+> import sys
+> import pandas as pd
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> encoding = ingester.encode_process('$csv_file')
+> df = pd.read_csv('$csv_file', encoding=encoding)
+> result = ingester.detect_column_type(df, '$column_name')
+> print(result)
+> "
+> }
+>
+> # Function to parse dates
+> date-parsing() {
+>     local csv_file="$1"
+>     local column_name="$2"
+>
+>     if [ -z "$csv_file" ] || [ -z "$column_name" ]; then
+>         echo "Error: csv_file and column_name required" >&2
+>         return 1
+>     fi
+>
+>     python3 -c "
+> import sys
+> import pandas as pd
+> import json
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> encoding = ingester.encode_process('$csv_file')
+> df = pd.read_csv('$csv_file', encoding=encoding)
+> parsed = df['$column_name'].apply(ingester.date_parser).dropna().tolist()
+> print(json.dumps(parsed, indent=2))
+> "
+> }
+>
+> # Function to truncate outliers
+> outlier-truncate() {
+>     local csv_file="$1"
+>     local column_name="$2"
+>
+>     if [ -z "$csv_file" ] || [ -z "$column_name" ]; then
+>         echo "Error: csv_file and column_name required" >&2
+>         return 1
+>     fi
+>
+>     python3 -c "
+> import sys
+ut_file]"
+echo "  - dataframe-cons> import pandas as pd
+> import json
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> encoding = ingester.encode_process('$csv_file')
+"  - csv-s> df = pd.read_csv('$csv_file', encoding=encoding)
+> result = ingester.outlier_truncate(df, '$column_name')
+> print(json.dumps(result, indent=2))
+> "
+> }
+>
+> # Function to clean a single dataframe
+> dataframe-cleaning() {
+>     local csv_file="$1"
+>     local output_file="${2:-cleaned_output.csv}"
+>
+>     if [ -z "$csv_file" ]; then
+>         echo "Error: csv_file required" >&2
+>         return 1
+>     fi
+>
+>     python3 -c "
+> import sys
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> df, _ = ingester.processed_dataframe('$csv_file')
+> df.to_csv('$output_file', index=False)
+> print('Cleaned data saved to $output_file')
+> "
+> }
+>
+> # Function to consolidate multiple dataframes
+> dataframe-consolidation() {
+>     local output_file="$1"
+>     shift
+>     local files=("$@")
+>
+>     if [ -z "$output_file" ] || [ ${#files[@]} -eq 0 ]; then
+>         echo "Error: output_file and at least one input file required" >&2
+>         return 1
+>     fi
+>
+>     local files_str=$(printf ",'%s'" "${files[@]}")
+>     files_str="[${files_str:1}]"
+>
+>     python3 -c "
+> import sys
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> files = $files_str
+> processed = []
+> for f in files:
+>     df, src = ingester.processed_dataframe(f)
+>     processed.append((df, src))
+> consolidated = ingester.consolidated_cleaned_dataframes(processed)
+> consolidated.to_csv('$output_file', index=False)
+> print('Consolidated data saved to $output_file')
+> print(f'Total rows: {len(consolidated)}')
+> print(f'Total columns: {len(consolidated.columns)}')
+> "
+> }
+>
+> # Function to process files (full pipeline)
+> file-processing() {
+>     local output_file="$1"
+>     local log_file="$2"
+>     shift 2
+>     local files=("$@")
+>
+>     if [ -z "$output_file" ] || [ -z "$log_file" ] || [ ${#files[@]} -eq 0 ]; then
+>         echo "Error: output_file, log_file and at least one input file required" >&2
+>         return 1
+>     fi
+>
+>     local files_str=$(printf " '%s'" "${files[@]}")
+>
+>     python3 "$PYTHON_SCRIPT" $files_str -o "$output_file" -l "$log_file"
+> }
+>
+> # Function to view cleaning log
+> cleaning_log() {
+>     local log_file="${1:-cleaning_log.json}"
+>
+>     if [ ! -f "$log_file" ]; then
+>         echo "Error: log file not found: $log_file" >&2
+>         return 1
+>     fi
+>
+>     cat "$log_file"
+> }
+>
+> # Function to get CSV summary
+> csv-summary() {
+>     local csv_file="$1"
+>
+>     if [ -z "$csv_file" ]; then
+>         echo "Error: csv_file required" >&2
+>         return 1
+>     fi
+>
+>     python3 -c "
+> import sys
+> import pandas as pd
+> import json
+> sys.path.insert(0, 'src')
+> from CSVIngester import CSVIngester
+> ingester = CSVIngester()
+> encoding = ingester.encode_process('$csv_file')
+> df = pd.read_csv('$csv_file', encoding=encoding)
+>
+> missing = {}
+> for col in df.columns:
+>     missing_count = df[col].isna().sum()
+>     if missing_count > 0:
+>         missing[col] = int(missing_count)
+>
+> summary = {
+>     'file': '$csv_file',
+>     'rows': len(df),
+>     'columns': len(df.columns),
+>     'column_names': df.columns.tolist(),
+>     'missing_values': missing
+> }
+>
+> print(json.dumps(summary, indent=2))
+> "
+> }
+>
+> # Function to get operations from log
+> get-operations() {
+>     local log_file="$1"
+>
+>     if [ -z "$log_file" ]; then
+>         echo "Error: log_file required" >&2
+>         return 1
+>     fi
+>
+>     if [ ! -f "$log_file" ]; then
+>         echo "Error: log file not found: $log_file" >&2
+>         return 1
+>     fi
+>
+>     python3 -c "
+> import json
+> with open('$log_file', 'r') as f:
+>     data = json.load(f)
+>     operations = data.get('operations', [])
+>     print(json.dumps(operations, indent=2))
+> "
+> }
+>
+> echo "CSV Ingester shell functions loaded."
+> echo "Available commands:"
+> echo "  - encoding-detection <filepath>"
+> echo "  - name-standardization <column_name>"
+> echo "  - type-detection <csv_file> <column_name>"
+> echo "  - date-parsing <csv_file> <column_name>"
+> echo "  - outlier-truncate <csv_file> <column_name>"
+> echo "  - dataframe-cleaning <csv_file> [output_file]"
+> echo "  - dataframe-consolidation <output_file> <file1> <file2> ..."
+> echo "  - file-processing <output_file> <log_file> <file1> <file2> ..."
+> echo "  - cleaning_log [log_file]"
+> echo "  - csv-summary <csv_file>"
+> echo "  - get-operations <log_file>"
+> EOF
+root@19c53a573b6d:/app# chmod +x solution/solve.sh
+root@19c53a573b6d:/app#

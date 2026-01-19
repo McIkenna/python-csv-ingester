@@ -257,7 +257,7 @@ def test_detect_nonexistent_column(mock_test_data_three, solve_sh_path):
         f'"{mock_test_data_three}" "NonExistent"',
         solve_sh_path
     )
-    assert returncode == 0
+    assert returncode == 1
     assert "not found" in stdout.lower()
 
 
@@ -582,7 +582,7 @@ def test_get_cleaning_log(mock_test_data, solve_sh_path):
         
         # Now, get cleaning log
         stdout, stderr, returncode = run_bash_command(
-            "cleaning_log",
+            "cleaning-log",
             f'"{log_file}"',
             solve_sh_path
         )
@@ -602,7 +602,7 @@ def test_get_cleaning_log_nonexistent_file(solve_sh_path):
         fake_log_file = os.path.join('tests', "nonexistent_log.json")
         
         stdout, stderr, returncode = run_bash_command(
-            "cleaning_log",
+            "cleaning-log",
             f'"{fake_log_file}"',
             solve_sh_path
         )

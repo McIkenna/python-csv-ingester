@@ -1,0 +1,17 @@
+New Terminal Output:
+
+root@19c53a573b6d:/app# python3 src/CSVIngester.py tests/test_data.csv tests/test2_data.csv -o tests/demo_output.csv -l tests/demo_log.json
+Error processing tests/test_data.csv: redefinition of group name 'd' as group 3; was group 1 at position 75
+Error processing tests/test2_data.csv: redefinition of group name 'd' as group 3; was group 1 at position 75
+Processing complete!
+Output: tests/demo_output.csv
+Log: tests/demo_log.json
+Rows: 0
+Columns: 0
+root@19c53a573b6d:/app# echo "Checking output files..."
+Checking output files...
+root@19c53a573b6d:/app# ls -lh tests/demo_*.* 2>/dev/null || echo "Output files created"
+-rw-r--r-- 1 root root 1.5K Jan 19 18:49 tests/demo_log.json
+root@19c53a573b6d:/app# head -5 tests/demo_output.csv
+head: cannot open 'tests/demo_output.csv' for reading: No such file or directory
+root@19c53a573b6d:/app#

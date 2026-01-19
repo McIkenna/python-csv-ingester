@@ -1,0 +1,309 @@
+New Terminal Output:
+
+root@522eced4d5b6:/app# ls -la
+total 12
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 .
+drwxr-xr-x 1 root root 4096 Jan 19 18:36 ..
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 src
+root@522eced4d5b6:/app# ls -la src solution tests || true
+ls: cannot access 'solution': No such file or directory
+ls: cannot access 'tests': No such file or directory
+src:
+total 16
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 .
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 ..
+-rw-r--r-- 1 root root  874 Jan  6 04:31 sample1_data.csv
+-rw-r--r-- 1 root root  768 Jan  6 04:17 sample2_data.csv
+root@522eced4d5b6:/app# sed -n '1,200p' tests/test_outputs.py
+sed: can't read tests/test_outputs.py: No such file or directory
+root@522eced4d5b6:/app# sed -n '200,400p' tests/test_outputs.py
+sed: can't read tests/test_outputs.py: No such file or directory
+root@522eced4d5b6:/app# sed -n '1,200p' instruction.md
+sed: can't read instruction.md: No such file or directory
+root@522eced4d5b6:/app# sed -n '1,200p' task.toml
+sed: can't read task.toml: No such file or directory
+root@522eced4d5b6:/app# sed -n '1,200p' tests/test.sh 2>/dev/null || true
+root@522eced4d5b6:/app# sed -n '1,200p' src/CSVIngester.py 2>/dev/null || true
+root@522eced4d5b6:/app# sed -n '1,120p' solution/solve.sh 2>/dev/null || true
+root@522eced4d5b6:/app# sed -n '1,200p' tests/test_data.csv
+sed: can't read tests/test_data.csv: No such file or directory
+root@522eced4d5b6:/app# sed -n '1,200p' tests/test2_data.csv
+sed: can't read tests/test2_data.csv: No such file or directory
+root@522eced4d5b6:/app# sed -n '1,200p' tests/test3_data.csv
+sed: can't read tests/test3_data.csv: No such file or directory
+root@522eced4d5b6:/app# python3 -V
+Python 3.11.14
+root@522eced4d5b6:/app# pip -V
+python3 - << 'PY'
+import os, textwrap, pathlib
+pathlib.Path('src').mkdir(exist_ok=True)
+code = r'''#!/usr/bin/env python3
+import argparse
+import json
+import sys
+import re
+from datetime import datetime
+from typing import List, Dict, Any, Optional
+import pandas as pd
+import numpy as np
+from pathlib import Path
+
+DATE_FORMATS = [
+    '%Y-%m-%d','%Y/%m/%d','%Y.%m.%d',
+    '%m/%d/%Y','%m/%d/%y','%m-%d-%Y','%m-%d-%y',
+    '%d/%m/%Y','%d.%m.%Y','%d-%m-%Y','%d-%m-%y',
+    '%b %d, %Y','%d %b %Y','%B %d, %Y','%d %B %Y','%b %d %Y','%B %d %Y'
+]
+
+ENCODINGS = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+
+
+def standardize_column_name(name: str) -> str:
+    if name is None:
+        return ''
+    s = str(name)
+    s = s.strip()
+    s = s.lower()
+    s = re.sub(r'[^0-9a-zA-Z]+', ' ', s)
+    s = s.strip()
+    s = re.sub(r'\s+', '_', s)
+    return s
+
+
+def detect_encoding(filepath: str) -> str:
+    for enc in ENCODINGS:
+        try:
+            with open(filepath, 'r', encoding=enc) as f:
+                f.read(4096)
+            return enc
+        except Exception:
+            continue
+    return 'utf-8'
+
+
+def parse_date_value(val: Any) -> Optional[str]:
+    if pd.isna(val):
+        return None
+    s = str(val).strip()
+    if s == '':
+        return None
+    # Try pandas to_datetime first with dayfirst ambiguity handling
+    try:
+        dt = pd.to_datetime(s, errors='raise', dayfirst=False)
+        return dt.date().isoformat()
+    except Exception:
+        pass
+    # Try known formats explicitly
+    for fmt in DATE_FORMATS:
+        try:
+            dt = datetime.strptime(s, fmt)
+            return dt.date().isoformat()
+        except Exception:
+            continue
+    # Try dayfirst=True if looks like dd/mm/yyyy
+    try:
+        dt = pd.to_datetime(s, errors='raise', dayfirst=True)
+        return dt.date().isoformat()
+    except Exception:
+        return None
+
+
+def detect_column_type(series: pd.Series) -> str:
+    # Heuristic: if convertible to numeric for most values -> numeric
+    non_na = series.dropna().astype(str)
+    if non_na.empty:
+        return 'categorical'
+    # Date detection: if a majority parse as dates
+    parsed = non_na.apply(lambda x: parse_date_value(x) is not None)
+    if len(parsed) > 0 and parsed.mean() >= 0.6:
+        return 'date'
+    # Numeric detection
+    def to_num(x):
+        try:
+            float(str(x).replace(',', ''))
+            return True
+        except Exception:
+            return False
+    is_num = non_na.apply(to_num)
+    if len(is_num) > 0 and is_num.mean() >= 0.8:
+        return 'numeric'
+    return 'categorical'
+
+
+def clip_outliers_numeric(series: pd.Series) -> Dict[str, Any]:
+    s = pd.to_numeric(series, errors='coerce')
+    if s.dropna().empty:
+        return {
+            'lower_bound': None, 'upper_bound': None,
+            'original_min': None, 'original_max': None,
+            'clipped_min': None, 'clipped_max': None
+        }
+    lb = s.quantile(0.01)
+    ub = s.quantile(0.99)
+    orig_min = float(s.min()) if not s.empty else None
+    orig_max = float(s.max()) if not s.empty else None
+    s_clipped = s.clip(lower=lb, upper=ub)
+    res = {
+        'lower_bound': float(lb) if pd.notna(lb) else None,
+        'upper_bound': float(ub) if pd.notna(ub) else None,
+        'original
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+_values': missing
+>     }
+>
+>
+> def main(argv=None):
+>     argv = argv if argv is not None else sys.argv[1:]
+>     args = build_arg_parser().parse_args(argv)
+>
+>     # Utility modes
+>     if args.get_operations:
+>         try:
+>             with open(args.get_operations, 'r', encoding='utf-8') as f:
+>                 data = json.load(f)
+>             print(json.dumps(data.get('operations', []), indent=2))
+>         except FileNotFoundError:
+>             print(json.dumps({'error': 'log_not_found'}))
+>         return 0
+>
+>     if args.standardize_name is not None:
+>         print(standardize_column_name(args.standardize_name))
+>         return 0
+>
+>     if args.detect_encoding is not None:
+>         print(detect_encoding(args.detect_encoding))
+>         return 0
+>
+>     if args.column_type is not None:
+>         csv_path, column = args.column_type
+>         enc = detect_encoding(csv_path)
+>         df = pd.read_csv(csv_path, encoding=enc)
+>         # Allow non-standardized column names: try exact, else try standardized mapping
+>         if column not in df.columns:
+>             lookup = {standardize_column_name(c): c for c in df.columns}
+>             if column in lookup:
+>                 column = lookup[column]
+>         if column not in df.columns:
+>             print(json.dumps({'error': 'column_not_found'}))
+>             return 1
+>         print(detect_column_type(df[column]))
+>         return 0
+>
+>     if args.outlier_stats is not None:
+>         csv_path, column = args.outlier_stats
+>         enc = detect_encoding(csv_path)
+>         df = pd.read_csv(csv_path, encoding=enc)
+>         if column not in df.columns:
+>             lookup = {standardize_column_name(c): c for c in df.columns}
+>             if column in lookup:
+>                 column = lookup[column]
+>         if column not in df.columns:
+>             print(json.dumps({'error': 'column_not_found'}))
+>             return 1
+>         stats = clip_outliers_numeric(df[column])
+>         print(json.dumps(stats, indent=2))
+>         return 0
+>
+>     if args.summary:
+>         try:
+>             print(json.dumps(csv_summary(args.files[0]), indent=2))
+>         except Exception as e:
+>             print(json.dumps({'error': str(e)}))
+>             return 1
+>         return 0
+>
+>     # Default: process files
+>     ingester = CSVIngester()
+>     if not args.files:
+>         print(json.dumps({'error': 'no_input_files'}))
+>         return 1
+>     log = ingester.file_processor(args.output, args.log, args.files)
+>     print(json.dumps({'output': args.output, 'log': args.log, 'rows': int(len(log.get('operations', [])))}))
+>     return 0
+>
+>
+> if __name__ == '__main__':
+>     sys.exit(main())
+> '''
+> open('src/CSVIngester.py','w').write(code)
+> os.chmod('src/CSVIngester.py', 0o755)
+> print('Wrote src/CSVIngester.py')
+> PY
+Wrote src/CSVIngester.py
+root@522eced4d5b6:/app# python3 - << 'PY'
+> import os, pathlib
+> pathlib.Path('solution').mkdir(exist_ok=True)
+> sh = r'''#!/usr/bin/env bash
+> # Shell interface wrapping CSVIngester.py
+> SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+> ROOT_DIR=$(cd "$SCRIPT_DIR/.." && pwd)
+> PY="$ROOT_DIR/src/CSVIngester.py"
+>
+> encoding-detection() {
+>   python3 "$PY" --detect-encoding "$1"
+> }
+>
+> name-standardization() {
+>   python3 "$PY" --standardize-name "$1"
+> }
+>
+> type-detection() {
+>   python3 "$PY" --column-type "$1" "$2"
+> }
+>
+> date-parsing() {
+>   # Not a direct parser; we will process summary for now
+>   echo "Use dataframe-cleaning to parse dates." 1>&2
+> }
+>
+> outlier-truncate() {
+>   python3 "$PY" --outlier-stats "$1" "$2"
+> }
+>
+> dataframe-cleaning() {
+>   local input="$1"; shift
+>   local out="${1:-tests/cleaned_data.csv}"
+>   python3 "$PY" -o "$out" -l tests/cleaning_log.json "$input"
+> }
+>
+> dataframe-consolidation() {
+>   local out="$1"; shift
+>   python3 "$PY" -o "$out" -l tests/cleaning_log.json "$@"
+> }
+>
+> file-processing() {
+>   local out="$1"; shift
+>   local log="$1"; shift
+>   python3 "$PY" -o "$out" -l "$log" "$@"
+> }
+>
+> cleaning_log() {
+>   local log="${1:-tests/cleaning_log.json}"
+>   cat "$log"
+> }
+>
+> csv-summary() {
+>   python3 "$PY" --summary "$1"
+> }
+>
+> get-operations() {
+>   python3 "$PY" --get-operations "$1"
+> }
+> '''
+> open('solution/solve.sh','w').write(sh)
+> os.chmod('solution/solve.sh', 0o755)
+> print('Wrote solution/solve.sh')
+> PY
+Wrote solution/solve.sh
+root@522eced4d5b6:/app# chmod +x src/CSVIngester.py solution/solve.sh 2>/dev/null || true
+root@522eced4d5b6:/app# pip install -q pandas numpy pytest
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a v
+irtual environment instead: https://pip.pypa.io/warnings/venv
+
+[notice] A new release of pip is available: 24.0 -> 25.3
+[notice] To update, run: pip install --upgrade pip
+root@522eced4d5b6:/app# pytest -q tests/test_outputs.py -q
+
+ERROR: file or directory not found: tests/test_outputs.py
+
+root@522eced4d5b6:/app#

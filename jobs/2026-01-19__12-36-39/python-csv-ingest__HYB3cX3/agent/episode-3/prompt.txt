@@ -1,0 +1,182 @@
+New Terminal Output:
+
+CSV summary:
+{
+  "file": "src/sample1_data.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Order ID": 0,
+    "Customer Name": 3,
+    "Order Date": 0,
+    "Product Price $": 1,
+    "Quantity!!": 0,
+    "Total Amount": 0,
+    "Ship Date": 4,
+    "Status": 6
+  }
+}
+root@522eced4d5b6:/app# python3 src/CSVIngester.py --summary src/sample1_data.csv
+{
+  "file": "src/sample1_data.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Order ID": 0,
+    "Customer Name": 3,
+    "Order Date": 0,
+    "Product Price $": 1,
+    "Quantity!!": 0,
+    "Total Amount": 0,
+    "Ship Date": 4,
+    "Status": 6
+  }
+}
+root@522eced4d5b6:/app# . solution/solve.sh && csv-summary src/sample1_data.csv
+{
+  "file": "src/sample1_data.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Order ID": 0,
+    "Customer Name": 3,
+    "Order Date": 0,
+    "Product Price $": 1,
+    "Quantity!!": 0,
+    "Total Amount": 0,
+    "Ship Date": 4,
+    "Status": 6
+  }
+}
+root@522eced4d5b6:/app# . solution/solve.sh && echo 'Type detection (Order Date):' && type-detection src/sample1_data.csv 'Order Date'
+Type detection (Order Date):
+/app/src/CSVIngester.py:53: UserWarning: Parsing dates in %d.%m.%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify a for
+mat to silence this warning.
+  dt = pd.to_datetime(s, errors='raise', dayfirst=False)
+/app/src/CSVIngester.py:53: UserWarning: Parsing dates in %d-%m-%Y format when dayfirst=False (the default) was specified. Pass `dayfirst=True` or specify a for
+mat to silence this warning.
+  dt = pd.to_datetime(s, errors='raise', dayfirst=False)
+date
+root@522eced4d5b6:/app# . solution/solve.sh && echo 'Outlier stats (Product Price $):' && outlier-truncate src/sample1_data.csv 'Product Price $'
+Outlier stats (Product Price $):
+{
+  "lower_bound": 68.62333908402061,
+  "upper_bound": 477.86817998687496,
+  "original_min": 68.48485841399017,
+  "original_max": 481.85449697522034,
+  "clipped_min": 68.62333908402061,
+  "clipped_max": 477.86817998687496
+}
+root@522eced4d5b6:/app# . solution/solve.sh && echo 'Operations from log:' && get-operations output/cleaning_log.json | sed -n '1,80p'
+Operations from log:
+[
+  {
+    "operation": "detect_encoding",
+    "details": {
+      "source": "src/sample1_data.csv",
+      "encoding": "utf-8"
+    },
+    "timestamp": "2026-01-19T18:39:17.927281"
+  },
+  {
+    "operation": "load_file",
+    "details": {
+      "source": "src/sample1_data.csv",
+      "rows": 10,
+      "columns": 8,
+      "encoding": "utf-8"
+    },
+    "timestamp": "2026-01-19T18:39:17.929702"
+  },
+  {
+    "operation": "standardize_columns",
+    "details": {
+      "source": "src/sample1_data.csv",
+      "mappings": {
+        "Order ID": "order_id",
+        "Customer Name": "customer_name",
+        "Order Date": "order_date",
+        "Product Price $": "product_price",
+        "Quantity!!": "quantity",
+        "Total Amount": "total_amount",
+        "Ship Date": "ship_date",
+        "Status": "status"
+      }
+    },
+    "timestamp": "2026-01-19T18:39:17.931035"
+  },
+  {
+    "operation": "column_types",
+    "details": {
+      "source": "src/sample1_data.csv",
+      "types": {
+        "order_id": "categorical",
+        "customer_name": "categorical",
+        "order_date": "date",
+        "product_price": "numeric",
+        "quantity": "numeric",
+        "total_amount": "numeric",
+        "ship_date": "date",
+        "status": "categorical"
+      }
+    },
+    "timestamp": "2026-01-19T18:39:17.951518"
+  },
+  {
+    "operation": "parse_dates",
+    "details": {
+      "column": "order_date",
+      "before_missing": 0,
+      "after_missing": 0
+    },
+    "timestamp": "2026-01-19T18:39:17.953674"
+  },
+  {
+    "operation": "parse_dates",
+    "details": {
+      "column": "ship_date",
+      "before_missing": 4,
+      "after_missing": 4
+    },
+    "timestamp": "2026-01-19T18:39:17.954805"
+  },
+  {
+    "operation": "impute_categorical_unknown",
+    "details": {
+      "column": "order_id",
+      "missing_before": 0,
+      "missing_after": 0
+    },
+    "timestamp": "2026-01-19T18:39:17.955246"
+  },
+root@522eced4d5b6:/app#

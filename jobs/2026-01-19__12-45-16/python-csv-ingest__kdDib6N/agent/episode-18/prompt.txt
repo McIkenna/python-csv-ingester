@@ -1,0 +1,43 @@
+Current Terminal Screen:
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+product_price
+root@19c53a573b6d:/app# type-detection tests/test_data.csv 'Order Date'
+date
+root@19c53a573b6d:/app# csv-summary tests/test_data.csv
+{
+  "file": "tests/test_data.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Customer Name": 2,
+    "Product Price $": 1,
+    "Ship Date": 4,
+    "Status": 6
+  }
+}
+root@19c53a573b6d:/app# file-processing tests/final_output.csv tests/final_log.json tests/test_data.csv tests/test2_data.csv tests/test3_data.csv 2>&1 | grep -v
+ FutureWarning | grep -v 'inplace method'
+Error processing 'tests/test_data.csv': Could not detect encoding for 'tests/test_data.csv'
+Error processing 'tests/test2_data.csv': Could not detect encoding for 'tests/test2_data.csv'
+Error processing 'tests/test3_data.csv': Could not detect encoding for 'tests/test3_data.csv'
+Processing complete!
+Output: tests/final_output.csv
+Log: tests/final_log.json
+Rows: 0
+Columns: 0
+root@19c53a573b6d:/app# echo "Verifying output..."
+Verifying output...
+root@19c53a573b6d:/app# wc -l tests/final_output.csv
+wc: tests/final_output.csv: No such file or directory
+root@19c53a573b6d:/app#
