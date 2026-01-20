@@ -1,0 +1,111 @@
+{
+    "id": "6d595531-8a77-4097-bdc5-708b29bd201e",
+    "task_name": "",
+    "trial_name": "python-csv-ingest__GavRA5s",
+    "trial_uri": "file:///Users/newaccount/Downloads/python-csv-ingest/jobs/2026-01-19__13-17-55/python-csv-ingest__GavRA5s",
+    "task_id": {
+        "path": "."
+    },
+    "source": null,
+    "task_checksum": "96e75ccd8b535dbee414d5cb9fc8f7852f51931c809bd989acdead430ac3e10c",
+    "config": {
+        "task": {
+            "path": ".",
+            "git_url": null,
+            "git_commit_id": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "python-csv-ingest__GavRA5s",
+        "trials_dir": "jobs/2026-01-19__13-17-55",
+        "timeout_multiplier": 1.0,
+        "agent": {
+            "name": "terminus-2",
+            "import_path": null,
+            "model_name": "openai/@anthropic-tbench/claude-sonnet-4-5-20250929",
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {}
+        },
+        "environment": {
+            "type": "docker",
+            "force_build": false,
+            "delete": true,
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "kwargs": {}
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "job_id": "7e914e34-7900-4bae-81f9-917fb5c15812"
+    },
+    "agent_info": {
+        "name": "terminus-2",
+        "version": "2.0.0",
+        "model_info": {
+            "name": "@anthropic-tbench/claude-sonnet-4-5-20250929",
+            "provider": "openai"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 506231,
+        "n_cache_tokens": 0,
+        "n_output_tokens": 17482,
+        "cost_usd": null,
+        "rollout_details": [],
+        "metadata": {
+            "n_episodes": 19,
+            "api_request_times_msec": [
+                13534.328937530518,
+                7064.791679382324,
+                42640.96999168396,
+                29164.49499130249,
+                24688.189029693604,
+                46089.097023010254,
+                11083.784103393555,
+                6823.233127593994,
+                7228.428840637207,
+                12401.594161987305,
+                4221.212148666382,
+                6898.221254348755,
+                8319.67306137085,
+                9484.019994735718,
+                7875.23627281189,
+                10643.405199050903,
+                14433.592081069946,
+                15104.270935058594,
+                20315.14286994934
+            ],
+            "summarization_count": 0
+        }
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-01-19T13:17:55.685203",
+    "finished_at": "2026-01-19T13:24:10.587714",
+    "environment_setup": {
+        "started_at": "2026-01-19T13:17:57.945053",
+        "finished_at": "2026-01-19T13:17:59.193873"
+    },
+    "agent_setup": {
+        "started_at": "2026-01-19T13:17:59.193971",
+        "finished_at": "2026-01-19T13:18:08.626384"
+    },
+    "agent_execution": {
+        "started_at": "2026-01-19T13:18:08.626525",
+        "finished_at": "2026-01-19T13:23:52.593524"
+    },
+    "verifier": {
+        "started_at": "2026-01-19T13:23:52.593665",
+        "finished_at": "2026-01-19T13:23:58.312231"
+    }
+}

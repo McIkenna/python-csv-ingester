@@ -1,0 +1,50 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@253fcef909e9:/app# head -40 tests/demo_log.json
+{
+  "timestamp": "2026-01-19T19:21:25.320525",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "tests/test_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T19:21:25.287104"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T19:21:25.288146"
+    },
+    {
+      "operation": "clip_outliers",
+      "details": {
+        "column": "order_id",
+        "lower_percentile": 1001.09,
+        "upper_percentile": 1009.91
+      },
+      "timestamp": "2026-01-19T19:21:25.290461"
+    },
+    {
+      "operation": "impute_categorical",
+root@253fcef909e9:/app# pytest tests/test_outputs.py::TestColumnNameStandardization -v
+bash: pytest: command not found
+root@253fcef909e9:/app#

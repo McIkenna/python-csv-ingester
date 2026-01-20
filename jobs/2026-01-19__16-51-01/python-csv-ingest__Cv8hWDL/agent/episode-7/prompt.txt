@@ -1,0 +1,43 @@
+New Terminal Output:
+
+root@effc21c2e322:/app# chmod +x solution/solve.sh
+root@effc21c2e322:/app# cat > tests/test_data.csv << 'EOF'
+> Order ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status
+> ORD1000,,01-10-2023,264.31,7,1850.19,09-10-2023,
+> ORD1001,,2023-04-02,171.54,17,2916.22,,Shipped
+> ORD1002,Bob Johnson,05.12.2023,,17,3317.41,2023-12-11,
+> ORD1003,Alice Williams,29.08.2023,70.22,10,702.16,09/07/2023,
+> ORD1004,John Smith,2023/01/09,318.75,8,2550.02,,
+> ORD1005,Alice Williams,14-02-2023,90.52,14,1267.34,,Cancelled
+> ORD1006,Alice Williams,20.04.2023,432.03,2,864.05,21.04.2023,Cancelled
+> ORD1007,,11/24/2023,68.48,7,479.39,2023/11/29,
+> ORD1008,Jane Doe,03/22/2023,9500.00,15,7227.82,,
+> ORD1009,Alice Williams,25.07.2023,111.06,11,1221.61,03-08-2023,Shipped
+> EOF
+root@effc21c2e322:/app# cat > tests/test2_data.csv << 'EOF'
+> SKU#,Product  Name,stock_qty,Unit Cost ($),Last Restock,Supplier,Category Type
+> SKU-3000,Monitor,261,32.31,2023-11-11,,Accessories
+> SKU-3001,Mouse,431,194.72,23-09-2023,MegaStore,Accessories
+> SKU-3002,Chair,406,1994.93,2023/10/15,,Electronics
+> SKU-3003,Monitor,411,1763.16,2023/11/08,GlobalTech,Accessories
+> SKU-3004,Mouse,124,1402.72,2023-10-28,GlobalTech,Accessories
+> SKU-3005,Keyboard,375,1195.11,04-08-2023,OfficeSupply Inc,
+> SKU-3006,Monitor,43,1893.11,05-12-2023,GlobalTech,Electronics
+> SKU-3007,Mouse,13930,399.45,08/04/2023,TechCorp,Accessories
+> SKU-3008,Laptop,266,1170.19,2023/11/24,,
+> SKU-3009,Desk,6,32.92,08/22/2023,OfficeSupply Inc,Accessories
+> EOF
+root@effc21c2e322:/app# cat > tests/test3_data.csv << 'EOF'
+> Employee_ID,Full Name,Hire-Date,Salary $$$,Department!!,Performance Score,Manager Name
+> EMP001,John Doe,2020-01-15,75000,Engineering,8.5,
+> EMP002,Jane Smith,15/03/2019,85000,,9.2,Mike Johnson
+> EMP003,,2021-06-20,65000,Marketing,7.8,Sarah Lee
+> EMP004,Bob Wilson,2018/11/10,95000,Engineering,,Mike Johnson
+> EMP005,Alice Brown,10-05-2022,70000,Sales,8.9,
+> EMP006,Charlie Davis,2019-08-25,,Engineering,9.5,Mike Johnson
+> EMP007,Diana Evans,25.09.2020,80000,Marketing,8.2,Sarah Lee
+> EMP008,Eve Foster,03/12/2021,72000,Sales,,Tom Brown
+> EMP009,Frank Green,2022-02-14,68000,,8.7,Sarah Lee
+> EMP010,Grace Hill,18-07-2019,15000,Engineering,9.1,Mike Johnson
+> EOF
+root@effc21c2e322:/app#

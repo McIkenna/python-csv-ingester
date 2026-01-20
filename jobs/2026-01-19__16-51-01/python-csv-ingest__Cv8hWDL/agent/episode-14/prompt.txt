@@ -1,0 +1,5 @@
+New Terminal Output:
+
+root@effc21c2e322:/app# pytest tests/test_outputs.py -v
+bash: pytest: command not found
+root@effc21c2e322:/app#

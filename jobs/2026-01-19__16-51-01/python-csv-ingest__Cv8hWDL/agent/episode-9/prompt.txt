@@ -1,0 +1,53 @@
+New Terminal Output:
+
+root@effc21c2e322:/app# cat > tests/test.sh << 'EOFSH'
+> #!/bin/bash
+>
+> # Test runner for CSV Ingester
+> # Runs the pytest test suite
+>
+> SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+> cd "$SCRIPT_DIR/.."
+>
+> echo "================================"
+> echo "CSV Ingester Test Suite"
+> echo "================================"
+> echo ""
+>
+> # Check if pytest is installed
+> if ! command -v pytest &> /dev/null; then
+>     echo "Error: pytest is not installed"
+>     echo "Install it with: pip install pytest"
+>     exit 1
+> fi
+>
+> # Run tests
+> if [ $# -eq 0 ]; then
+>     # Run all tests with verbose output
+>     echo "Running all tests..."
+>     pytest tests/test_outputs.py -v
+> else
+>     # Run specific test
+>     pytest "$@"
+> fi
+>
+> echo ""
+> echo "================================"
+> echo "Test run complete"
+> echo "================================"
+> EOFSH
+root@effc21c2e322:/app# chmod +x tests/test.sh
+root@effc21c2e322:/app# python3 solution/CSVIngester.py --help
+usage: CSVIngester.py [-h] [-o OUTPUT] [-l LOG] input_files [input_files ...]
+
+CSV Ingester - Clean and standardize CSV data
+
+positional arguments:
+  input_files           Input CSV files to process
+
+options:
+  -h, --help            show this help message and exit
+  -o OUTPUT, --output OUTPUT
+                        Output file path (default: cleaned_data.csv)
+  -l LOG, --log LOG     Log file path (default: cleaning_log.json)
+root@effc21c2e322:/app#

@@ -1,0 +1,107 @@
+New Terminal Output:
+
+root@785ec509f842:/app# wc -l solution/CSVIngester.py solution/solve.sh
+  295 solution/CSVIngester.py
+  573 solution/solve.sh
+  868 total
+root@785ec509f842:/app# tail -100 solution/CSVIngester.py
+            all_columns.update(df.columns)
+
+        # Reindex all dataframes to have same columns
+        normalized_dfs = []
+        for df in dfs:
+            missing_cols = all_columns - set(df.columns)
+            for col in missing_cols:
+                df[col] = np.nan
+            normalized_dfs.append(df[sorted(all_columns)])
+
+        # Concatenate
+        consolidated = pd.concat(normalized_dfs, ignore_index=True)
+
+        self.logging_process("consolidate", {
+            "total_dataframes": len(dfs),
+            "total_rows": len(consolidated),
+            "total_columns": len(consolidated.columns)
+        })
+
+        return consolidated
+
+    def file_processor(self, input_files: List[str], output_file: str, log_file: str):
+        """Main processing pipeline"""
+        print(f"Processing {len(input_files)} CSV file(s)...")
+
+        cleaned_dfs = []
+
+        for filepath in input_files:
+            path = Path(filepath)
+            if not path.exists():
+                print(f"Warning: {filepath} does not exist, skipping...")
+                continue
+
+            print(f"  Loading {path.name}...")
+
+            # this detect encoding
+            encoding = self.encode_process(path)
+
+            # Load CSV
+            try:
+                df = pd.read_csv(path, encoding=encoding)
+            except Exception as e:
+                print(f"  Error loading {path.name}: {e}")
+                continue
+
+            # Clean dataframe
+            cleaned_df = self.processed_dataframe(df, str(path))
+            cleaned_dfs.append(cleaned_df)
+
+        if not cleaned_dfs:
+            print("Error: No data to process")
+            return
+
+        # Consolidate all dataframes
+        print("Consolidating datasets...")
+        final_df = self.consolidated_cleaned_dataframes(cleaned_dfs)
+
+        # Save output
+        print(f"Writing cleaned data to {output_file}...")
+        final_df.to_csv(output_file, index=False)
+
+        # Save log
+        print(f"Writing cleaning log to {log_file}...")
+        with open(log_file, 'w') as f:
+            json.dump(self.data_cleaning_log, f, indent=2)
+
+        print(" Completed")
+        print(f"  Processed: {len(cleaned_dfs)} file(s)")
+        print(f"  Output rows: {len(final_df)}")
+        print(f"  Output columns: {len(final_df.columns)}")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Clean and consolidate multiple CSV files with inconsistent schemas'
+    )
+    parser.add_argument(
+        'input_files',
+        nargs='+',
+        help='Input CSV file paths'
+    )
+    parser.add_argument(
+        '-o', '--output',
+        default='cleaned_data.csv',
+        help='Output CSV file path (default: cleaned_data.csv)'
+    )
+    parser.add_argument(
+        '-l', '--log',
+        default='data_cleaning_log.json',
+        help='Output log file path (default: data_cleaning_log.json)'
+    )
+
+    args = parser.parse_args()
+
+    processor = CSVIngester()
+    processor.file_processor(args.input_files, args.output, args.log)
+
+
+if __name__ == '__main__':
+    main()root@785ec509f842:/app#

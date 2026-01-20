@@ -1,0 +1,88 @@
+New Terminal Output:
+
+root@effc21c2e322:/app# cat tests/demo_log.json | head -60
+{
+  "timestamp": "2026-01-19T22:56:35.995812",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T22:56:35.971960"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "src/sample1_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T22:56:35.972224"
+    },
+    {
+      "operation": "impute_categorical",
+      "details": {
+        "column": "customer_name",
+        "method": "constant",
+        "value": "Unknown",
+        "count": 3
+      },
+      "timestamp": "2026-01-19T22:56:35.976976"
+    },
+    {
+      "operation": "parse_dates",
+      "details": {
+        "column": "order_date",
+        "format": "ISO-8601",
+        "success_count": 6
+      },
+      "timestamp": "2026-01-19T22:56:35.979130"
+    },
+    {
+      "operation": "impute_numeric",
+      "details": {
+        "column": "product_price",
+        "method": "median",
+        "value": 171.54224088174146,
+        "count": 1
+      },
+      "timestamp": "2026-01-19T22:56:35.980045"
+    },
+    {
+      "operation": "clip_outliers",
+root@effc21c2e322:/app# source solution/solve.sh && name-standardization "Product Price $"
+product_price
+root@effc21c2e322:/app# source solution/solve.sh && csv-summary tests/test_data.csv
+{
+  "file": "tests/test_data.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Customer Name": 3,
+    "Product Price $": 1,
+    "Ship Date": 4,
+    "Status": 6
+  }
+}
+root@effc21c2e322:/app#

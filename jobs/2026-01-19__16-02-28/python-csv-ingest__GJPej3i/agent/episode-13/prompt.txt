@@ -1,0 +1,39 @@
+New Terminal Output:
+
+root@5c43413d2e06:/app# cd tests && pytest test_outputs.py -v
+===================================================================== test session starts ======================================================================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app/tests
+collected 27 items
+
+test_outputs.py::test_standardize_spaces_col_name PASSED                                                                                                 [  3%]
+test_outputs.py::test_standardize_any_special_chars PASSED                                                                                               [  7%]
+test_outputs.py::test_standardize_any_casing PASSED                                                                                                      [ 11%]
+test_outputs.py::test_detect_date_column PASSED                                                                                                          [ 14%]
+test_outputs.py::test_parse_iso_dates PASSED                                                                                                             [ 18%]
+test_outputs.py::test_parse_mixed_date_formats PASSED                                                                                                    [ 22%]
+test_outputs.py::test_clean_single_dataframe PASSED                                                                                                      [ 25%]
+test_outputs.py::test_cleaned_columns_standardized PASSED                                                                                                [ 29%]
+test_outputs.py::test_get_unknown_for_missing PASSED                                                                                                     [ 33%]
+test_outputs.py::test_get_median_for_missing PASSED                                                                                                      [ 37%]
+test_outputs.py::test_clip_numeric_outliers PASSED                                                                                                       [ 40%]
+test_outputs.py::test_consolidate_dataframes PASSED                                                                                                      [ 44%]
+test_outputs.py::test_should_detect_utf8_encoding PASSED                                                                                                 [ 48%]
+test_outputs.py::test_should_detect_latin_encoding PASSED                                                                                                [ 51%]
+test_outputs.py::test_should_detect_encoding_nonexistent_file PASSED                                                                                     [ 55%]
+test_outputs.py::test_process_full_pipeline PASSED                                                                                                       [ 59%]
+test_outputs.py::test_full_workflow PASSED                                                                                                               [ 62%]
+test_outputs.py::test_detect_numeric_column PASSED                                                                                                       [ 66%]
+test_outputs.py::test_detect_categorical_column PASSED                                                                                                   [ 70%]
+test_outputs.py::test_detect_nonexistent_column PASSED                                                                                                   [ 74%]
+test_outputs.py::test_get_cleaning_log_nonexistent_file PASSED                                                                                           [ 77%]
+test_outputs.py::test_summary_shows_missing_values PASSED                                                                                                [ 81%]
+test_outputs.py::test_get_csv_summary PASSED                                                                                                             [ 85%]
+test_outputs.py::test_get_existing_operations PASSED                                                                                                     [ 88%]
+test_outputs.py::test_process_log_contains_operations PASSED                                                                                             [ 92%]
+test_outputs.py::test_get_operations_log PASSED                                                                                                          [ 96%]
+test_outputs.py::test_get_cleaning_log PASSED                                                                                                            [100%]
+
+====================================================================== 27 passed in 0.44s ======================================================================
+root@5c43413d2e06:/app/tests#

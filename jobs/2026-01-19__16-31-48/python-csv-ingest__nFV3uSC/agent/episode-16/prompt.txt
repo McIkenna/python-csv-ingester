@@ -1,0 +1,72 @@
+New Terminal Output:
+
+root@785ec509f842:/app# python3 << 'PYEOF'
+> with open('solution/CSVIngester.py', 'r') as f:
+>     lines = f.readlines()
+>
+> # Find the encode_process method and replace it
+> output = []
+> i = 0
+> while i < len(lines):
+>     if '    def encode_process(self, filepath: Path) -> str:' in lines[i]:
+>         # Write the new method
+>         output.append('    def encode_process(self, filepath: Path) -> str:\n')
+>         output.append('        """Detect file encoding"""\n')
+>         output.append('        # Check if file exists\n')
+>         output.append('        if not filepath.exists():\n')
+>         output.append('            return \'utf-8\'\n')
+>         output.append('        \n')
+>         output.append('        encodings = [\'utf-8\', \'latin-1\', \'iso-8859-1\', \'cp1252\']\n')
+>         output.append('        for enc in encodings:\n')
+>         output.append('            try:\n')
+>         output.append('                with open(filepath, \'r\', encoding=enc) as f:\n')
+>         output.append('                    f.read()\n')
+>         output.append('                return enc\n')
+>         output.append('            except UnicodeDecodeError:\n')
+>         output.append('                continue\n')
+>         output.append('        return \'utf-8\'\n')
+>         # Skip old method lines
+>         i += 1
+>         while i < len(lines) and not lines[i].strip().startswith('def '):
+>             i += 1
+>         continue
+>     output.append(lines[i])
+>     i += 1
+>
+> with open('solution/CSVIngester.py', 'w') as f:
+>     f.writelines(output)
+>
+> print('Fixed encode_process method properly')
+> PYEOF
+Fixed encode_process method properly
+root@785ec509f842:/app# grep -A 18 'def encode_process' solution/CSVIngester.py
+    def encode_process(self, filepath: Path) -> str:
+        """Detect file encoding"""
+        # Check if file exists
+        if not filepath.exists():
+            return 'utf-8'
+
+        encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+        for enc in encodings:
+            try:
+                with open(filepath, 'r', encoding=enc) as f:
+                    f.read()
+                return enc
+            except UnicodeDecodeError:
+                continue
+        return 'utf-8'
+    def standardize_column_name(self, col: str) -> str:
+        """Standardize column names to snake_case"""
+
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', col)
+root@785ec509f842:/app# pytest tests/test_outputs.py::TestEncodingDetection::test_should_detect_encoding_nonexistent_file -v
+===================================================================== test session starts ======================================================================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+collected 1 item
+
+tests/test_outputs.py::TestEncodingDetection::test_should_detect_encoding_nonexistent_file PASSED                                                        [100%]
+
+====================================================================== 1 passed in 0.35s =======================================================================
+root@785ec509f842:/app#

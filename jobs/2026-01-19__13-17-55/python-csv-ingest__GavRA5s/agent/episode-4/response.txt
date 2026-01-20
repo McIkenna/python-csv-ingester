@@ -1,0 +1,21 @@
+```json
+{
+  "analysis": "Successfully created solve.sh with all required bash functions. Now I need to create test CSV files with inconsistent schemas, varying date formats, missing values, and outliers. Then I'll create the test suite (test_outputs.py) and test.sh.",
+  "plan": "Create three test CSV files (test_data.csv, test2_data.csv, test3_data.csv) with messy data including different column names, date formats, missing values, and outliers. Then create the pytest test suite and test.sh script.",
+  "commands": [
+    {
+      "keystrokes": "cat > tests/test_data.csv << 'EOF'\nOrder ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status\n1001,John Smith,2025-01-01,99.99,2,199.98,01/05/2025,Active\n1002,Jane Doe,01/15/2025,150.50,,150.50,Jan 20 2025,Pending\n1003,,Jan 10 2025,9500.00,1,9500.00,2025-01-15,Active\n1004,Bob Johnson,15-01-2025,25.00,5,125.00,,Cancelled\n1005,Alice Williams,2025/01/20,75.25,3,225.75,2025/01/25,Active\n1006,Charlie Brown,2025-01-22,,10,,01/30/2025,Pending\n1007,Diana Prince,Jan 25 2025,200.00,1,200.00,2025-01-28,Active\n1008,,01/28/2025,50.50,2,101.00,,Unknown\n1009,Eve Anderson,2025-01-30,10.00,,,Feb 05 2025,Active\n1010,Frank Miller,02/01/2025,300.00,4,1200.00,2025-02-10,Pending\nEOF\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat > tests/test2_data.csv << 'EOF'\norder_id,customer_name,purchase_date,price,qty,total,delivery_date,order_status\n2001,George Lucas,2025-02-01,125.00,2,250.00,02/05/2025,Completed\n2002,,02/10/2025,85.75,3,257.25,Feb 15 2025,Active\n2003,Helen Keller,Feb 12 2025,,1,,2025-02-18,Pending\n2004,Ivan Drago,15-02-2025,45.50,10,455.00,,Shipped\n2005,Julia Roberts,2025/02/18,175.00,,175.00,2025/02/22,Active\n2006,,2025-02-20,8999.99,1,8999.99,02/25/2025,Completed\n2007,Kevin Hart,Feb 22 2025,95.50,2,191.00,2025-02-28,Active\n2008,Laura Croft,02/25/2025,65.00,,65.00,,Pending\n2009,Mike Tyson,2025-02-28,5.00,5,25.00,Mar 05 2025,Active\n2010,,03/01/2025,250.50,3,751.50,2025-03-10,Shipped\nEOF\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat > tests/test3_data.csv << 'EOF'\nID,Client,Date,Amount,Count,Sum,Shipped,State\n3001,Nancy Drew,2025-03-01,199.99,1,199.99,03/05/2025,Done\n3002,Oscar Wilde,03/08/2025,,2,,Mar 12 2025,Processing\n3003,,Mar 10 2025,75.50,4,302.00,2025-03-15,Done\n3004,Peter Parker,15-03-2025,50.00,,50.00,,Active\n3005,Quinn Fabray,2025/03/18,125.75,3,377.25,2025/03/22,Done\n3006,Rachel Green,2025-03-20,15000.00,1,15000.00,03/25/2025,Processing\n3007,,Mar 22 2025,85.00,2,170.00,2025-03-28,Done\n3008,Steve Rogers,03/25/2025,45.50,5,227.50,,Active\n3009,Tina Turner,2025-03-28,,3,,Apr 02 2025,Done\n3010,Uma Thurman,04/01/2025,175.00,2,350.00,2025-04-10,Processing\nEOF\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}
+```

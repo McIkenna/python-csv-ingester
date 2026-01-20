@@ -1,0 +1,43 @@
+Current Terminal Screen:
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+E        +    where Index(['order_id', 'customer_name', 'order_date', 'product_price', 'quantity',\n       'total_amount', 'ship_date', 'status'],\n      dtype=
+'object') =   order_id   customer_name  order_date  ...  total_amount   ship_date     status\n0  ORD1000         Unknown  2023-10-01  ...     1850.1900  2023-10
+-09    Unknown\n1  ORD1001         Unknown  2023-04-02  ...     2916.2200        None    Shipped\n2  ORD1002     Bob Johnson        None  ...     3317.4100  202
+3-12-11    Unknown\n3  ORD1003  Alice Williams        None  ...      702.1600  2023-07-09    Unknown\n4  ORD1004      John Smith  2023-01-09  ...     2550.0200
+       None    Unknown\n5  ORD1005  Alice Williams  2023-02-14  ...     1267.3400        None  Cancelled\n6  ORD1006  Alice Williams        None  ...      864.0
+500        None  Cancelled\n7  ORD1007         Unknown  2023-11-24  ...      499.4393  2023-11-29    Unknown\n8  ORD1008        Jane Doe  2023-03-22  ...     68
+75.8831        None    Unknown\n9  ORD1009  Alice Williams        None  ...     1221.6100  2023-08-03    Shipped\n\n[10 rows x 8 columns].columns
+
+tests/test_outputs.py:70: AssertionError
+=============================== warnings summary ===============================
+tests/test_outputs.py: 26 warnings
+  /app/solution/CSVIngester.py:295: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace me
+thod.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a
+ copy.
+
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, t
+o perform the operation inplace on the original object.
+
+
+    df[col].fillna('Unknown', inplace=True)
+
+tests/test_outputs.py: 12 warnings
+  /app/solution/CSVIngester.py:243: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace me
+thod.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a
+ copy.
+
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, t
+o perform the operation inplace on the original object.
+
+
+    df[col].fillna(median_val, inplace=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_outputs.py::TestDateFormatDetection::test_parse_mixed_date_formats
+FAILED tests/test_outputs.py::TestMissingValueImputation::test_clean_single_dataframe
+================== 2 failed, 24 passed, 38 warnings in 0.53s ===================
+root@effc21c2e322:/app#

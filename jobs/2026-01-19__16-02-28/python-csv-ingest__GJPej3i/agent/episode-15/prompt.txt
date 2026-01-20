@@ -1,0 +1,58 @@
+New Terminal Output:
+
+root@5c43413d2e06:/app# tree -L 2 -I '__pycache__|*.pyc' . 2>/dev/null || find . -type f -name '*.py' -o -name '*.sh' -o -name '*.csv' -o -name '*.json' -o -nam
+e '*.md' -o -name '*.toml' | grep -v __pycache__ | sort
+./output/cleaned_result.csv
+./output/cleaning_operations.json
+./solution/CSVIngester.py
+./solution/solve.sh
+./src/cleaned_sample1.csv
+./src/consolidated_output.csv
+./src/final_cleaned_data.csv
+./src/final_cleaning_log.json
+./src/sample1_data.csv
+./src/sample2_data.csv
+./tests/.pytest_cache/README.md
+./tests/test.sh
+./tests/test2_data.csv
+./tests/test3_data.csv
+./tests/test_data.csv
+./tests/test_outputs.py
+root@5c43413d2e06:/app# head -3 output/cleaned_result.csv && echo '...' && tail -2 output/cleaned_result.csv
+order_id,customer_name,order_date,product_price,quantity,total_amount,ship_date,status,sku,product_name,stock_qty,unit_cost,last_restock,supplier,category_type
+ORD1000,Unknown,2023-10-01,264.3134984759545,7.0,1850.194489331681,2023-10-09,Unknown,,,,,,,
+ORD1001,Unknown,2023-04-02,171.54224088174146,17.0,2916.2180949896047,,Shipped,,,,,,,
+...
+,,,,,,,,SKU-3008,Laptop,266.0,1170.1888689891994,2023-11-24,Unknown,Unknown
+,,,,,,,,SKU-3009,Desk,9.33,32.92113306832887,2023-08-22,OfficeSupply Inc,Accessories
+root@5c43413d2e06:/app# source solution/solve.sh && outlier-truncate src/sample1_data.csv 'Product Price $' 2>/dev/null
+{
+  "lower_bound": 68.62333908402061,
+  "upper_bound": 477.86817998687496,
+  "original_min": 68.48485841399017,
+  "original_max": 481.85449697522034,
+  "clipped_min": 68.62333908402061,
+  "clipped_max": 477.86817998687496
+}
+root@5c43413d2e06:/app# ./tests/test.sh 2>&1 | tail -20
+test_outputs.py::test_should_detect_latin_encoding PASSED                [ 51%]
+test_outputs.py::test_should_detect_encoding_nonexistent_file PASSED     [ 55%]
+test_outputs.py::test_process_full_pipeline PASSED                       [ 59%]
+test_outputs.py::test_full_workflow PASSED                               [ 62%]
+test_outputs.py::test_detect_numeric_column PASSED                       [ 66%]
+test_outputs.py::test_detect_categorical_column PASSED                   [ 70%]
+test_outputs.py::test_detect_nonexistent_column PASSED                   [ 74%]
+test_outputs.py::test_get_cleaning_log_nonexistent_file PASSED           [ 77%]
+test_outputs.py::test_summary_shows_missing_values PASSED                [ 81%]
+test_outputs.py::test_get_csv_summary PASSED                             [ 85%]
+test_outputs.py::test_get_existing_operations PASSED                     [ 88%]
+test_outputs.py::test_process_log_contains_operations PASSED             [ 92%]
+test_outputs.py::test_get_operations_log PASSED                          [ 96%]
+test_outputs.py::test_get_cleaning_log PASSED                            [100%]
+
+============================== 27 passed in 0.41s ==============================
+
+================================
+All tests passed successfully!
+================================
+root@5c43413d2e06:/app#

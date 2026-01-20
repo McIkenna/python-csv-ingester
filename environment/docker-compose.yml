@@ -2,7 +2,11 @@ version: '3.8'
 
 services:
   python-csv-ingest:
+<<<<<<< Updated upstream
     image: ${MAIN_IMAGE_NAME}
+=======
+    image: ${MAIN_IMAGE_NAME:-python-csv-ingest}
+>>>>>>> Stashed changes
     build:
       context: ..
       dockerfile: environment/Dockerfile

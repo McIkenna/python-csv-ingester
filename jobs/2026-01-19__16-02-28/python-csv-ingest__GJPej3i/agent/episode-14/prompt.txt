@@ -1,0 +1,19 @@
+New Terminal Output:
+
+root@5c43413d2e06:/app/tests# cd /app
+root@5c43413d2e06:/app# rm -f tests/output_test.csv tests/output_log.json tests/cleaned_data.csv tests/cleaning_log.json tests/final_log.json
+root@5c43413d2e06:/app# python3 solution/CSVIngester.py src/sample1_data.csv src/sample2_data.csv -o output/cleaned_result.csv -l output/cleaning_operations.jso
+n 2>/dev/null
+root@5c43413d2e06:/app# mkdir -p output
+root@5c43413d2e06:/app# python3 solution/CSVIngester.py src/sample1_data.csv src/sample2_data.csv -o output/cleaned_result.csv -l output/cleaning_operations.jso
+n 2>/dev/null
+Processing complete!
+Cleaned data saved to: output/cleaned_result.csv
+Cleaning log saved to: output/cleaning_operations.json
+root@5c43413d2e06:/app# echo 'Sample output created successfully'
+Sample output created successfully
+root@5c43413d2e06:/app# ls -lh output/
+total 12K
+-rw-r--r-- 1 root root 1.9K Jan 19 22:08 cleaned_result.csv
+-rw-r--r-- 1 root root 5.1K Jan 19 22:08 cleaning_operations.json
+root@5c43413d2e06:/app#

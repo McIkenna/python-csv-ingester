@@ -1,0 +1,42 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@253fcef909e9:/app# cat > tests/test.sh << 'EOF'
+> #!/bin/bash
+>
+> # Test script for CSV Ingester
+> # Usage: ./tests/test.sh [options]
+>
+> echo "Running CSV Ingester Test Suite"
+> echo "================================"
+> echo ""
+>
+> # Check if pytest is available
+> if ! command -v pytest &> /dev/null; then
+>     echo "Error: pytest not found. Please install it with: pip install pytest"
+>     exit 1
+> fi
+>
+> # Run all tests
+> if [ "$1" == "-v" ] || [ "$1" == "--verbose" ]; then
+>     pytest tests/test_outputs.py -v
+> elif [ "$1" == "-vv" ]; then
+>     pytest tests/test_outputs.py -vv --tb=short
+> elif [ -n "$1" ]; then
+>     # Run specific test
+>     pytest tests/test_outputs.py::$1 -v
+> else
+>     # Run all tests with normal verbosity
+>     pytest tests/test_outputs.py -v
+> fi
+>
+> echo ""
+> echo "Test suite completed!"
+> EOF
+root@253fcef909e9:/app# chmod +x tests/test.sh
+root@253fcef909e9:/app# python3 -c "import pandas; import numpy; print('Required packages installed')"
+Required packages installed
+root@253fcef909e9:/app#

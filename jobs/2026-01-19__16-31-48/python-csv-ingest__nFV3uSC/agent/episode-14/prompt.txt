@@ -1,0 +1,82 @@
+New Terminal Output:
+
+root@785ec509f842:/app# pytest tests/test_outputs.py -v
+===================================================================== test session starts ======================================================================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+collected 25 items
+
+tests/test_outputs.py::TestColumnStandardization::test_standardize_spaces_col_name PASSED                                                                [  4%]
+tests/test_outputs.py::TestColumnStandardization::test_standardize_any_special_chars PASSED                                                              [  8%]
+tests/test_outputs.py::TestColumnStandardization::test_standardize_any_casing PASSED                                                                     [ 12%]
+tests/test_outputs.py::TestDateDetectionAndParsing::test_detect_date_column PASSED                                                                       [ 16%]
+tests/test_outputs.py::TestDateDetectionAndParsing::test_parse_iso_dates PASSED                                                                          [ 20%]
+tests/test_outputs.py::TestDateDetectionAndParsing::test_parse_mixed_date_formats PASSED                                                                 [ 24%]
+tests/test_outputs.py::TestMissingValueImputation::test_clean_single_dataframe PASSED                                                                    [ 28%]
+tests/test_outputs.py::TestMissingValueImputation::test_cleaned_columns_standardized PASSED                                                              [ 32%]
+tests/test_outputs.py::TestOutlierClipping::test_clip_numeric_outliers PASSED                                                                            [ 36%]
+tests/test_outputs.py::TestConsolidation::test_consolidate_dataframes PASSED                                                                             [ 40%]
+tests/test_outputs.py::TestEncodingDetection::test_should_detect_utf8_encoding PASSED                                                                    [ 44%]
+tests/test_outputs.py::TestEncodingDetection::test_should_detect_latin_encoding PASSED                                                                   [ 48%]
+tests/test_outputs.py::TestEncodingDetection::test_should_detect_encoding_nonexistent_file FAILED                                                        [ 52%]
+tests/test_outputs.py::TestFullPipeline::test_process_full_pipeline PASSED                                                                               [ 56%]
+tests/test_outputs.py::TestFullPipeline::test_full_workflow PASSED                                                                                       [ 60%]
+tests/test_outputs.py::TestColumnTypeDetection::test_detect_numeric_column PASSED                                                                        [ 64%]
+tests/test_outputs.py::TestColumnTypeDetection::test_detect_categorical_column PASSED                                                                    [ 68%]
+tests/test_outputs.py::TestErrorHandling::test_detect_nonexistent_column FAILED                                                                          [ 72%]
+tests/test_outputs.py::TestErrorHandling::test_get_cleaning_log_nonexistent_file PASSED                                                                  [ 76%]
+tests/test_outputs.py::TestErrorHandling::test_summary_shows_missing_values PASSED                                                                       [ 80%]
+tests/test_outputs.py::TestCSVSummary::test_get_csv_summary PASSED                                                                                       [ 84%]
+tests/test_outputs.py::TestLogOperations::test_get_existing_operations PASSED                                                                            [ 88%]
+tests/test_outputs.py::TestLogOperations::test_process_log_contains_operations PASSED                                                                    [ 92%]
+tests/test_outputs.py::TestReplacingEmptyValues::test_get_unknown_for_missing PASSED                                                                     [ 96%]
+tests/test_outputs.py::TestReplacingEmptyValues::test_get_median_for_missing PASSED                                                                      [100%]
+
+=========================================================================== FAILURES ===========================================================================
+______________________________________________ TestEncodingDetection.test_should_detect_encoding_nonexistent_file ______________________________________________
+
+self = <test_outputs.TestEncodingDetection object at 0xffffa3a88190>
+
+    def test_should_detect_encoding_nonexistent_file(self):
+        """Test encoding detection on non-existent file"""
+        ingester = CSVIngester()
+        # Should default to utf-8 for non-existent files
+>       encoding = ingester.encode_process(Path('tests/nonexistent.csv'))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_outputs.py:160:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <CSVIngester.CSVIngester object at 0xffffa3a7bb10>, filepath = PosixPath('tests/nonexistent.csv')
+
+    def encode_process(self, filepath: Path) -> str:
+        """Detect file encoding"""
+        encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+        for enc in encodings:
+            try:
+>               with open(filepath, 'r', encoding=enc) as f:
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               FileNotFoundError: [Errno 2] No such file or directory: 'tests/nonexistent.csv'
+
+solution/CSVIngester.py:42: FileNotFoundError
+_______________________________________________________ TestErrorHandling.test_detect_nonexistent_column _______________________________________________________
+
+self = <test_outputs.TestErrorHandling object at 0xffffa3a8a550>
+
+    def test_detect_nonexistent_column(self):
+        """Test type detection on non-existent column"""
+        ingester = CSVIngester()
+        # Create a simple series with non-date, non-numeric data
+        test_series = pd.Series([None, None, None])
+        result = ingester.detect_column_type(test_series)
+>       assert result in ['categorical', 'unknown']
+E       AssertionError: assert 'numeric' in ['categorical', 'unknown']
+
+tests/test_outputs.py:259: AssertionError
+=================================================================== short test summary info ====================================================================
+FAILED tests/test_outputs.py::TestEncodingDetection::test_should_detect_encoding_nonexistent_file - FileNotFoundError: [Errno 2] No such file or directory: 'tes
+ts/nonexistent.csv'
+FAILED tests/test_outputs.py::TestErrorHandling::test_detect_nonexistent_column - AssertionError: assert 'numeric' in ['categorical', 'unknown']
+================================================================= 2 failed, 23 passed in 0.49s =================================================================
+root@785ec509f842:/app#

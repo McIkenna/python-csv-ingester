@@ -1,0 +1,241 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@253fcef909e9:/app# cat > solution/solve.sh << 'EOF'
+s.tolist(),
+    'missing_values':> #!/bin/bash
+>
+> # Source this script to use the CSV cleaning functions
+> # Usage: source solution/solve.sh
+ df.isnull().sum().to_dict()
+}
+print(json.dumps(summary, indent=2))
+PYTHON
+}
+
+get-operations() {
+    i>
+> encoding-detection() {
+>     if [ -z "$1" ]; then
+  echo "Usage: get-oper>         echo "Usage: encoding-detection <filepath>"
+>         return 1
+>     fi
+>     python3 -c "from solution.CSVIngester import CSVIngester; ingester = CSVIngester(); print(ingester.encode_process('$1'))"
+> }
+>
+> name-standardization() {
+>     if [ -z "$1" ]; then
+>         echo "Usage: name-standardization <column_name>"
+>         return 1
+>     fi
+>     python3 -c "from solution.CSVIngester import CSVIngester; ingester = CSVIngester(); print(ingester.standardize_column_name('$1'))"
+> }
+>
+> type-detection() {
+>     if [ -z "$1" ] || [ -z "$2" ]; then
+>         echo "Usage: type-detection <csv_file> <column_name>"
+>         return 1
+>     fi
+>     python3 -c "import pandas as pd; from solution.CSVIngester import CSVIngester; ingester = CSVIngester(); df = pd.read_csv('$1'); print(ingester.detect_col
+umn_type(df, '$2'))"
+> }
+>
+> date-parsing() {
+>     if [ -z "$1" ] || [ -z "$2" ]; then
+>         echo "Usage: date-parsing <csv_file> <column_name>"
+ations']]
+    print(json.dumps(operations, indent=2))
+else:
+    print(json.dumps([]))
+PYTHON
+}
+
+echo "CSV Cleaning functions loaded. Available commands:"
+echo "  - encoding-detection <filepath>"
+echo "  - name-standardization <column_name>"
+echo "  - type-detection <csv_file> <column_name>"
+echo "  - date-parsing <csv_file> <column_name>"
+echo "  - outlier-truncate <csv_file> <column_name>"
+echo "  - dataframe-cleaning <csv_file> [output_file]"
+echo "  - dataframe-consolidation <output_file> <file1> <file2> ..."
+echo "  - file-processing <output_file> <log_file> <file1> <file2> ..."
+echo "  - cleani>         return 1
+>     fi
+>     python3 << PYTHON
+> import pandas as pd
+> from solution.CSVIngester import CSVIngester
+> import json
+>
+> ingester = CSVIngester()
+> df = pd.read_csv('$1')
+> if '$2' in df.columns:
+>     parsed = df['$2'].apply(lambda x: ingester.date_parser(str(x)) if pd.notna(x) else None)
+>     result = parsed.dropna().tolist()
+>     print(json.dumps(result[:10]))  # First 10 parsed dates
+> else:
+>     print(json.dumps([]))
+> PYTHON
+> }
+>
+> outlier-truncate() {
+>     if [ -z "$1" ] || [ -z "$2" ]; then
+>         echo "Usage: outlier-truncate <csv_file> <column_name>"
+>         return 1
+>     fi
+>     python3 << PYTHON
+> import pandas as pd
+> from solution.CSVIngester import CSVIngester
+> import json
+>
+> ingester = CSVIngester()
+> df = pd.read_csv('$1')
+> result = ingester.outlier_truncate(df, '$2')
+> print(json.dumps(result, indent=2))
+> PYTHON
+> }
+>
+> dataframe-cleaning() {
+>     if [ -z "$1" ]; then
+>         echo "Usage: dataframe-cleaning <csv_file> [output_file]"
+>         return 1
+>     fi
+>
+>     local input_file="$1"
+>     local output_file="${2:-cleaned_output.csv}"
+>
+>     python3 << PYTHON
+> from solution.CSVIngester import CSVIngester
+>
+> ingester = CSVIngester()
+> df = ingester.processed_dataframe('$input_file')
+> df.to_csv('$output_file', index=False)
+> print("Cleaned data saved to: $output_file")
+> PYTHON
+> }
+>
+> dataframe-consolidation() {
+>     if [ "$#" -lt 2 ]; then
+>         echo "Usage: dataframe-consolidation <output_file> <file1> <file2> ..."
+>         return 1
+>     fi
+>
+>     local output_file="$1"
+>     shift
+>     local files="$@"
+>
+>     python3 << PYTHON
+> from solution.CSVIngester import CSVIngester
+> import sys
+>
+> ingester = CSVIngester()
+> files = '$files'.split()
+> dataframes = []
+> for f in files:
+>     df = ingester.processed_dataframe(f)
+>     dataframes.append(df)
+>
+> consolidated = ingester.consolidated_cleaned_dataframes(dataframes)
+> consolidated.to_csv('$output_file', index=False)
+> print(f"Consolidated data saved to: $output_file")
+> PYTHON
+> }
+>
+> file-processing() {
+>     if [ "$#" -lt 3 ]; then
+>         echo "Usage: file-processing <output_file> <log_file> <file1> <file2> ..."
+>         return 1
+>     fi
+>
+>     local output_file="$1"
+>     local log_file="$2"
+>     shift 2
+>     local files="$@"
+>
+>     python3 << PYTHON
+> from solution.CSVIngester import CSVIngester
+>
+> ingester = CSVIngester()
+> files = '$files'.split()
+> ingester.file_processor(files, '$output_file', '$log_file')
+> print(f"Processing complete!")
+> print(f"Cleaned data saved to: $output_file")
+> print(f"Cleaning log saved to: $log_file")
+> PYTHON
+> }
+>
+> cleaning-log() {
+>     local log_file="${1:-cleaning_log.json}"
+>
+>     if [ ! -f "$log_file" ]; then
+>         echo "Log file not found: $log_file"
+>         return 1
+>     fi
+>
+>     cat "$log_file" | python3 -m json.tool
+> }
+>
+> csv-summary() {
+>     if [ -z "$1" ]; then
+>         echo "Usage: csv-summary <csv_file>"
+>         return 1
+>     fi
+>
+>     python3 << PYTHON
+> import pandas as pd
+> import json
+>
+> df = pd.read_csv('$1')
+> summary = {
+>     'file': '$1',
+>     'rows': len(df),
+>     'columns': len(df.columns),
+>     'column_names': df.columns.tolist(),
+>     'missing_values': df.isnull().sum().to_dict()
+> }
+> print(json.dumps(summary, indent=2))
+> PYTHON
+> }
+>
+> get-operations() {
+>     if [ -z "$1" ]; then
+>         echo "Usage: get-operations <log_file>"
+>         return 1
+>     fi
+>
+>     if [ ! -f "$1" ]; then
+>         echo "Log file not found: $1"
+>         return 1
+>     fi
+>
+>     python3 << PYTHON
+> import json
+>
+> with open('$1', 'r') as f:
+>     data = json.load(f)
+>
+> if 'operations' in data:
+>     operations = [op['operation'] for op in data['operations']]
+>     print(json.dumps(operations, indent=2))
+> else:
+>     print(json.dumps([]))
+> PYTHON
+> }
+>
+> echo "CSV Cleaning functions loaded. Available commands:"
+> echo "  - encoding-detection <filepath>"
+> echo "  - name-standardization <column_name>"
+> echo "  - type-detection <csv_file> <column_name>"
+> echo "  - date-parsing <csv_file> <column_name>"
+> echo "  - outlier-truncate <csv_file> <column_name>"
+> echo "  - dataframe-cleaning <csv_file> [output_file]"
+> echo "  - dataframe-consolidation <output_file> <file1> <file2> ..."
+> echo "  - file-processing <output_file> <log_file> <file1> <file2> ..."
+> echo "  - cleaning-log [log_file]"
+> echo "  - csv-summary <csv_file>"
+> echo "  - get-operations <log_file>"
+> EOF
+root@253fcef909e9:/app# chmod +x solution/solve.sh
+root@253fcef909e9:/app#

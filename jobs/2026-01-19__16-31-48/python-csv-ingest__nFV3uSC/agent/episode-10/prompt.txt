@@ -1,0 +1,39 @@
+New Terminal Output:
+
+root@785ec509f842:/app# cat > tests/test.sh << 'SHEOF'
+> #!/bin/bash
+> # Test runner for CSV Ingester
+>
+> SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+> cd "$SCRIPT_DIR/.."
+>
+> echo "Running CSV Ingester Test Suite..."
+> echo "================================="
+>
+> # Run pytest with verbose output
+> pytest tests/test_outputs.py -v
+>
+> # Capture exit code
+> EXIT_CODE=$?
+>
+> if [ $EXIT_CODE -eq 0 ]; then
+>     echo ""
+>     echo "================================="
+>     echo "All tests passed!"
+>     echo "================================="
+> else
+>     echo ""
+>     echo "================================="
+>     echo "Some tests failed. Exit code: $EXIT_CODE"
+>     echo "================================="
+> fi
+>
+> exit $EXIT_CODE
+> SHEOF
+root@785ec509f842:/app# chmod +x solution/CSVIngester.py solution/solve.sh tests/test.sh
+root@785ec509f842:/app# pip list | grep -i dateutil
+python-dateutil 2.9.0.post0
+
+[notice] A new release of pip is available: 24.0 -> 25.3
+[notice] To update, run: pip install --upgrade pip
+root@785ec509f842:/app#

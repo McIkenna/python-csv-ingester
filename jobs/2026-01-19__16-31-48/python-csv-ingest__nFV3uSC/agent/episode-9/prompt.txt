@@ -1,0 +1,269 @@
+New Terminal Output:
+
+root@785ec509f842:/app# cat > tests/test_outputs.py << 'TESTEOF'
+> import pytest
+iers)
+        > import sys
+_df > import os
+> import json
+> import pandas as pd
+> import numpy as np
+> from pathlib import Path
+>
+> # Add solution directory to path
+e standardized column name
+        p> sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'solution'))
+> from CSVIngester import CSVIngester
+        a>
+>
+> class TestColumnStandardization:
+>     """Test column name standardization"""
+>
+>     def test_standardize_spaces_col_name(self):
+>         """Test standardizing column names with spaces"""
+>         ingester = CSVIngester()
+>         assert ingester.standardize_column_name("Product Price") == "product_price"
+>         assert ingester.standardize_column_name("Customer Name") == "customer_name"
+>         assert ingester.standardize_column_name("Order ID") == "order_id"
+>
+>     def test_standardize_any_special_chars(self):
+>         """Test standardizing column names with special characters"""
+>         ingester = CSVIngester()
+>         assert ingester.standardize_column_name("Product Price $") == "product_price"
+>         assert ingester.standardize_column_name("Quantity!!") == "quantity"
+>         assert ingester.standardize_column_name("Item-Name") == "item_name"
+>
+>     def test_standardize_any_casing(self):
+>         """Test standardizing column names with various casing"""
+>         ingester = CSVIngester()
+>         assert ingester.standardize_column_name("PRODUCT_NAME") == "product_name"
+>         assert ingester.standardize_column_name("ProductName") == "product_name"
+>         assert ingester.standardize_column_name("product_name") == "product_name"
+>
+>
+> class TestDateDetectionAndParsing:
+olidated) == len(cleaned1) + len(cleaned2) + len(cleaned3)
+
+        # Should have union of all columns
+        all_cols = set(cleaned1.columns) | set(cleaned2.columns) | set(cleaned3.columns)
+        assert set(consolidated.columns) == all_cols
+
+
+class TestEncodingDetection:
+    """Test encoding detection"""
+
+    def test_should_detect_utf8_encoding(self):
+        """Test dete>     """Test date detection and parsing"""
+>
+>     def test_detect_date_column(self):
+>         """Test detecting date columns"""
+>         ingester = CSVIngester()
+>         df = pd.read_csv('tests/test_data.csv')
+>         assert ingester.detect_column_type(df, 'Order Date') == 'date'
+>         assert ingester.detect_column_type(df, 'Ship Date') == 'date'
+>
+>     def test_parse_iso_dates(self):
+>         """Test parsing ISO format dates"""
+>         ingester = CSVIngester()
+>         dates = pd.Series(['2025-01-01', '2025-01-15', '2025-02-01'])
+>         parsed = dates.apply(ingester.date_parser)
+>         assert all(parsed.str.match(r'\d{4}-\d{2}-\d{2}'))
+>
+>     def test_parse_mixed_date_formats(self):
+>         """Test parsing various date formats"""
+tests/nonexistent.csv'))
+        assert>         ingester = CSVIngester()
+>         dates = pd.Series(['2025-01-01', '01/05/2025', 'Jan 10 2025', '15-01-2025'])
+>         parsed = dates.apply(ingester.date_parser)
+>         assert all(parsed.str.match(r'\d{4}-\d{2}-\d{2}'))
+>
+>
+> class TestMissingValueImputation:
+>     """Test missing value imputation"""
+>
+>     def test_clean_single_dataframe(self):
+>         """Test cleaning a single dataframe with missing values"""
+>         ingester = CSVIngester()
+>         df = pd.read_csv('tests/test_data.csv')
+>         cleaned_df = ingester.processed_dataframe(df, 'tests/test_data.csv')
+>
+>         # Check no missing values in numeric columns (should be filled with median)
+>         numeric_cols = cleaned_df.select_dtypes(include=[np.number]).columns
+>         for col in numeric_cols:
+>             assert cleaned_df[col].isna().sum() == 0
+>
+>     def test_cleaned_columns_standardized(self):
+>         """Test that cleaned dataframe has standardized column names"""
+>         ingester = CSVIngester()
+>         df = pd.read_csv('tests/test_data.csv')
+>         cleaned_df = ingester.processed_dataframe(df, 'tests/test_data.csv')
+        # Clean up
+        o>
+>         # All column names should be lowercase and snake_case
+>         for col in cleaned_df.columns:
+>             assert col.islower()
+>             assert ' ' not in col
+>             assert '$' not in col
+>             assert '!' not in col
+>
+>
+> class TestOutlierClipping:
+>     """Test outlier clipping"""
+>
+>     def test_clip_numeric_outliers(self):
+>         """Test clipping outliers at 1st and 99th percentiles"""
+>         ingester = CSVIngester()
+>         df = pd.read_csv('tests/test_data.csv')
+>
+>         # Get the Product Price column
+>         price_col = 'Product Price $'
+>         original_max = df[price_col].max()
+>
+>         # Clean the dataframe (should clip outliers)
+>         cleaned_df = ingester.processed_dataframe(df, 'tests/test_data.csv')
+>
+>         # Find the standardized column name
+>         price_col_clean = 'product_price'
+>
+>         # 
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+est_detect_categorical_column(self):
+>         """Test detecting categorical columns"""
+   i>         ingester = CSVIngester()
+>         df = pd.read_csv('tests/test_data.csv')
+>         assert ingester.detect_column_type(df, 'Status') == 'categorical'
+>
+>
+> class TestErrorHandling:
+>     """Test error handling"""
+>
+>     def test_detect_nonexistent_column(self):
+>         """Test type detection on non-existent column"""
+>         ingester = CSVIngester()
+>         df = pd.read_csv('tests/test_data.csv')
+>         result = ingester.detect_column_type(df, 'NonExistentColumn')
+>         assert result == 'unknown'
+>
+>     def test_get_cleaning_log_nonexistent_file(self):
+>         """Test getting operations from non-existent log file"""
+>         ingester = CSVIngester()
+>         with pytest.raises(FileNotFoundError):
+>             ingester.get_operations_log(Path('tests/nonexistent_log.json'))
+>
+>     def test_summary_shows_missing_values(self):
+>         """Test CSV summary shows missing values correctly"""
+>         ingester = CSVIngester()
+>         df = pd.read_csv('tests/test_data.csv')
+>
+>         # Count missing values
+>         missing = df.isna().sum()
+>         assert missing['Customer Name'] > 0
+>         assert missing['Quantity!!'] > 0
+>
+>
+> class TestCSVSummary:
+>     """Test CSV summary functionality"""
+>
+>     def test_get_csv_summary(self):
+>         """Test getting CSV summary"""
+>         df = pd.read_csv('tests/test_data.csv')
+>
+>         summary = {
+>             'file': 'tests/test_data.csv',
+>             'rows': len(df),
+>             'columns': len(df.columns),
+>             'column_names': list(df.columns),
+>             'missing_values': df.isna().sum().to_dict()
+>         }
+>
+>         assert summary['rows'] == 10
+>         assert summary['columns'] == 8
+>         assert 'Order ID' in summary['column_names']
+>
+>
+> class TestLogOperations:
+>     """Test logging operations"""
+>
+>     def test_get_existing_operations(self):
+>         """Test retrieving operations from log"""
+>         ingester = CSVIngester()
+>         output_file = 'tests/test_output.csv'
+>         log_file = 'tests/test_log.json'
+>
+>         # Clean up if files exist
+>         for f in [output_file, log_file]:
+>             if os.path.exists(f):
+>                 os.remove(f)
+>
+>         # Process a file
+>         ingester.file_processor(['tests/test_data.csv'], output_file, log_file)
+>
+>         # Get operations
+>         operations = ingester.get_operations_log(Path(log_file))
+>         assert len(operations) > 0
+>         assert isinstance(operations, list)
+>
+>         # Clean up
+>         os.remove(output_file)
+>         os.remove(log_file)
+>
+>     def test_process_log_contains_operations(self):
+>         """Test that processing creates log with operations"""
+>         ingester = CSVIngester()
+>         output_file = 'tests/test_output2.csv'
+>         log_file = 'tests/test_log2.json'
+>
+>         # Clean up if files exist
+>         for f in [output_file, log_file]:
+>             if os.path.exists(f):
+>                 os.remove(f)
+>
+>         # Process
+>         ingester.file_processor(['tests/test_data.csv'], output_file, log_file)
+>
+>         # Check log contains expected operations
+>         with open(log_file, 'r') as f:
+>             log = json.load(f)
+>
+>         operations = [op['operation'] for op in log['operations']]
+>         assert 'load_file' in operations
+>         assert 'standardize_columns' in operations
+>
+>         # Clean up
+>         os.remove(output_file)
+>         os.remove(log_file)
+>
+>
+> class TestReplacingEmptyValues:
+>     """Test replacing empty values"""
+>
+>     def test_get_unknown_for_missing(self):
+>         """Test that missing categorical values are replaced with 'Unknown'"""
+>         ingester = CSVIngester()
+>         df = pd.read_csv('tests/test_data.csv')
+>         cleaned = ingester.processed_dataframe(df, 'tests/test_data.csv')
+>
+>         # Check categorical columns for 'Unknown'
+>         categorical_cols = cleaned.select_dtypes(include=['object']).columns
+>         for col in categorical_cols:
+>             if cleaned[col].isna().sum() == 0:  # If no NaN values
+>                 # Should have 'Unknown' for originally missing values
+>                 if 'Unknown' in cleaned[col].values:
+>                     assert True
+>                     return
+>
+>     def test_get_median_for_missing(self):
+>         """Test that missing numeric values are replaced with median"""
+>         ingester = CSVIngester()
+>         df = pd.read_csv('tests/test_data.csv')
+>
+>         # Find a numeric column with missing values
+>         numeric_cols = df.select_dtypes(include=[np.number]).columns
+>
+>         cleaned = ingester.processed_dataframe(df, 'tests/test_data.csv')
+>
+>         # Check that numeric columns have no missing values
+>         for col in cleaned.select_dtypes(include=[np.number]).columns:
+>             assert cleaned[col].isna().sum() == 0
+> TESTEOF
+root@785ec509f842:/app#

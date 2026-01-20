@@ -1,0 +1,43 @@
+Current Terminal Screen:
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+=================================== FAILURES ===================================
+____________ TestDateFormatDetection.test_parse_mixed_date_formats _____________
+tests/test_outputs.py:62: in test_parse_mixed_date_formats
+    assert result2 is not None
+E   assert None is not None
+____________ TestMissingValueImputation.test_clean_single_dataframe ____________
+tests/test_outputs.py:77: in test_clean_single_dataframe
+    assert total_nulls < total_cells * 0.1
+E   assert np.int64(9) < (80 * 0.1)
+=============================== warnings summary ===============================
+tests/test_outputs.py: 26 warnings
+  /app/solution/CSVIngester.py:295: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace me
+thod.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a
+ copy.
+
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, t
+o perform the operation inplace on the original object.
+
+
+    df[col].fillna('Unknown', inplace=True)
+
+tests/test_outputs.py: 12 warnings
+  /app/solution/CSVIngester.py:243: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace me
+thod.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a
+ copy.
+
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, t
+o perform the operation inplace on the original object.
+
+
+    df[col].fillna(median_val, inplace=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_outputs.py::TestDateFormatDetection::test_parse_mixed_date_formats
+FAILED tests/test_outputs.py::TestMissingValueImputation::test_clean_single_dataframe
+================== 2 failed, 24 passed, 38 warnings in 0.50s ===================
+root@effc21c2e322:/app#

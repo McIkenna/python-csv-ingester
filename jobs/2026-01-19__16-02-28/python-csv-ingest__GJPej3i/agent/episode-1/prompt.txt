@@ -1,0 +1,42 @@
+New Terminal Output:
+
+root@5c43413d2e06:/app# ls -la
+total 12
+drwxr-xr-x 1 root root 4096 Jan 19 22:01 .
+drwxr-xr-x 1 root root 4096 Jan 19 22:02 ..
+drwxr-xr-x 2 root root 4096 Jan 19 22:00 src
+root@5c43413d2e06:/app# pwd
+/app
+root@5c43413d2e06:/app# find . -type f -name '*.py' -o -name '*.sh' -o -name '*.csv' -o -name '*.json' -o -name '*.toml' -o -name '*.md' 2>/dev/null | head -30
+./src/sample2_data.csv
+./src/consolidated_output.csv
+./src/sample1_data.csv
+./src/final_cleaning_log.json
+./src/cleaned_sample1.csv
+./src/final_cleaned_data.csv
+root@5c43413d2e06:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

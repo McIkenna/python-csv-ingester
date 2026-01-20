@@ -1,0 +1,308 @@
+New Terminal Output:
+
+root@effc21c2e322:/app# chmod +x solution/CSVIngester.py
+root@effc21c2e322:/app# cat > solution/solve.sh << 'EOFBASH'
+> #!/bin/bash
+>
+> # CSV Ingester Shell Interface
+> # Provides bash functions for interacting with CSVIngester.py
+>
+> SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+> CSV_INGESTER="${SCRIPT_DIR}/CSVIngester.py"
+>
+> # Ensure Python script exists
+> if [[ ! -f "$CSV_INGESTER" ]]; then
+>     echo "Error: CSVIngester.py not found at $CSV_INGESTER" >&2
+>     exit 1
+> fi
+>
+> # Function: encoding-detection
+> # Detect the encoding of a CSV file
+> encoding-detection() {
+>     local filepath="$1"
+>
+>     if [[ -z "$filepath" ]]; then
+>         echo "Usage: encoding-detection <filepath>" >&2
+>         return 1
+>     fi
+>
+>     python3 -c "
+> import sys
+> sys.path.insert(0, '${SCRIPT_DIR}')
+> from CSVIngester import CSVIngester
+>
+> ingester = CSVIngester()
+> encoding = ingester.encode_process('${filepath}')
+> if encoding:
+>     print(encoding)
+> else:
+>     sys.exit(1)
+shift 2> "
+> }
+>
+> # Function: name-standardization
+    p> # Standardize a column name to snake_case
+> name-standardization() {
+>     local column_name="$1"
+>
+>     if [[ -z "$column_name" ]]; then
+>         echo "Usage: name-standardization <column_name>" >&2
+>         return 1
+>     fi
+>
+>     python3 -c "
+> import sys
+> sys.path.insert(0, '${SCRIPT_DIR}')
+> from CSVIngester import CSVIngester
+t "$log_>
+> ingester = CSVIngester()
+> print(ingester.standardize_column_name('${column_name}'))
+file"
+}
+
+# Function: csv-summary
+# Get summary statistics for a CSV file
+csv-summary> "
+> }
+>
+> # Function: type-detection
+> # Detect the type of a column (numeric, date, categorical)
+> type-detection() {
+
+    if [[ -z "$csv_file" ]]; then
+        echo "Usage: csv-summary <csv_file>     local csv_file="$1"
+>     local column_name="$2"
+>
+>     if [[ -z "$csv_file" || -z "$column_name" ]]; then
+>         echo "Usage: type-detection <csv_file> <column_name>" >&2
+>         return 1
+
+summary = ingester.g>     fi
+>
+>     python3 -c "
+> import sys
+> import pandas as pd
+> sys.path.insert(0, '${SCRIPT_DIR}')
+> from CSVIngester import CSVIngester
+>
+> ingester = CSVIngester()
+> encoding = ingester.encode_process('${csv_file}')
+> df = pd.read_csv('${csv_file}', encoding=encoding)
+> column_type = ingester.detect_column_type(df, '${column_name}')
+> if column_type:
+1
+    fi
+
+  >     print(column_type)
+> else:
+>     sys.exit(1)
+> "
+> }
+in>
+> # Function: date-parsing
+> # Parse dates in a column to ISO-8601 format
+r > date-parsing() {
+>     local csv_file="$1"
+>     local column_name="$2"
+>
+>     if [[ -z "$csv_file" || -z "$column_name" ]]; then
+>         echo "Usage: date-parsing <csv_file> <column_name>" >&2
+>         return 1
+>     fi
+>
+>     python3 -c "
+> import sys
+> import pandas as pd
+> import json
+> sys.path.insert(0, '${SCRIPT_DIR}')
+> from CSVIngester import CSVIngester
+>
+> ingester = CSVIngester()
+> encoding = ingester.encode_process('${csv_file}')
+> df = pd.read_csv('${csv_file}', encoding=encoding)
+>
+> if '${column_name}' in df.columns:
+>     parsed_dates = df['${column_name}'].apply(ingester.date_parser)
+>     result = parsed_dates.dropna().tolist()
+>     print(json.dumps(result, indent=2))
+ate <csv_file> <column_name>"
+    echo "  dataframe-cleaning <csv_file> [output_file]"
+    echo "  dataframe-> else:
+>     sys.exit(1)
+> "
+> }
+>
+> # Function: outlier-truncate
+> # Get outlier truncation statistics for a numeric column
+> outlier-truncate() {
+>     local csv_file="$1"
+>     local column_name="$2"
+>
+>     if [[ -z "$csv_file" || -z "$column_name" ]]; then
+>         echo "Usage: outlier-truncate <csv_file> <column_name>" >&2
+>         return 1
+>     fi
+>
+>     python3 -c "
+> import sys
+> import pandas as pd
+> import json
+> sys.path.insert(0, '${SCRIPT_DIR}')
+> from CSVIngester import CSVIngester
+>
+> ingester = CSVIngester()
+> encoding = ingester.encode_process('${csv_file}')
+> df = pd.read_csv('${csv_file}', encoding=encoding)
+> stats = ingester.outlier_truncate(df, '${column_name}')
+> print(json.dumps(stats, indent=2))
+> "
+> }
+>
+> # Function: dataframe-cleaning
+> # Clean a single CSV file
+> dataframe-cleaning() {
+>     local csv_file="$1"
+>     local output_file="${2:-cleaned_output.csv}"
+>
+>     if [[ -z "$csv_file" ]]; then
+>         echo "Usage: dataframe-cleaning <csv_file> [output_file]" >&2
+>         return 1
+>     fi
+>
+>     python3 -c "
+> import sys
+> sys.path.insert(0, '${SCRIPT_DIR}')
+> from CSVIngester import CSVIngester
+>
+> ingester = CSVIngester()
+> df, operations = ingester.processed_dataframe('${csv_file}')
+> df.to_csv('${output_file}', index=False)
+> print('Cleaned data saved to: ${output_file}')
+> "
+> }
+>
+> # Function: dataframe-consolidation
+> # Consolidate multiple CSV files
+> dataframe-consolidation() {
+>     if [[ $# -lt 2 ]]; then
+>         echo "Usage: dataframe-consolidation <output_file> <file1> <file2> ..." >&2
+>         return 1
+>     fi
+>
+>     local output_file="$1"
+>     shift
+>     local input_files="$@"
+>
+>     python3 -c "
+> import sys
+> sys.path.insert(0, '${SCRIPT_DIR}')
+> from CSVIngester import CSVIngester
+>
+> ingester = CSVIngester()
+> files = '${input_files}'.split()
+> consolidated = ingester.consolidated_cleaned_dataframes(files)
+> consolidated.to_csv('${output_file}', index=False)
+> print('Consolidated data saved to: ${output_file}')
+> "
+> }
+>
+> # Function: file-processing
+> # Full pipeline: process multiple files and generate log
+> file-processing() {
+>     if [[ $# -lt 3 ]]; then
+>         echo "Usage: file-processing <output_file> <log_file> <file1> <file2> ..." >&2
+>         return 1
+>     fi
+>
+>     local output_file="$1"
+>     local log_file="$2"
+>     shift 2
+>     local input_files="$@"
+>
+>     python3 "$CSV_INGESTER" $input_files -o "$output_file" -l "$log_file"
+> }
+>
+> # Function: cleaning-log
+> # Display the cleaning log
+> cleaning-log() {
+>     local log_file="${1:-cleaning_log.json}"
+>
+>     if [[ ! -f "$log_file" ]]; then
+>         echo "Error: Log file not found: $log_file" >&2
+>         return 1
+>     fi
+>
+>     cat "$log_file"
+> }
+>
+> # Function: csv-summary
+> # Get summary statistics for a CSV file
+> csv-summary() {
+>     local csv_file="$1"
+>
+>     if [[ -z "$csv_file" ]]; then
+>         echo "Usage: csv-summary <csv_file>" >&2
+>         return 1
+>     fi
+>
+>     python3 -c "
+> import sys
+> import json
+> sys.path.insert(0, '${SCRIPT_DIR}')
+> from CSVIngester import CSVIngester
+>
+> ingester = CSVIngester()
+> summary = ingester.get_csv_summary('${csv_file}')
+> if summary:
+>     print(json.dumps(summary, indent=2))
+> else:
+>     sys.exit(1)
+> "
+> }
+>
+> # Function: get-operations
+> # Get operations log from a log file
+> get-operations() {
+>     local log_file="$1"
+>
+>     if [[ -z "$log_file" ]]; then
+>         echo "Usage: get-operations <log_file>" >&2
+>         return 1
+>     fi
+>
+>     python3 -c "
+> import sys
+> import json
+> sys.path.insert(0, '${SCRIPT_DIR}')
+> from CSVIngester import CSVIngester
+>
+> ingester = CSVIngester()
+> log_data = ingester.get_operations_log('${log_file}')
+> if log_data:
+>     print(json.dumps(log_data, indent=2))
+> else:
+>     sys.exit(1)
+> "
+> }
+>
+> # If script is executed directly (not sourced), show usage
+> if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+>     echo "CSV Ingester Shell Interface"
+>     echo ""
+>     echo "Available commands:"
+>     echo "  encoding-detection <filepath>"
+>     echo "  name-standardization <column_name>"
+>     echo "  type-detection <csv_file> <column_name>"
+>     echo "  date-parsing <csv_file> <column_name>"
+>     echo "  outlier-truncate <csv_file> <column_name>"
+>     echo "  dataframe-cleaning <csv_file> [output_file]"
+>     echo "  dataframe-consolidation <output_file> <file1> <file2> ..."
+>     echo "  file-processing <output_file> <log_file> <file1> <file2> ..."
+>     echo "  cleaning-log [log_file]"
+>     echo "  csv-summary <csv_file>"
+>     echo "  get-operations <log_file>"
+>     echo ""
+>     echo "Usage: source solve.sh"
+> fi
+> EOFBASH
+root@effc21c2e322:/app#

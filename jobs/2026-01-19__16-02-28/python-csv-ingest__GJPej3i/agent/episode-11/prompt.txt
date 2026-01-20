@@ -1,0 +1,83 @@
+New Terminal Output:
+
+root@5c43413d2e06:/app# cd tests && pytest test_outputs.py -v
+===================================================================== test session starts ======================================================================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app/tests
+collected 27 items
+
+test_outputs.py::test_standardize_spaces_col_name PASSED                                                                                                 [  3%]
+test_outputs.py::test_standardize_any_special_chars PASSED                                                                                               [  7%]
+test_outputs.py::test_standardize_any_casing FAILED                                                                                                      [ 11%]
+test_outputs.py::test_detect_date_column PASSED                                                                                                          [ 14%]
+test_outputs.py::test_parse_iso_dates PASSED                                                                                                             [ 18%]
+test_outputs.py::test_parse_mixed_date_formats PASSED                                                                                                    [ 22%]
+test_outputs.py::test_clean_single_dataframe PASSED                                                                                                      [ 25%]
+test_outputs.py::test_cleaned_columns_standardized PASSED                                                                                                [ 29%]
+test_outputs.py::test_get_unknown_for_missing PASSED                                                                                                     [ 33%]
+test_outputs.py::test_get_median_for_missing PASSED                                                                                                      [ 37%]
+test_outputs.py::test_clip_numeric_outliers PASSED                                                                                                       [ 40%]
+test_outputs.py::test_consolidate_dataframes PASSED                                                                                                      [ 44%]
+test_outputs.py::test_should_detect_utf8_encoding PASSED                                                                                                 [ 48%]
+test_outputs.py::test_should_detect_latin_encoding PASSED                                                                                                [ 51%]
+test_outputs.py::test_should_detect_encoding_nonexistent_file PASSED                                                                                     [ 55%]
+test_outputs.py::test_process_full_pipeline PASSED                                                                                                       [ 59%]
+test_outputs.py::test_full_workflow PASSED                                                                                                               [ 62%]
+test_outputs.py::test_detect_numeric_column PASSED                                                                                                       [ 66%]
+test_outputs.py::test_detect_categorical_column PASSED                                                                                                   [ 70%]
+test_outputs.py::test_detect_nonexistent_column PASSED                                                                                                   [ 74%]
+test_outputs.py::test_get_cleaning_log_nonexistent_file PASSED                                                                                           [ 77%]
+test_outputs.py::test_summary_shows_missing_values PASSED                                                                                                [ 81%]
+test_outputs.py::test_get_csv_summary PASSED                                                                                                             [ 85%]
+test_outputs.py::test_get_existing_operations PASSED                                                                                                     [ 88%]
+test_outputs.py::test_process_log_contains_operations PASSED                                                                                             [ 92%]
+test_outputs.py::test_get_operations_log PASSED                                                                                                          [ 96%]
+test_outputs.py::test_get_cleaning_log PASSED                                                                                                            [100%]
+
+=========================================================================== FAILURES ===========================================================================
+_________________________________________________________________ test_standardize_any_casing __________________________________________________________________
+
+ingester = <CSVIngester.CSVIngester object at 0xffff7cb8da50>
+
+    def test_standardize_any_casing(ingester):
+        """Test standardization handles various casing."""
+        assert ingester.standardize_column_name('CUSTOMER NAME') == 'customer_name'
+>       assert ingester.standardize_column_name('customer_name') == 'customer_name'
+E       AssertionError: assert 'customername' == 'customer_name'
+E
+E         - customer_name
+E         ?         -
+E         + customername
+
+test_outputs.py:56: AssertionError
+======================================================================= warnings summary =======================================================================
+test_outputs.py: 28 warnings
+  /app/tests/../solution/CSVIngester.py:255: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an i
+nplace method.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a
+ copy.
+
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, t
+o perform the operation inplace on the original object.
+
+
+    df[col].fillna('Unknown', inplace=True)
+
+test_outputs.py: 17 warnings
+  /app/tests/../solution/CSVIngester.py:229: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an i
+nplace method.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a
+ copy.
+
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, t
+o perform the operation inplace on the original object.
+
+
+    df[col].fillna(median_val, inplace=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=================================================================== short test summary info ====================================================================
+FAILED test_outputs.py::test_standardize_any_casing - AssertionError: assert 'customername' == 'customer_name'
+========================================================== 1 failed, 26 passed, 45 warnings in 0.53s ===========================================================
+root@5c43413d2e06:/app/tests#

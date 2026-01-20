@@ -1,0 +1,65 @@
+New Terminal Output:
+
+root@effc21c2e322:/app# ls -la src/
+total 36
+drwxr-xr-x 2 root root 4096 Jan 19 22:00 .
+drwxr-xr-x 1 root root 4096 Jan 19 22:50 ..
+-rw-r--r-- 1 root root  958 Jan 19 19:17 cleaned_sample1.csv
+-rw-r--r-- 1 root root 1808 Jan 19 19:17 consolidated_output.csv
+-rw-r--r-- 1 root root 1927 Jan 19 19:17 final_cleaned_data.csv
+-rw-r--r-- 1 root root 4729 Jan 19 19:17 final_cleaning_log.json
+-rw-r--r-- 1 root root  874 Jan 19 19:17 sample1_data.csv
+-rw-r--r-- 1 root root  768 Jan 19 19:17 sample2_data.csv
+root@effc21c2e322:/app# cat src/* 2>/dev/null | head -50
+order_id,customer_name,order_date,product_price,quantity,total_amount,ship_date,status
+ORD1000,Unknown,2023-10-01,264.3134984759545,7.0,1850.194489331681,2023-10-09,Unknown
+ORD1001,Unknown,2023-02-04,171.54224088174146,17.0,2916.2180949896047,,Shipped
+ORD1002,Bob Johnson,2023-12-05,171.54224088174146,17.0,3317.4124189023737,2023-11-12,Unknown
+ORD1003,Alice Williams,2023-08-29,70.21586678937072,10.0,702.1586678937072,2023-07-09,Unknown
+ORD1004,John Smith,2023-09-01,318.7528395915485,8.0,2550.022716732388,,Unknown
+ORD1005,Alice Williams,2023-02-14,90.523993705531,14.0,1267.335911877434,,Cancelled
+ORD1006,Alice Williams,2023-04-20,432.0255346209029,2.45,864.0510692418057,2023-04-21,Cancelled
+ORD1007,Unknown,2023-11-24,68.64064916777441,7.0,499.442828207551,2023-11-29,Unknown
+ORD1008,Jane Doe,2023-03-22,477.36989036333176,15.0,6875.881001412972,,Unknown
+ORD1009,Alice Williams,2023-07-25,111.05535490816476,11.0,1221.6089039898125,2023-08-03,Shipped
+Category Type,Customer Name,Last Restock,Order Date,Order ID,Product  Name,Product Price $,Quantity!!,SKU#,Ship Date,Status,Supplier,Total Amount,Unit Cost ($),
+stock_qty
+,,,01-10-2023,ORD1000,,264.3134984759545,7.0,,09-10-2023,,,1850.194489331681,,
+,,,2023-04-02,ORD1001,,171.54224088174146,17.0,,,Shipped,,2916.2180949896047,,
+,Bob Johnson,,05.12.2023,ORD1002,,,17.0,,2023-12-11,,,3317.4124189023737,,
+,Alice Williams,,29.08.2023,ORD1003,,70.21586678937072,10.0,,09/07/2023,,,702.1586678937072,,
+,John Smith,,2023/01/09,ORD1004,,318.7528395915485,8.0,,,,,2550.022716732388,,
+,Alice Williams,,14-02-2023,ORD1005,,90.523993705531,14.0,,,Cancelled,,1267.335911877434,,
+,Alice Williams,,20.04.2023,ORD1006,,432.0255346209029,2.0,,21.04.2023,Cancelled,,864.0510692418057,,
+,,,11/24/2023,ORD1007,,68.48485841399017,7.0,,2023/11/29,,,479.39400889793114,,
+,Jane Doe,,03/22/2023,ORD1008,,481.85449697522034,15.0,,,,,7227.817454628305,,
+,Alice Williams,,25.07.2023,ORD1009,,111.05535490816476,11.0,,03-08-2023,Shipped,,1221.6089039898125,,
+Accessories,,2023-11-11,,,Monitor,,,SKU-3000,,,,,32.30900302329,261.0
+Accessories,,23-09-2023,,,Mouse,,,SKU-3001,,,MegaStore,,194.71833117751393,431.0
+Electronics,,2023/10/15,,,Chair,,,SKU-3002,,,,,1994.9345575090504,406.0
+Accessories,,2023/11/08,,,Monitor,,,SKU-3003,,,GlobalTech,,1763.1557275063572,411.0
+Accessories,,2023-10-28,,,Mouse,,,SKU-3004,,,GlobalTech,,1402.715113144494,124.0
+,,04-08-2023,,,Keyboard,,,SKU-3005,,,OfficeSupply Inc,,1195.107567789151,375.0
+Electronics,,05-12-2023,,,Monitor,,,SKU-3006,,,GlobalTech,,1893.1068424782395,43.0
+Accessories,,08/04/2023,,,Mouse,,,SKU-3007,,,TechCorp,,399.4540451996029,13930.0
+,,2023/11/24,,,Laptop,,,SKU-3008,,,,,1170.1888689891994,266.0
+Accessories,,08/22/2023,,,Desk,,,SKU-3009,,,OfficeSupply Inc,,32.92113306832887,6.0
+category_type,customer_name,last_restock,order_date,order_id,product_name,product_price,quantity,ship_date,sku,status,stock_qty,supplier,total_amount,unit_cost
+,Unknown,,2023-10-01,ORD1000,,264.3134984759545,7.0,2023-10-09,,Unknown,,,1850.194489331681,
+,Unknown,,2023-02-04,ORD1001,,171.54224088174146,17.0,,,Shipped,,,2916.2180949896047,
+,Bob Johnson,,2023-12-05,ORD1002,,171.54224088174146,17.0,2023-11-12,,Unknown,,,3317.4124189023737,
+,Alice Williams,,2023-08-29,ORD1003,,70.21586678937072,10.0,2023-07-09,,Unknown,,,702.1586678937072,
+,John Smith,,2023-09-01,ORD1004,,318.7528395915485,8.0,,,Unknown,,,2550.022716732388,
+,Alice Williams,,2023-02-14,ORD1005,,90.523993705531,14.0,,,Cancelled,,,1267.335911877434,
+,Alice Williams,,2023-04-20,ORD1006,,432.0255346209029,2.45,2023-04-21,,Cancelled,,,864.0510692418057,
+,Unknown,,2023-11-24,ORD1007,,68.64064916777441,7.0,2023-11-29,,Unknown,,,499.442828207551,
+,Jane Doe,,2023-03-22,ORD1008,,477.36989036333176,15.0,,,Unknown,,,6875.881001412972,
+,Alice Williams,,2023-07-25,ORD1009,,111.05535490816476,11.0,2023-08-03,,Shipped,,,1221.6089039898125,
+Accessories,,2023-11-11,,,Monitor,,,,SKU-3000,,261.0,Unknown,,32.3640947273435
+Accessories,,2023-09-23,,,Mouse,,,,SKU-3001,,431.0,MegaStore,,194.71833117751393
+Electronics,,2023-10-15,,,Chair,,,,SKU-3002,,406.0,Unknown,,1985.7700631562775
+Accessories,,2023-08-11,,,Monitor,,,,SKU-3003,,411.0,GlobalTech,,1763.1557275063572
+Accessories,,2023-10-28,,,Mouse,,,,SKU-3004,,124.0,GlobalTech,,1402.715113144494
+Unknown,,2023-08-04,,,Keyboard,,,,SKU-3005,,375.0,OfficeSupply Inc,,1195.107567789151
+Electronics,,2023-12-05,,,Monitor,,,,SKU-3006,,43.0,GlobalTech,,1893.1068424782395
+root@effc21c2e322:/app#

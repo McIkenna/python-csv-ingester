@@ -21,12 +21,15 @@ uvx \
   -p 3.13 \
   -w pytest==8.4.1 \
   -w pytest-json-ctrf==0.3.5 \
-  -w datetime==5.5 \
   -w numpy==2.0.2 \
   -w pandas==2.3.3 \
+<<<<<<< Updated upstream
   -w docker==7.1.0 \
   pytest --ctrf /logs/verifier/ctrf.json tests/test_outputs.py -rA
 
+=======
+  pytest --ctrf /logs/verifier/ctrf.json ${SCRIPT_DIR}/test_outputs.py -rA
+>>>>>>> Stashed changes
 
 if [ $? -eq 0 ]; then
   echo 1 > /logs/verifier/reward.txt

@@ -1,0 +1,57 @@
+New Terminal Output:
+
+root@effc21c2e322:/app# python3 -c "import pandas; import numpy; print('Python dependencies OK')"
+python3 solution/CSVIngester.py src/sample1_data.csv src/sample2_data.csv -o tests/demo_output.csv -l tests/demo_log.json
+Python dependencies OK
+root@effc21c2e322:/app# python3 solution/CSVIngester.py src/sample1_data.csv src/sample2_data.csv -o tests/demo_output.csv -l tests/demo_log.json
+Traceback (most recent call last):
+  File "/app/solution/CSVIngester.py", line 466, in <module>
+    main()
+  File "/app/solution/CSVIngester.py", line 458, in main
+    ingester.file_processor(args.input_files, args.output, args.log)
+  File "/app/solution/CSVIngester.py", line 346, in file_processor
+    consolidated = self.consolidated_cleaned_dataframes(filepaths)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/solution/CSVIngester.py", line 318, in consolidated_cleaned_dataframes
+    df, ops = self.processed_dataframe(filepath)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/solution/CSVIngester.py", line 230, in processed_dataframe
+    col_type = self.detect_column_type(df, col)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/solution/CSVIngester.py", line 113, in detect_column_type
+    if self._is_date(str(value)):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/solution/CSVIngester.py", line 125, in _is_date
+    datetime.strptime(str(value).strip(), fmt)
+  File "/usr/local/lib/python3.11/_strptime.py", line 567, in _strptime_datetime
+    tt, fraction, gmtoff_fraction = _strptime(data_string, format)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/_strptime.py", line 333, in _strptime
+    format_regex = _TimeRE_cache.compile(format)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/_strptime.py", line 263, in compile
+    return re_compile(self.pattern(format), IGNORECASE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/re/__init__.py", line 227, in compile
+    return _compile(pattern, flags)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/re/__init__.py", line 294, in _compile
+    p = _compiler.compile(pattern, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/re/_compiler.py", line 745, in compile
+    p = _parser.parse(p, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/re/_parser.py", line 989, in parse
+    p = _parse_sub(source, state, flags & SRE_FLAG_VERBOSE, 0)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/re/_parser.py", line 464, in _parse_sub
+    itemsappend(_parse(source, state, verbose, nested + 1,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/re/_parser.py", line 867, in _parse
+    raise source.error(err.msg, len(name) + 1) from None
+re.error: redefinition of group name 'd' as group 3; was group 1 at position 75
+root@effc21c2e322:/app# ls -lh tests/*.csv tests/*.json 2>/dev/null | head -20
+-rw-r--r-- 1 root root 648 Jan 19 22:54 tests/test2_data.csv
+-rw-r--r-- 1 root root 636 Jan 19 22:54 tests/test3_data.csv
+-rw-r--r-- 1 root root 653 Jan 19 22:54 tests/test_data.csv
+root@effc21c2e322:/app#

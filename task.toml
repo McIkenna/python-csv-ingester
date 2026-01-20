@@ -15,9 +15,13 @@ timeout_sec = 900.0
 [agent]
 timeout_sec = 900.0
 
+[task]
+id = "csv-ingest-task" 
+name = "CSV Ingestion Task"
+version = "1.0.0"
+
 [environment]
-build_timeout_sec = 600.0
-docker_image = "pythoncsvingest"
-cpus = 1
-memory_mb = 2048
-storage_mb = 10240
+environment_name = "pythoncsv"
+type = "docker"
+dockerfile = "environment/Dockerfile"
+docker_image = "python-csv-ingest"

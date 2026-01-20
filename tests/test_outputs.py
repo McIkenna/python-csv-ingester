@@ -126,6 +126,10 @@ def solve_sh_path():
 
 def run_bash_command(command_name, args, file_path):
     cmd = f"{file_path} {command_name} {args}"
+
+    print(f"DEBUG: Running command: {cmd}")
+    print(f"DEBUG: File exists: {os.path.exists(file_path)}")
+    print(f"DEBUG: File executable: {os.access(file_path, os.X_OK)}")
     result = subprocess.run(
         cmd,
         shell=True,
@@ -133,7 +137,13 @@ def run_bash_command(command_name, args, file_path):
         text=True,
         executable='/bin/bash'
     )
+
+    print(f"DEBUG: Return code: {result.returncode}")
+    print(f"DEBUG: Stdout: '{result.stdout}'")
+    print(f"DEBUG: Stderr: '{result.stderr}'")
     stdout = result.stdout.strip()
+
+    
     
     # If output contains JSON, extract only the JSON part
     # Look for the first occurrence of '[' or '{' to find where JSON starts
@@ -155,6 +165,12 @@ def run_bash_command(command_name, args, file_path):
 
 def test_should_detect_utf8_encoding(mock_test_data_two, solve_sh_path):
     """Test for encoding detection"""
+
+
+    print(f"DEBUG: Current directory: {os.getcwd()}")
+    print(f"DEBUG: Directory contents: {os.listdir('.')}")
+    print(f"DEBUG: solve_sh_path: {solve_sh_path}")
+    print(f"DEBUG: Absolute path: {os.path.abspath(solve_sh_path)}")
     stdout, stderr, returncode = run_bash_command(
             "encoding-detection",
             f'"{mock_test_data_two}"',

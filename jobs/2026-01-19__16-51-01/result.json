@@ -1,0 +1,29 @@
+{
+    "id": "52c4320f-d212-457f-b3e0-aaafaa2b5bc2",
+    "started_at": "2026-01-19T16:51:01.574881",
+    "finished_at": "2026-01-19T17:00:00.620818",
+    "n_total_trials": 1,
+    "stats": {
+        "n_trials": 1,
+        "n_errors": 0,
+        "evals": {
+            "terminus-2__@anthropic-tbench-claude-sonnet-4-5-20250929__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 0.0
+                    }
+                ],
+                "reward_stats": {
+                    "reward": {
+                        "0.0": [
+                            "python-csv-ingest__Cv8hWDL"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        }
+    }
+}

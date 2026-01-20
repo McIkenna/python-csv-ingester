@@ -1,7 +1,6 @@
-set -e
+# !/bin/bash
 # apt update && apt install -y vim
 # pip install pandas numpy argparse pathlib datetime typing
-# !/bin/bash
 
 # Solution.sh - Shell interface for CSVIngester functions
 # This script wraps Python CSVIngester methods as bash functions

@@ -1,0 +1,31 @@
+New Terminal Output:
+
+root@785ec509f842:/app# cat > tests/test3_data.csv << 'EOF'
+> product_code,Item-Name,Stock Quantity,Unit Price!!,Supplier Name,Reorder Date,Category Type
+> P001,Widget A,150,25.50,Acme Corp,2025-01-01,Electronics
+> P002,Gadget B,200,35.75,Beta Inc,01/05/2025,Electronics
+> P003,,50,45.25,Gamma Ltd,Jan 10 2025,Furniture
+> P004,Device D,5,9999.99,Delta Co,15-01-2025,Electronics
+> P005,Tool E,300,15.00,,2025/01/20,Hardware
+> P006,Item F,,55.50,Epsilon LLC,25 Jan 2025,Unknown
+> P007,Product G,100,65.75,Zeta Corp,2025-02-01,Electronics
+> P008,Widget H,250,8.50,Eta Inc,01-Feb-2025,Hardware
+> P009,,75,85.25,Theta Ltd,Feb 10 2025,Furniture
+> P010,Gadget J,400,,Iota Co,15/02/2025,Electronics
+> EOF
+root@785ec509f842:/app# python3 << 'PYEOF'
+> import csv
+> # Create a Latin-1 encoded file
+> data = [
+>     ['id', 'name', 'city', 'salary'],
+>     ['1', 'José García', 'São Paulo', '50000'],
+>     ['2', 'François Müller', 'Zürich', '75000'],
+>     ['3', 'María Rodríguez', 'México', '45000']
+> ]
+> with open('tests/latin1_data.csv', 'w', encoding='latin-1', newline='') as f:
+>     writer = csv.writer(f)
+>     writer.writerows(data)
+> print('Created latin1_data.csv')
+> PYEOF
+Created latin1_data.csv
+root@785ec509f842:/app#

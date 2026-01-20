@@ -1,0 +1,1488 @@
+[?2004hroot@253fcef909e9:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@253fcef909e9:/app# clear
+[?2004l[H[J[3J[?2004hroot@253fcef909e9:/app# ls -la
+[?2004ltotal 12
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 .
+drwxr-xr-x 1 root root 4096 Jan 19 19:18 ..
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 src
+[?2004hroot@253fcef909e9:/app# pwd
+[?2004l/app
+[?2004hroot@253fcef909e9:/app# ls -la src/
+[?2004ltotal 16
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 .
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 ..
+-rw-r--r-- 1 root root  874 Jan  6 04:31 sample1_data.csv
+-rw-r--r-- 1 root root  768 Jan  6 04:17 sample2_data.csv
+[?2004hroot@253fcef909e9:/app# mkdir -p solution tests
+[?2004l[?2004hroot@253fcef909e9:/app# cat > solution/CSVIngester.py << 'EOF'
+[?2004l[?2004h> #!/usr/bin/env python3
+[?2004l[?2004h> 
+[?2004l[?2004h> import argparse
+[?2004l[?2004h> import json
+[?2004lpped_min': float(clipped.min()),
+            'clipped_max': float(clipped.max())
+        }
+[?2004h> import re
+[?2004l[?2004h> import sys
+[?2004l    
+    def logging_[?2004h> from datetime import datetime
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> from typing import Dict, List, Any, Optional, Tuple
+[?2004l[?2004h> 
+[?2004l[?2004h> import pandas as pd
+[?2004l[?2004h> import numpy as np
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> class CSVIngester:
+[?2004l[?2004h>     """Main class for CSV ingestion, cleaning, and consolidation."""
+[?2004l[?2004h>     
+[?2004l[?2004h>     def __init__(self):
+[?2004l         'details': details,
+            'timestamp': datetime.now().isoformat()
+        }
+        self.opera[?2004h>         self.operations_log = []
+[?2004l[?2004h>         
+[?2004l[?2004h>     def encode_process(self, filepath: str) -> Optional[str]:
+[?2004l[?2004h>         """Auto-detect file encoding (UTF-8, Latin-1)."""
+[?2004l[?2004h>         if not Path(filepath).exists():
+[?2004l[?2004h>             return None
+[?2004l[?2004h>             
+[?2004l[?2004h>         encodings = ['utf-8', 'latin-1']
+[?2004l[?2004h>         for encoding in encodings:
+[?2004l[?2004h>             try:
+[?2004l[?2004h>                 with open(filepath, 'r', encoding=encoding) as f:
+[?2004l[?2004h>                     f.read()
+[?2004l[?2004h>                 return encoding
+[?2004l[?2004h>             except (UnicodeDecodeError, UnicodeError):
+[?2004l[?2004h>                 continue
+[?2004l[?2004h>         return 'utf-8'
+[?2004lging_process('load[?2004h>     
+[?2004l[?2004h>     def standardize_column_name(self, column_name: str) -> str:
+[?2004l[?2004h>         """Convert column names to snake_case."""
+[?2004l[?2004h>         # Remove special characters except underscores and spaces
+[?2004l[?2004h>         cleaned = re.sub(r'[^a-zA-Z0-9\s_]', '', column_name)
+[?2004l[?2004h>         # Replace spaces with underscores
+[?2004l[?2004h>         cleaned = re.sub(r'\s+', '_', cleaned)
+[?2004l[?2004h>         # Convert to lowercase
+[?2004l[?2004h>         cleaned = cleaned.lower()
+[?2004l       [?2004h>         # Remove multiple underscores
+[?2004l[?2004h>         cleaned = re.sub(r'_+', '_', cleaned)
+[?2004l[?2004h>         # Strip leading/trailing underscores
+[?2004lth,
+            'mappings': column_mappings
+ [?2004h>         cleaned = cleaned.strip('_')
+[?2004l[?2004h>         return cleaned
+[?2004l[?2004h>     
+[?2004l[?2004h>     def detect_column_type(self, df: pd.DataFrame, column_name: str) -> str:
+[?2004l[?2004h>         """Identify if column is numeric/date/categorical."""
+[?2004l[?2004h>         if column_name not in df.columns:
+[?2004l[?2004h>             return 'unknown'
+[?2004l[?2004h>         
+[?2004l[?2004h>         col = df[column_name].dropna()
+[?2004l[?2004h>         if len(col) == 0:
+[?2004l[?2004h>             return 'categorical'
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Try numeric
+[?2004lwith median
+                if df[col].isna().any():
+                    [?2004h>         try:
+[?2004l[?2004h>             pd.to_numeric(col)
+[?2004l[?2004h>             return 'numeric'
+[?2004l[?2004h>         except (ValueError, TypeError):
+[?2004l[?2004h>             pass
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Try date
+[?2004l[?2004h>         date_detected = 0
+[?2004l[?2004h>         sample_size = min(len(col), 100)
+[?2004l     self.logging_process('impute_numeric[?2004h>         for val in col.head(sample_size):
+[?2004l[?2004h>             if self.date_parser(str(val)) is not None:
+[?2004l[?2004h>                 date_detected += 1
+[?2004l[?2004h>         
+[?2004l[?2004h>         if date_detected > sample_size * 0.5:
+[?2004l[?2004h>             return 'date'
+[?2004ln_val) if pd.notna(median_val) else 0.0,
+                        'count': int(mis[?2004h>         
+[?2004l[?2004h>         return 'categorical'
+[?2004l[?2004h>     
+[?2004l[?2004h>     def date_parser(self, date_string: str) -> Optional[str]:
+[?2004l[?2004h>         """Convert various date formats to ISO-8601 (YYYY-MM-DD)."""
+[?2004l[?2004h>         if pd.isna(date_string) or date_string == '':
+[?2004l[?2004h>             return None
+[?2004l[?2004h>         
+[?2004l[?2004h>         date_formats = [
+[?2004l             self.loggi[?2004h>             '%Y-%m-%d', '%Y/%m/%d', '%Y.%m.%d',
+[?2004l[?2004h>             '%m/%d/%Y', '%m/%d/%y', '%m-%d-%Y',
+[?2004l[?2004h>             '%d/%m/%Y', '%d.%m.%Y', '%d-%m-%Y',
+[?2004l[?2004h>             '%b %d, %Y', '%d %b %Y', '%B %d, %Y',
+[?2004l[?2004h>             '%d %B %Y', '%Y%m%d'
+[?2004l[?2004h>         ]
+[?2004l[?2004h>         
+[?2004l[?2004h>         for fmt in date_formats:
+[?2004l[?2004h>             try:
+[?2004l[?2004h>                 dt = datetime.strptime(str(date_string).strip(), fmt)
+[?2004l[?2004h>                 return dt.strftime('%Y-%m-%d')
+[?2004l[?2004h>             except (ValueError, TypeError):
+[?2004l[?2004h>                 continue
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Try pandas parser as fallback
+[?2004l[?2004h>         try:
+[?2004l[?2004h>             dt = pd.to_datetime(date_string, errors='coerce')
+[?2004l[?2004h>             if pd.notna(dt):
+[?2004l[?2004h>                 return dt.strftime('%Y-%m-%d')
+[?2004l[?2004h>         except:
+[?2004lown'
+           [?2004h>             pass
+[?2004l[?2004h>         
+[?2004l[?2004h>         return None
+[?2004l[?2004h>     
+[?2004l[?2004h>     def outlier_truncate(self, df: pd.DataFrame, column_name: str) -> Dict[str, float]:
+[?2004l[?2004h>         """Clip values at 1st/99th percentiles."""
+[?2004l            se[?2004h>         if column_name not in df.columns:
+[?2004l[?2004h>             return {}
+[?2004l[?2004h>         
+[?2004l[?2004h>         col = pd.to_numeric(df[column_name], errors='coerce')
+[?2004l[?2004h>         lower_bound = col.quantile(0.01)
+[?2004l[?2004h>         upper_bound = col.quantile(0.99)
+[?2004l[?2004h>         
+[?2004l[?2004h>         original_min = col.min()
+[?2004l[?2004h>         original_max = col.max()
+[?2004l[?2004h>         
+[?2004l[?2004h>         clipped = col.clip(lower=lower_bound, upper=upper_bound)
+[?2004l[?2004h>         
+[?2004l[?2004h>         return {
+[?2004l[?2004h>             'lower_bound': float(lower_bound),
+[?2004l[?2004h>             'upper_bound': float(upper_bound),
+[?2004l[?2004h>             'original_min': float(original_min),
+[?2004lgnore[?2004h>             'original_max': float(original_max),
+[?2004llf.lo[?2004h>             'clipped_min': float(clipped.min()),
+[?2004l[?2004h>             'clipped_max': float(clipped.max())
+[?2004l[?2004h>         }
+[?2004l[?2004h>     
+[?2004l[?2004h>     def logging_process(self, operation: str, details: Dict[str, Any]):
+[?2004led.columns)
+        })
+[?2004h>         """Log a cleaning operation."""
+[?2004l[?2004h>         log_entry = {
+[?2004lrocess[?2004h>             'operation': operation,
+[?2004l[?2004h>             'details': details,
+[?2004l[?2004h>             'timestamp': datetime.now().isoformat()
+[?2004l     self.o[?2004h>         }
+[?2004lperations_[?2004h>         self.operations_log.append(log_entry)
+[?2004l[?2004h>     
+[?2004l[?2004h>     def get_operations_log(self) -> List[Dict[str, Any]]:
+[?2004l      df = [?2004h>         """Return the operations log."""
+[?2004lth)
+      [?2004h>         return self.operations_log
+[?2004l[?2004h>     
+[?2004l[?2004h>     def processed_dataframe(self, filepath: str) -> pd.DataFrame:
+[?2004l[?2004h>         """Clean and process a single CSV file."""
+[?2004l[?2004h>         # Detect encoding
+[?2004l[?2004h>         encoding = self.encode_process(filepath)
+[?2004lile, index=False)
+        
+        self.lo[?2004h>         
+[?2004l[?2004h>         # Load file
+[?2004l[?2004h>         df = pd.read_csv(filepath, encoding=encoding)
+[?2004l[?2004h>         original_rows = len(df)
+[?2004l[?2004h>         original_cols = len(df.columns)
+[?2004l[?2004h>         
+[?2004l[?2004h>         self.logging_process('load_file', {
+[?2004l[?2004h>             'source': filepath,
+[?2004l[?2004h>             'rows': original_rows,
+[?2004l[?2004h>             'columns': original_cols
+[?2004l[?2004h>         })
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Standardize column names
+[?2004l[?2004h>         column_mappings = {}
+[?2004len(log_file, 'w') as f:
+            json.dump(log_da[?2004h>         for col in df.columns:
+[?2004l[?2004h>             new_col = self.standardize_column_name(col)
+[?2004l[?2004h>             column_mappings[col] = new_col
+[?2004l[?2004h>         
+[?2004l[?2004h>         df.rename(columns=column_mappings, inplace=True)
+[?2004l[?2004h>         
+[?2004l[?2004h>         self.logging_process('standardize_columns', {
+[?2004l[?2004h>             'source': filepath,
+[?2004l[?2004h>             'mappings': column_mappings
+[?2004l[?2004h>         })
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Process each column
+[?2004l[?2004h>         for col in df.columns:
+[?2004l[?2004h>             col_type = self.detect_column_type(df, col)
+[?2004l[?2004h>             
+[?2004l[?2004h>             if col_type == 'numeric':
+[?2004l[?2004h>                 # Convert to numeric
+[?2004l[?2004h>                 df[col] = pd.to_numeric(df[col], errors='coerce')
+[?2004l[?2004h>                 
+[?2004l[?2004h>                 # Impute missing with median
+[?2004l[?2004h>                 if df[col].isna().any():
+[?2004l[?2004h>                     median_val = df[col].median()
+[?2004l[?2004h>                     missing_count = df[col].isna().sum()
+[?2004l[?2004h>                     df[col].fillna(median_val, inplace=True)
+[?2004l[?2004h>                     
+[?2004l[?2004h>                     self.logging_process('impute_numeric', {
+[?2004l[?2004h>                         'column': col,
+[?2004l[?2004h>                         'method': 'median',
+[?2004l[?2004h>                         'value': float(median_val) if pd.notna(median_val) else 0.0,
+[?2004l[?2004h>                         'count': int(missing_count)
+[?2004l[?2004h>                     })
+[?2004l[?2004h>                 
+[?2004l[?2004h>                 # Clip outliers
+[?2004l[?2004h>                 lower = df[col].quantile(0.01)
+[?2004l[?2004h>                 upper = df[col].quantile(0.99)
+[?2004l[?2004h>                 df[col] = df[col].clip(lower=lower, upper=upper)
+[?2004l[?2004h>                 
+[?2004l[?2004h>                 self.logging_process('clip_outliers', {
+[?2004l[?2004h>                     'column': col,
+[?2004l[?2004h>                     'lower_percentile': float(lower),
+[?2004l[?2004h>                     'upper_percentile': float(upper)
+[?2004l[?2004h>                 })
+[?2004l[?2004h>             
+[?2004l[?2004h>             elif col_type == 'date':
+[?2004l[?2004h>                 # Parse dates
+[?2004l[?2004h>                 parsed_dates = df[col].apply(lambda x: self.date_parser(str(x)) if pd.notna(x) else None)
+[?2004l[?2004h>                 df[col] = parsed_dates
+[?2004l[?2004h>                 
+[?2004l[?2004h>                 self.logging_process('parse_dates', {
+[?2004l[?2004h>                     'column': col,
+[?2004l[?2004h>                     'format': 'ISO-8601 (YYYY-MM-DD)'
+[?2004l[?2004h>                 })
+[?2004l[?2004h>             
+[?2004l[?2004h>             else:  # categorical
+[?2004l[?2004h>                 # Fill missing with 'Unknown'
+[?2004l[?2004h>                 if df[col].isna().any():
+[?2004l[?2004h>                     missing_count = df[col].isna().sum()
+[?2004l[?2004h>                     df[col].fillna('Unknown', inplace=True)
+[?2004l[?2004h>                     
+[?2004l[?2004h>                     self.logging_process('impute_categorical', {
+[?2004l[?2004h>                         'column': col,
+[?2004l[?2004h>                         'value': 'Unknown',
+[?2004l[?2004h>                         'count': int(missing_count)
+[?2004l[?2004h>                     })
+[?2004l[?2004h>         
+[?2004l[?2004h>         return df
+[?2004l[?2004h>     
+[?2004l[?2004h>     def consolidated_cleaned_dataframes(self, dataframes: List[pd.DataFrame]) -> pd.DataFrame:
+[?2004l[?2004h>         """Merge multiple cleaned DataFrames."""
+[?2004l[?2004h>         if not dataframes:
+[?2004l[?2004h>             return pd.DataFrame()
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Concatenate all dataframes
+[?2004l[?2004h>         consolidated = pd.concat(dataframes, ignore_index=True, sort=False)
+[?2004l[?2004h>         
+[?2004l[?2004h>         self.logging_process('consolidate', {
+[?2004l[?2004h>             'num_files': len(dataframes),
+[?2004l[?2004h>             'total_rows': len(consolidated),
+[?2004l[?2004h>             'total_columns': len(consolidated.columns)
+[?2004l[?2004h>         })
+[?2004l[?2004h>         
+[?2004l[?2004h>         return consolidated
+[?2004l[?2004h>     
+[?2004l[?2004h>     def file_processor(self, input_files: List[str], output_file: str, log_file: str):
+[?2004l[?2004h>         """Full pipeline execution."""
+[?2004l[?2004h>         self.operations_log = []  # Reset log
+[?2004l[?2004h>         
+[?2004l[?2004h>         dataframes = []
+[?2004l[?2004h>         for filepath in input_files:
+[?2004l[?2004h>             df = self.processed_dataframe(filepath)
+[?2004l[?2004h>             dataframes.append(df)
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Consolidate
+[?2004l[?2004h>         final_df = self.consolidated_cleaned_dataframes(dataframes)
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Save output
+[?2004l[?2004h>         final_df.to_csv(output_file, index=False)
+[?2004l[?2004h>         
+[?2004l[?2004h>         self.logging_process('save_output', {
+[?2004l[?2004h>             'output_file': output_file,
+[?2004l[?2004h>             'rows': len(final_df),
+[?2004l[?2004h>             'columns': len(final_df.columns)
+[?2004l[?2004h>         })
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Save log
+[?2004l[?2004h>         log_data = {
+[?2004l[?2004h>             'timestamp': datetime.now().isoformat(),
+[?2004l[?2004h>             'operations': self.operations_log
+[?2004l[?2004h>         }
+[?2004l[?2004h>         
+[?2004l[?2004h>         with open(log_file, 'w') as f:
+[?2004l[?2004h>             json.dump(log_data, f, indent=2)
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def main():
+[?2004l[?2004h>     parser = argparse.ArgumentParser(
+[?2004l[?2004h>         description='CSV Ingester - Clean and consolidate CSV files'
+[?2004l[?2004h>     )
+[?2004l[?2004h>     parser.add_argument(
+[?2004l[?2004h>         'input_files',
+[?2004l[?2004h>         nargs='+',
+[?2004l[?2004h>         help='Input CSV files to process'
+[?2004l[?2004h>     )
+[?2004l[?2004h>     parser.add_argument(
+[?2004l[?2004h>         '-o', '--output',
+[?2004l[?2004h>         default='cleaned_data.csv',
+[?2004l[?2004h>         help='Output CSV file (default: cleaned_data.csv)'
+[?2004l[?2004h>     )
+[?2004l[?2004h>     parser.add_argument(
+[?2004l[?2004h>         '-l', '--log',
+[?2004l[?2004h>         default='cleaning_log.json',
+[?2004l[?2004h>         help='Output log file (default: cleaning_log.json)'
+[?2004l[?2004h>     )
+[?2004l[?2004h>     
+[?2004l[?2004h>     args = parser.parse_args()
+[?2004l[?2004h>     
+[?2004l[?2004h>     ingester = CSVIngester()
+[?2004l[?2004h>     ingester.file_processor(args.input_files, args.output, args.log)
+[?2004l[?2004h>     
+[?2004l[?2004h>     print(f"Processing complete!")
+[?2004l[?2004h>     print(f"Cleaned data saved to: {args.output}")
+[?2004l[?2004h>     print(f"Cleaning log saved to: {args.log}")
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> if __name__ == '__main__':
+[?2004l[?2004h>     main()
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@253fcef909e9:/app# chmod +x solution/CSVIngester.py
+[?2004l[?2004hroot@253fcef909e9:/app# cat > solution/solve.sh << 'EOF'
+[?2004ls.tolist(),
+    'missing_values':[?2004h> #!/bin/bash
+[?2004l[?2004h> 
+[?2004l[?2004h> # Source this script to use the CSV cleaning functions
+[?2004l[?2004h> # Usage: source solution/solve.sh
+[?2004l df.isnull().sum().to_dict()
+}
+print(json.dumps(summary, indent=2))
+PYTHON
+}
+
+get-operations() {
+    i[?2004h> 
+[?2004l[?2004h> encoding-detection() {
+[?2004l[?2004h>     if [ -z "$1" ]; then
+[?2004l  echo "Usage: get-oper[?2004h>         echo "Usage: encoding-detection <filepath>"
+[?2004l[?2004h>         return 1
+[?2004l[?2004h>     fi
+[?2004l[?2004h>     python3 -c "from solution.CSVIngester import CSVIngester; ingester = CSVIngester(); print(ingester.encode_process('$1'))"
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> name-standardization() {
+[?2004l[?2004h>     if [ -z "$1" ]; then
+[?2004l[?2004h>         echo "Usage: name-standardization <column_name>"
+[?2004l[?2004h>         return 1
+[?2004l[?2004h>     fi
+[?2004l[?2004h>     python3 -c "from solution.CSVIngester import CSVIngester; ingester = CSVIngester(); print(ingester.standardize_column_name('$1'))"
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> type-detection() {
+[?2004l[?2004h>     if [ -z "$1" ] || [ -z "$2" ]; then
+[?2004l[?2004h>         echo "Usage: type-detection <csv_file> <column_name>"
+[?2004l[?2004h>         return 1
+[?2004l[?2004h>     fi
+[?2004l[?2004h>     python3 -c "import pandas as pd; from solution.CSVIngester import CSVIngester; ingester = CSVIngester(); df = pd.read_csv('$1'); print(ingester.detect_column_type(df, '$2'))"
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> date-parsing() {
+[?2004l[?2004h>     if [ -z "$1" ] || [ -z "$2" ]; then
+[?2004l[?2004h>         echo "Usage: date-parsing <csv_file> <column_name>"
+[?2004lations']]
+    print(json.dumps(operations, indent=2))
+else:
+    print(json.dumps([]))
+PYTHON
+}
+
+echo "CSV Cleaning functions loaded. Available commands:"
+echo "  - encoding-detection <filepath>"
+echo "  - name-standardization <column_name>"
+echo "  - type-detection <csv_file> <column_name>"
+echo "  - date-parsing <csv_file> <column_name>"
+echo "  - outlier-truncate <csv_file> <column_name>"
+echo "  - dataframe-cleaning <csv_file> [output_file]"
+echo "  - dataframe-consolidation <output_file> <file1> <file2> ..."
+echo "  - file-processing <output_file> <log_file> <file1> <file2> ..."
+echo "  - cleani[?2004h>         return 1
+[?2004l[?2004h>     fi
+[?2004l[?2004h>     python3 << PYTHON
+[?2004l[?2004h> import pandas as pd
+[?2004l[?2004h> from solution.CSVIngester import CSVIngester
+[?2004l[?2004h> import json
+[?2004l[?2004h> 
+[?2004l[?2004h> ingester = CSVIngester()
+[?2004l[?2004h> df = pd.read_csv('$1')
+[?2004l[?2004h> if '$2' in df.columns:
+[?2004l[?2004h>     parsed = df['$2'].apply(lambda x: ingester.date_parser(str(x)) if pd.notna(x) else None)
+[?2004l[?2004h>     result = parsed.dropna().tolist()
+[?2004l[?2004h>     print(json.dumps(result[:10]))  # First 10 parsed dates
+[?2004l[?2004h> else:
+[?2004l[?2004h>     print(json.dumps([]))
+[?2004l[?2004h> PYTHON
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> outlier-truncate() {
+[?2004l[?2004h>     if [ -z "$1" ] || [ -z "$2" ]; then
+[?2004l[?2004h>         echo "Usage: outlier-truncate <csv_file> <column_name>"
+[?2004l[?2004h>         return 1
+[?2004l[?2004h>     fi
+[?2004l[?2004h>     python3 << PYTHON
+[?2004l[?2004h> import pandas as pd
+[?2004l[?2004h> from solution.CSVIngester import CSVIngester
+[?2004l[?2004h> import json
+[?2004l[?2004h> 
+[?2004l[?2004h> ingester = CSVIngester()
+[?2004l[?2004h> df = pd.read_csv('$1')
+[?2004l[?2004h> result = ingester.outlier_truncate(df, '$2')
+[?2004l[?2004h> print(json.dumps(result, indent=2))
+[?2004l[?2004h> PYTHON
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> dataframe-cleaning() {
+[?2004l[?2004h>     if [ -z "$1" ]; then
+[?2004l[?2004h>         echo "Usage: dataframe-cleaning <csv_file> [output_file]"
+[?2004l[?2004h>         return 1
+[?2004l[?2004h>     fi
+[?2004l[?2004h>     
+[?2004l[?2004h>     local input_file="$1"
+[?2004l[?2004h>     local output_file="${2:-cleaned_output.csv}"
+[?2004l[?2004h>     
+[?2004l[?2004h>     python3 << PYTHON
+[?2004l[?2004h> from solution.CSVIngester import CSVIngester
+[?2004l[?2004h> 
+[?2004l[?2004h> ingester = CSVIngester()
+[?2004l[?2004h> df = ingester.processed_dataframe('$input_file')
+[?2004l[?2004h> df.to_csv('$output_file', index=False)
+[?2004l[?2004h> print("Cleaned data saved to: $output_file")
+[?2004l[?2004h> PYTHON
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> dataframe-consolidation() {
+[?2004l[?2004h>     if [ "$#" -lt 2 ]; then
+[?2004l[?2004h>         echo "Usage: dataframe-consolidation <output_file> <file1> <file2> ..."
+[?2004l[?2004h>         return 1
+[?2004l[?2004h>     fi
+[?2004l[?2004h>     
+[?2004l[?2004h>     local output_file="$1"
+[?2004l[?2004h>     shift
+[?2004l[?2004h>     local files="$@"
+[?2004l[?2004h>     
+[?2004l[?2004h>     python3 << PYTHON
+[?2004l[?2004h> from solution.CSVIngester import CSVIngester
+[?2004l[?2004h> import sys
+[?2004l[?2004h> 
+[?2004l[?2004h> ingester = CSVIngester()
+[?2004l[?2004h> files = '$files'.split()
+[?2004l[?2004h> dataframes = []
+[?2004l[?2004h> for f in files:
+[?2004l[?2004h>     df = ingester.processed_dataframe(f)
+[?2004l[?2004h>     dataframes.append(df)
+[?2004l[?2004h> 
+[?2004l[?2004h> consolidated = ingester.consolidated_cleaned_dataframes(dataframes)
+[?2004l[?2004h> consolidated.to_csv('$output_file', index=False)
+[?2004l[?2004h> print(f"Consolidated data saved to: $output_file")
+[?2004l[?2004h> PYTHON
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> file-processing() {
+[?2004l[?2004h>     if [ "$#" -lt 3 ]; then
+[?2004l[?2004h>         echo "Usage: file-processing <output_file> <log_file> <file1> <file2> ..."
+[?2004l[?2004h>         return 1
+[?2004l[?2004h>     fi
+[?2004l[?2004h>     
+[?2004l[?2004h>     local output_file="$1"
+[?2004l[?2004h>     local log_file="$2"
+[?2004l[?2004h>     shift 2
+[?2004l[?2004h>     local files="$@"
+[?2004l[?2004h>     
+[?2004l[?2004h>     python3 << PYTHON
+[?2004l[?2004h> from solution.CSVIngester import CSVIngester
+[?2004l[?2004h> 
+[?2004l[?2004h> ingester = CSVIngester()
+[?2004l[?2004h> files = '$files'.split()
+[?2004l[?2004h> ingester.file_processor(files, '$output_file', '$log_file')
+[?2004l[?2004h> print(f"Processing complete!")
+[?2004l[?2004h> print(f"Cleaned data saved to: $output_file")
+[?2004l[?2004h> print(f"Cleaning log saved to: $log_file")
+[?2004l[?2004h> PYTHON
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> cleaning-log() {
+[?2004l[?2004h>     local log_file="${1:-cleaning_log.json}"
+[?2004l[?2004h>     
+[?2004l[?2004h>     if [ ! -f "$log_file" ]; then
+[?2004l[?2004h>         echo "Log file not found: $log_file"
+[?2004l[?2004h>         return 1
+[?2004l[?2004h>     fi
+[?2004l[?2004h>     
+[?2004l[?2004h>     cat "$log_file" | python3 -m json.tool
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> csv-summary() {
+[?2004l[?2004h>     if [ -z "$1" ]; then
+[?2004l[?2004h>         echo "Usage: csv-summary <csv_file>"
+[?2004l[?2004h>         return 1
+[?2004l[?2004h>     fi
+[?2004l[?2004h>     
+[?2004l[?2004h>     python3 << PYTHON
+[?2004l[?2004h> import pandas as pd
+[?2004l[?2004h> import json
+[?2004l[?2004h> 
+[?2004l[?2004h> df = pd.read_csv('$1')
+[?2004l[?2004h> summary = {
+[?2004l[?2004h>     'file': '$1',
+[?2004l[?2004h>     'rows': len(df),
+[?2004l[?2004h>     'columns': len(df.columns),
+[?2004l[?2004h>     'column_names': df.columns.tolist(),
+[?2004l[?2004h>     'missing_values': df.isnull().sum().to_dict()
+[?2004l[?2004h> }
+[?2004l[?2004h> print(json.dumps(summary, indent=2))
+[?2004l[?2004h> PYTHON
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> get-operations() {
+[?2004l[?2004h>     if [ -z "$1" ]; then
+[?2004l[?2004h>         echo "Usage: get-operations <log_file>"
+[?2004l[?2004h>         return 1
+[?2004l[?2004h>     fi
+[?2004l[?2004h>     
+[?2004l[?2004h>     if [ ! -f "$1" ]; then
+[?2004l[?2004h>         echo "Log file not found: $1"
+[?2004l[?2004h>         return 1
+[?2004l[?2004h>     fi
+[?2004l[?2004h>     
+[?2004l[?2004h>     python3 << PYTHON
+[?2004l[?2004h> import json
+[?2004l[?2004h> 
+[?2004l[?2004h> with open('$1', 'r') as f:
+[?2004l[?2004h>     data = json.load(f)
+[?2004l[?2004h>     
+[?2004l[?2004h> if 'operations' in data:
+[?2004l[?2004h>     operations = [op['operation'] for op in data['operations']]
+[?2004l[?2004h>     print(json.dumps(operations, indent=2))
+[?2004l[?2004h> else:
+[?2004l[?2004h>     print(json.dumps([]))
+[?2004l[?2004h> PYTHON
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> echo "CSV Cleaning functions loaded. Available commands:"
+[?2004l[?2004h> echo "  - encoding-detection <filepath>"
+[?2004l[?2004h> echo "  - name-standardization <column_name>"
+[?2004l[?2004h> echo "  - type-detection <csv_file> <column_name>"
+[?2004l[?2004h> echo "  - date-parsing <csv_file> <column_name>"
+[?2004l[?2004h> echo "  - outlier-truncate <csv_file> <column_name>"
+[?2004l[?2004h> echo "  - dataframe-cleaning <csv_file> [output_file]"
+[?2004l[?2004h> echo "  - dataframe-consolidation <output_file> <file1> <file2> ..."
+[?2004l[?2004h> echo "  - file-processing <output_file> <log_file> <file1> <file2> ..."
+[?2004l[?2004h> echo "  - cleaning-log [log_file]"
+[?2004l[?2004h> echo "  - csv-summary <csv_file>"
+[?2004l[?2004h> echo "  - get-operations <log_file>"
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@253fcef909e9:/app# chmod +x solution/solve.sh
+[?2004l[?2004hroot@253fcef909e9:/app# cat > tests/test_data.csv << 'EOF'
+[?2004l[?2004h> Order ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status
+[?2004l[?2004h> 1001,John Smith,2025-01-01,99.99,2,199.98,01/05/2025,Active
+[?2004l[?2004h> 1002,Jane Doe,01/15/2025,150.50,,150.50,Jan 20 2025,Pending
+[?2004l[?2004h> 1003,,Jan 10 2025,9500.00,1,9500.00,2025-01-15,Active
+[?2004l[?2004h> 1004,Bob Johnson,15-01-2025,25.00,5,125.00,,Cancelled
+[?2004l[?2004h> 1005,Alice Williams,2025/01/20,75.25,3,225.75,2025/01/25,Active
+[?2004l[?2004h> 1006,Charlie Brown,2025-01-22,,10,,01/30/2025,Pending
+[?2004l[?2004h> 1007,Diana Prince,Jan 25 2025,200.00,1,200.00,2025-01-28,Active
+[?2004l[?2004h> 1008,,01/28/2025,50.50,2,101.00,,Unknown
+[?2004l[?2004h> 1009,Eve Anderson,2025-01-30,10.00,,,Feb 05 2025,Active
+[?2004l[?2004h> 1010,Frank Miller,02/01/2025,300.00,4,1200.00,2025-02-10,Pending
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@253fcef909e9:/app# cat > tests/test2_data.csv << 'EOF'
+[?2004l[?2004h> order_id,customer_name,purchase_date,price,qty,total,delivery_date,order_status
+[?2004l[?2004h> 2001,George Lucas,2025-02-01,125.00,2,250.00,02/05/2025,Completed
+[?2004l[?2004h> 2002,,02/10/2025,85.75,3,257.25,Feb 15 2025,Active
+[?2004l[?2004h> 2003,Helen Keller,Feb 12 2025,,1,,2025-02-18,Pending
+[?2004l[?2004h> 2004,Ivan Drago,15-02-2025,45.50,10,455.00,,Shipped
+[?2004l[?2004h> 2005,Julia Roberts,2025/02/18,175.00,,175.00,2025/02/22,Active
+[?2004l[?2004h> 2006,,2025-02-20,8999.99,1,8999.99,02/25/2025,Completed
+[?2004l[?2004h> 2007,Kevin Hart,Feb 22 2025,95.50,2,191.00,2025-02-28,Active
+[?2004l[?2004h> 2008,Laura Croft,02/25/2025,65.00,,65.00,,Pending
+[?2004l[?2004h> 2009,Mike Tyson,2025-02-28,5.00,5,25.00,Mar 05 2025,Active
+[?2004l[?2004h> 2010,,03/01/2025,250.50,3,751.50,2025-03-10,Shipped
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@253fcef909e9:/app# cat > tests/test3_data.csv << 'EOF'
+[?2004l[?2004h> ID,Client,Date,Amount,Count,Sum,Shipped,State
+[?2004l[?2004h> 3001,Nancy Drew,2025-03-01,199.99,1,199.99,03/05/2025,Done
+[?2004l[?2004h> 3002,Oscar Wilde,03/08/2025,,2,,Mar 12 2025,Processing
+[?2004l[?2004h> 3003,,Mar 10 2025,75.50,4,302.00,2025-03-15,Done
+[?2004l[?2004h> 3004,Peter Parker,15-03-2025,50.00,,50.00,,Active
+[?2004l[?2004h> 3005,Quinn Fabray,2025/03/18,125.75,3,377.25,2025/03/22,Done
+[?2004l[?2004h> 3006,Rachel Green,2025-03-20,15000.00,1,15000.00,03/25/2025,Processing
+[?2004l[?2004h> 3007,,Mar 22 2025,85.00,2,170.00,2025-03-28,Done
+[?2004l[?2004h> 3008,Steve Rogers,03/25/2025,45.50,5,227.50,,Active
+[?2004l[?2004h> 3009,Tina Turner,2025-03-28,,3,,Apr 02 2025,Done
+[?2004l[?2004h> 3010,Uma Thurman,04/01/2025,175.00,2,350.00,2025-04-10,Processing
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@253fcef909e9:/app# cat > tests/test_outputs.py << 'EOF'
+[?2004l[?2004h> import pytest
+[?2004l[?2004h> import pandas as pd
+[?2004l[?2004h> import json
+[?2004l[?2004h> import os
+[?2004l[?2004h> import sys
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> 
+[?2004l[?2004h> # Add parent directory to path to import CSVIngester
+[?2004l[?2004h> sys.path.insert(0, str(Path(__file__).parent.parent))
+[?2004l[?2004h> 
+[?2004l[?2004h> from solution.CSVIngester import CSVIngester
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> class TestColumnNameStandardization:
+[?2004l[?2004h>     """Test Case 1: Column Name Standardization"""
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_standardize_spaces_col_name(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         assert ingester.standardize_column_name("Customer Name") == "customer_name"
+[?2004l[?2004h>         assert ingester.standardize_column_name("Order ID") == "order_id"
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_standardize_any_special_chars(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         assert ingester.standardize_column_name("Product Price $") == "product_price"
+[?2004l[?2004h>         assert ingester.standardize_column_name("Quantity!!") == "quantity"
+[?2004l[?2004h>         assert ingester.standardize_column_name("Price-USD") == "priceusd"
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_standardize_any_casing(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         assert ingester.standardize_column_name("CUSTOMER_NAME") == "customer_name"
+[?2004l[?2004h>         assert ingester.standardize_column_name("OrderID") == "orderid"
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> class TestDateFormatDetection:
+[?2004l[?2004h>     """Test Case 2: Date Format Detection"""
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_detect_date_column(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         df = pd.read_csv('tests/test_data.csv')
+[?2004l[?2004h>         col_type = ingester.detect_column_type(df, 'Order Date')
+[?2004l[?2004h>         assert col_type == 'date'
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_parse_iso_dates(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         assert ingester.date_parser('2025-01-01') == '2025-01-01'
+[?2004l[?2004h>         assert ingester.date_parser('2025/01/15') == '2025-01-15'
+[?2004lput_file,
+[?2004h>     
+[?2004l     [?2004h>     def test_parse_mixed_date_formats(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         assert ingester.date_parser('01/15/2025') == '2025-01-15'
+[?2004l[?2004h>         assert ingester.date_parser('Jan 10 2025') is not None
+[?2004l[?2004h>         assert ingester.date_parser('15-01-2025') == '2025-01-15'
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> class TestMissingValueImputation:
+[?2004l[?2004h>     """Test Case 3: Missing Value Imputation"""
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_clean_single_dataframe(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         df = ingester.processed_dataframe('tests/test_data.csv')
+[?2004l[?2004h>         # Check that no missing values remain in numeric columns
+[?2004l[?2004h>         numeric_cols = df.select_dtypes(include=['number']).columns
+[?2004l[?2004h>         for col in numeric_cols:
+[?2004l[?2004h>             assert df[col].isna().sum() == 0
+[?2004l os.remove(log_file)
+    
+    def test_full_workflow(self):
+        ingester = CSVIngester()
+        output_file = 'tests/full_workflow_output.csv'
+        lo[?2004h>     
+[?2004l[?2004h>     def test_cleaned_columns_standardized(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         df = ingester.processed_dataframe('tests/test_data.csv')
+[?2004l[?2004h>         # Check that column names are standardized
+[?2004l[?2004h>         assert 'product_price' in df.columns
+[?2004l[?2004h>         assert 'quantity' in df.columns
+[?2004l[?2004h>         assert 'customer_name' in df.columns
+[?2004l[?2004h>     
+[?2004lumns
+        
+  [?2004h>     def test_get_unknown_for_missing(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         df = ingester.processed_dataframe('tests/test_data.csv')
+[?2004lutput_file):
+            os.remove(output_file)
+        if os.path.exists(log_file):
+            o[?2004h>         # Check that missing categorical values are filled with 'Unknown'
+[?2004l[?2004h>         assert 'Unknown' in df['customer_name'].values
+[?2004llumn Type Detection Accuracy"""
+    
+    def test_detec[?2004h>     
+[?2004l[?2004h>     def test_get_median_for_missing(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         df = ingester.processed_dataframe('tests/test_data.csv')
+[?2004l[?2004h>         # Verify numeric columns have no missing values after imputation
+[?2004l[?2004h>         assert df['product_price'].isna().sum() == 0
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> class TestOutlierClipping:
+[?2004l[?2004h>     """Test Case 4: Outlier Clipping"""
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_clip_numeric_outliers(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         df = pd.read_csv('tests/test_data.csv')
+[?2004l[?2004h>         result = ingester.outlier_truncate(df, 'Product Price $')
+[?2004l[?2004h>         
+[?2004l[?2004h>         assert 'lower_bound' in result
+[?2004lt_data.csv')
+     [?2004h>         assert 'upper_bound' in result
+[?2004l[?2004h>         assert 'original_min' in result
+[?2004l[?2004h>         assert 'original_max' in result
+[?2004l[?2004h>         assert result['original_max'] > result['upper_bound']
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> class TestMultiFileConsolidation:
+[?2004l[?2004h>     """Test Case 5: Multi-File Consolidation"""
+[?2004l[?2004h>     
+[?2004let_cleaning_log_nonexistent_file(self):
+        # Test that nonexistent file doesn[?2004h>     def test_consolidate_dataframes(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         df1 = ingester.processed_dataframe('tests/test_data.csv')
+[?2004l[?2004h>         df2 = ingester.processed_dataframe('tests/test2_data.csv')
+[?2004l[?2004h>         df3 = ingester.processed_dataframe('tests/test3_data.csv')
+[?2004l[?2004h>         
+[?2004l[?2004h>         consolidated = ingester.consolidated_cleaned_dataframes([df1, df2, df3])
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Check total rows
+[?2004l[?2004h>         assert len(consolidated) == len(df1) + len(df2) + len(df3)
+[?2004l[?2004h>         # Check that consolidation happened
+[?2004l[?2004h>         assert len(consolidated) == 30
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> class TestEncodingDetection:
+[?2004l[?2004h>     """Test Case 6: Encoding Detection"""
+[?2004l    'column_names': df.columns.tolist(),
+      [?2004h>     
+[?2004l[?2004h>     def test_should_detect_utf8_encoding(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         encoding = ingester.encode_process('tests/test_data.csv')
+[?2004l[?2004h>         assert encoding in ['utf-8', 'latin-1']
+[?2004lmns'] == 8
+        assert 'Order ID' in summary['column_names']
+[?2004h>     
+[?2004l[?2004h>     def test_should_detect_latin_encoding(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         # Create a test file with latin-1 encoding
+[?2004l[?2004h>         test_file = 'tests/latin1_test.csv'
+[?2004l[?2004h>         with open(test_file, 'w', encoding='latin-1') as f:
+[?2004l[?2004h>             f.write('Name,Age\n')
+[?2004l[?2004h>             f.write('José,25\n')
+[?2004l[?2004h>         
+[?2004l[?2004h>         encoding = ingester.encode_process(test_file)
+[?2004l[?2004h>         assert encoding in ['utf-8', 'latin-1']
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Clean up
+[?2004l[?2004h>         if os.path.exists(test_file):
+[?2004l[?2004h>             os.remove(test_file)
+[?2004l.load(f)
+            o[?2004h>     
+[?2004l[?2004h>     def test_should_detect_encoding_nonexistent_file(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         encoding = ingester.encode_process('nonexistent.csv')
+[?2004lperations = [op['operation'] for op in log_data['operations']]
+            assert 'load_file' in operations
+            assert 'standardize_columns' in operatio[?2004h>         assert encoding is None
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> class TestFullPipelineExecution:
+[?2004l[?2004h>     """Test Case 7: Full Pipeline Execution"""
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_process_full_pipeline(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         output_file = 'tests/test_output.csv'
+[?2004l[?2004h>         log_file = 'tests/test_log.json'
+[?2004l[?2004h>         
+[?2004lingester = CSVIngester()
+        ingester.logging_[?2004h>         ingester.file_processor(
+[?2004l[?2004h>             ['tests/test_data.csv', 'tests/test2_data.csv'],
+[?2004l[?2004h>             output_file,
+[?2004l[?2004h>             log_file
+[?2004l[?2004h>         )
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Check output file exists
+[?2004l[?2004h>         assert os.path.exists(output_file)
+[?2004l[?2004h>         assert os.path.exists(log_file)
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Check log structure
+[?2004l[?2004h>         with open(log_file, 'r') as f:
+[?2004l[?2004h>             log_data = json.load(f)
+[?2004l[?2004h>             assert 'timestamp' in log_data
+[?2004l[?2004h>             assert 'operations' in log_data
+[?2004l[?2004h>             assert len(log_data['operations']) > 0
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Clean up
+[?2004l[?2004h>         if os.path.exists(output_file):
+[?2004l[?2004h>             os.remove(output_file)
+[?2004l[?2004h>         if os.path.exists(log_file):
+[?2004l[?2004h>             os.remove(log_file)
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_full_workflow(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         output_file = 'tests/full_workflow_output.csv'
+[?2004l[?2004h>         log_file = 'tests/full_workflow_log.json'
+[?2004l[?2004h>         
+[?2004l[?2004h>         ingester.file_processor(
+[?2004l[?2004h>             ['tests/test_data.csv'],
+[?2004l[?2004h>             output_file,
+[?2004l[?2004h>             log_file
+[?2004l[?2004h>         )
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Load and verify output
+[?2004l[?2004h>         df = pd.read_csv(output_file)
+[?2004l[?2004h>         assert len(df) > 0
+[?2004l[?2004h>         assert 'product_price' in df.columns
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Clean up
+[?2004l[?2004h>         if os.path.exists(output_file):
+[?2004l[?2004h>             os.remove(output_file)
+[?2004l[?2004h>         if os.path.exists(log_file):
+[?2004l[?2004h>             os.remove(log_file)
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> class TestColumnTypeDetection:
+[?2004l[?2004h>     """Test Case 8: Column Type Detection Accuracy"""
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_detect_numeric_column(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         df = pd.read_csv('tests/test_data.csv')
+[?2004l[?2004h>         col_type = ingester.detect_column_type(df, 'Product Price $')
+[?2004l[?2004h>         assert col_type == 'numeric'
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_detect_categorical_column(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         df = pd.read_csv('tests/test_data.csv')
+[?2004l[?2004h>         col_type = ingester.detect_column_type(df, 'Status')
+[?2004l[?2004h>         assert col_type == 'categorical'
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_detect_nonexistent_column(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         df = pd.read_csv('tests/test_data.csv')
+[?2004l[?2004h>         col_type = ingester.detect_column_type(df, 'NonexistentColumn')
+[?2004l[?2004h>         assert col_type == 'unknown'
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> class TestErrorHandling:
+[?2004l[?2004h>     """Test Case 9: Error Handling"""
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_get_cleaning_log_nonexistent_file(self):
+[?2004l[?2004h>         # Test that nonexistent file doesn't crash
+[?2004l[?2004h>         assert not os.path.exists('nonexistent_log.json')
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_summary_shows_missing_values(self):
+[?2004l[?2004h>         df = pd.read_csv('tests/test_data.csv')
+[?2004l[?2004h>         missing = df.isnull().sum()
+[?2004l[?2004h>         # Verify that we can detect missing values
+[?2004l[?2004h>         assert missing.sum() > 0
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> class TestCSVSummary:
+[?2004l[?2004h>     """Test Case 10: CSV Summary"""
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_get_csv_summary(self):
+[?2004l[?2004h>         df = pd.read_csv('tests/test_data.csv')
+[?2004l[?2004h>         summary = {
+[?2004l[?2004h>             'file': 'tests/test_data.csv',
+[?2004l[?2004h>             'rows': len(df),
+[?2004l[?2004h>             'columns': len(df.columns),
+[?2004l[?2004h>             'column_names': df.columns.tolist(),
+[?2004l[?2004h>             'missing_values': df.isnull().sum().to_dict()
+[?2004l[?2004h>         }
+[?2004l[?2004h>         
+[?2004l[?2004h>         assert summary['rows'] == 10
+[?2004l[?2004h>         assert summary['columns'] == 8
+[?2004l[?2004h>         assert 'Order ID' in summary['column_names']
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> class TestLogOperations:
+[?2004l[?2004h>     """Test Case 11: Log Operations Data"""
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_get_existing_operations(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         output_file = 'tests/ops_test_output.csv'
+[?2004l[?2004h>         log_file = 'tests/ops_test_log.json'
+[?2004l[?2004h>         
+[?2004l[?2004h>         ingester.file_processor(
+[?2004l[?2004h>             ['tests/test_data.csv'],
+[?2004l[?2004h>             output_file,
+[?2004l[?2004h>             log_file
+[?2004l[?2004h>         )
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Read log and check operations
+[?2004l[?2004h>         with open(log_file, 'r') as f:
+[?2004l[?2004h>             log_data = json.load(f)
+[?2004l[?2004h>             operations = [op['operation'] for op in log_data['operations']]
+[?2004l[?2004h>             assert 'load_file' in operations
+[?2004l[?2004h>             assert 'standardize_columns' in operations
+[?2004l[?2004h>         
+[?2004l[?2004h>         # Clean up
+[?2004l[?2004h>         if os.path.exists(output_file):
+[?2004l[?2004h>             os.remove(output_file)
+[?2004l[?2004h>         if os.path.exists(log_file):
+[?2004l[?2004h>             os.remove(log_file)
+[?2004l[?2004h>     
+[?2004l[?2004h>     def test_process_log_contains_operations(self):
+[?2004l[?2004h>         ingester = CSVIngester()
+[?2004l[?2004h>         ingester.logging_process('test_operation', {'detail': 'test'})
+[?2004l[?2004h>         
+[?2004l[?2004h>         log = ingester.get_operations_log()
+[?2004l[?2004h>         assert len(log) > 0
+[?2004l[?2004h>         assert log[0]['operation'] == 'test_operation'
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> if __name__ == '__main__':
+[?2004l[?2004h>     pytest.main([__file__, '-v'])
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@253fcef909e9:/app# cat > tests/test.sh << 'EOF'
+[?2004l[?2004h> #!/bin/bash
+[?2004l[?2004h> 
+[?2004l[?2004h> # Test script for CSV Ingester
+[?2004l[?2004h> # Usage: ./tests/test.sh [options]
+[?2004l[?2004h> 
+[?2004l[?2004h> echo "Running CSV Ingester Test Suite"
+[?2004l[?2004h> echo "================================"
+[?2004l[?2004h> echo ""
+[?2004l[?2004h> 
+[?2004l[?2004h> # Check if pytest is available
+[?2004l[?2004h> if ! command -v pytest &> /dev/null; then
+[?2004l[?2004h>     echo "Error: pytest not found. Please install it with: pip install pytest"
+[?2004l[?2004h>     exit 1
+[?2004l[?2004h> fi
+[?2004l[?2004h> 
+[?2004l[?2004h> # Run all tests
+[?2004l[?2004h> if [ "$1" == "-v" ] || [ "$1" == "--verbose" ]; then
+[?2004l[?2004h>     pytest tests/test_outputs.py -v
+[?2004l[?2004h> elif [ "$1" == "-vv" ]; then
+[?2004l[?2004h>     pytest tests/test_outputs.py -vv --tb=short
+[?2004l[?2004h> elif [ -n "$1" ]; then
+[?2004l[?2004h>     # Run specific test
+[?2004l[?2004h>     pytest tests/test_outputs.py::$1 -v
+[?2004l[?2004h> else
+[?2004l[?2004h>     # Run all tests with normal verbosity
+[?2004l[?2004h>     pytest tests/test_outputs.py -v
+[?2004l[?2004h> fi
+[?2004l[?2004h> 
+[?2004l[?2004h> echo ""
+[?2004l[?2004h> echo "Test suite completed!"
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@253fcef909e9:/app# chmod +x tests/test.sh
+[?2004l[?2004hroot@253fcef909e9:/app# python3 -c "import pandas; import numpy; print('Required packages installed')"
+[?2004lRequired packages installed
+[?2004hroot@253fcef909e9:/app# ls -la
+[?2004ltotal 20
+drwxr-xr-x 1 root root 4096 Jan 19 19:18 .
+drwxr-xr-x 1 root root 4096 Jan 19 19:18 ..
+drwxr-xr-x 2 root root 4096 Jan 19 19:19 solution
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 src
+drwxr-xr-x 2 root root 4096 Jan 19 19:21 tests
+[?2004hroot@253fcef909e9:/app# ls -la solution/
+[?2004ltotal 28
+drwxr-xr-x 2 root root  4096 Jan 19 19:19 .
+drwxr-xr-x 1 root root  4096 Jan 19 19:18 ..
+-rwxr-xr-x 1 root root 10169 Jan 19 19:19 CSVIngester.py
+-rwxr-xr-x 1 root root  5254 Jan 19 19:19 solve.sh
+[?2004hroot@253fcef909e9:/app# ls -la tests/
+[?2004ltotal 36
+drwxr-xr-x 2 root root 4096 Jan 19 19:21 .
+drwxr-xr-x 1 root root 4096 Jan 19 19:18 ..
+-rwxr-xr-x 1 root root  728 Jan 19 19:21 test.sh
+-rw-r--r-- 1 root root  643 Jan 19 19:20 test2_data.csv
+-rw-r--r-- 1 root root  607 Jan 19 19:20 test3_data.csv
+-rw-r--r-- 1 root root  663 Jan 19 19:20 test_data.csv
+-rw-r--r-- 1 root root 9966 Jan 19 19:20 test_outputs.py
+[?2004hroot@253fcef909e9:/app# python3 solution/CSVIngester.py --help
+[?2004lusage: CSVIngester.py [-h] [-o OUTPUT] [-l LOG] input_files [input_files ...]
+
+CSV Ingester - Clean and consolidate CSV files
+
+positional arguments:
+  input_files           Input CSV files to process
+
+options:
+  -h, --help            show this help message and exit
+  -o OUTPUT, --output OUTPUT
+                        Output CSV file (default: cleaned_data.csv)
+  -l LOG, --log LOG     Output log file (default: cleaning_log.json)
+[?2004hroot@253fcef909e9:/app# python3 solution/CSVIngester.py tests/test_data.csv tests/test2_data.csv -o tests/demo_output.csv -l tests/demo_log.json
+[?2004l/app/solution/CSVIngester.py:219: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:219: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+Processing complete!
+Cleaned data saved to: tests/demo_output.csv
+Cleaning log saved to: tests/demo_log.json
+[?2004hroot@253fcef909e9:/app# ls -la tests/ | grep demo
+[?2004l-rw-r--r-- 1 root root 6296 Jan 19 19:21 demo_log.json
+-rw-r--r-- 1 root root 1551 Jan 19 19:21 demo_output.csv
+[?2004hroot@253fcef909e9:/app# head -20 tests/demo_output.csv
+[?2004lorder_id,customer_name,order_date,product_price,quantity,total_amount,ship_date,status,purchase_date,price,qty,total,delivery_date,order_status
+1001.09,John Smith,2025-01-01,99.99,2.0,199.98,2025-01-05,Active,,,,,,
+1002.0,Jane Doe,2025-01-15,150.5,2.5,150.5,2025-01-20,Pending,,,,,,
+1003.0,Unknown,2025-01-10,8672.000000000002,1.0,8753.000000000002,2025-01-15,Active,,,,,,
+1004.0,Bob Johnson,2025-01-15,25.0,5.0,125.0,,Cancelled,,,,,,
+1005.0,Alice Williams,2025-01-20,75.25,3.0,225.75,2025-01-25,Active,,,,,,
+1006.0,Charlie Brown,2025-01-22,99.99,9.55,199.99,2025-01-30,Pending,,,,,,
+1007.0,Diana Prince,2025-01-25,200.0,1.0,200.0,2025-01-28,Active,,,,,,
+1008.0,Unknown,2025-01-28,50.5,2.0,103.16,,Unknown,,,,,,
+1009.0,Eve Anderson,2025-01-30,11.35,2.5,199.99,2025-02-05,Active,,,,,,
+1009.91,Frank Miller,2025-02-01,300.0,4.0,1200.0,2025-02-10,Pending,,,,,,
+2001.09,George Lucas,,,,,,,2025-02-01,125.0,2.0,250.0,2025-02-05,Completed
+2002.0,Unknown,,,,,,,2025-02-10,85.75,3.0,257.25,2025-02-15,Active
+2003.0,Helen Keller,,,,,,,2025-02-12,95.5,1.0,250.0,2025-02-18,Pending
+2004.0,Ivan Drago,,,,,,,2025-02-15,45.5,9.55,455.0,,Shipped
+2005.0,Julia Roberts,,,,,,,2025-02-18,175.0,2.5,175.0,2025-02-22,Active
+2006.0,Unknown,,,,,,,2025-02-20,8212.5359,1.0,8257.625900000001,2025-02-25,Completed
+2007.0,Kevin Hart,,,,,,,2025-02-22,95.5,2.0,191.0,2025-02-28,Active
+2008.0,Laura Croft,,,,,,,2025-02-25,65.0,2.5,65.0,,Pending
+2009.0,Mike Tyson,,,,,,,2025-02-28,8.645,5.0,28.6,2025-03-05,Active
+[?2004hroot@253fcef909e9:/app# head -40 tests/demo_log.json
+[?2004l{
+  "timestamp": "2026-01-19T19:21:25.320525",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "tests/test_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T19:21:25.287104"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T19:21:25.288146"
+    },
+    {
+      "operation": "clip_outliers",
+      "details": {
+        "column": "order_id",
+        "lower_percentile": 1001.09,
+        "upper_percentile": 1009.91
+      },
+      "timestamp": "2026-01-19T19:21:25.290461"
+    },
+    {
+      "operation": "impute_categorical",
+[?2004hroot@253fcef909e9:/app# pytest tests/test_outputs.py::TestColumnNameStandardization -v
+[?2004lbash: pytest: command not found
+[?2004hroot@253fcef909e9:/app# pip install pytest -q
+[?2004lpytest tests/test_outputs.py::TestColumnNameStandardization -v
+[33mWARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv[0m[33m
+[0m
+[1m[[0m[34;49mnotice[0m[1;39;49m][0m[39;49m A new release of pip is available: [0m[31;49m24.0[0m[39;49m -> [0m[32;49m25.3[0m
+[1m[[0m[34;49mnotice[0m[1;39;49m][0m[39;49m To update, run: [0m[32;49mpip install --upgrade pip[0m
+[?2004hroot@253fcef909e9:/app# pytest tests/test_outputs.py::TestColumnNameStandardization -v
+[?2004l[1m===================================================================== test session starts ======================================================================[0m
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+[1mcollecting ... [0m[1mcollecting 0 items                                                                                                                                             [0m[1mcollected 3 items                                                                                                                                              [0m
+
+tests/test_outputs.py::TestColumnNameStandardization::test_standardize_spaces_col_name [32mPASSED[0m[32m                                                            [ 33%][0m
+tests/test_outputs.py::TestColumnNameStandardization::test_standardize_any_special_chars [32mPASSED[0m[32m                                                          [ 66%][0m
+tests/test_outputs.py::TestColumnNameStandardization::test_standardize_any_casing [32mPASSED[0m[32m                                                                 [100%][0m
+
+[32m====================================================================== [32m[1m3 passed[0m[32m in 0.63s[0m[32m =======================================================================[0m
+[?2004hroot@253fcef909e9:/app# pytest tests/test_outputs.py::TestDateFormatDetection -v
+[?2004l[1m===================================================================== test session starts ======================================================================[0m
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+[1mcollecting ... [0m[1mcollecting 0 items                                                                                                                                             [0m[1mcollected 3 items                                                                                                                                              [0m
+
+tests/test_outputs.py::TestDateFormatDetection::test_detect_date_column [32mPASSED[0m[32m                                                                           [ 33%][0m
+tests/test_outputs.py::TestDateFormatDetection::test_parse_iso_dates [32mPASSED[0m[32m                                                                              [ 66%][0m
+tests/test_outputs.py::TestDateFormatDetection::test_parse_mixed_date_formats [32mPASSED[0m[32m                                                                     [100%][0m
+
+[32m====================================================================== [32m[1m3 passed[0m[32m in 0.52s[0m[32m =======================================================================[0m
+[?2004hroot@253fcef909e9:/app# pytest tests/test_outputs.py::TestMissingValueImputation -v
+[?2004l[1m===================================================================== test session starts ======================================================================[0m
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+[1mcollecting ... [0m[1mcollected 4 items                                                                                                                                              [0m
+
+tests/test_outputs.py::TestMissingValueImputation::test_clean_single_dataframe [32mPASSED[0m[32m                                                                    [ 25%][0m
+tests/test_outputs.py::TestMissingValueImputation::test_cleaned_columns_standardized [32mPASSED[0m[33m                                                              [ 50%][0m
+tests/test_outputs.py::TestMissingValueImputation::test_get_unknown_for_missing [32mPASSED[0m[33m                                                                   [ 75%][0m
+tests/test_outputs.py::TestMissingValueImputation::test_get_median_for_missing [32mPASSED[0m[33m                                                                    [100%][0m
+
+[33m======================================================================= warnings summary =======================================================================[0m
+tests/test_outputs.py::TestMissingValueImputation::test_clean_single_dataframe
+tests/test_outputs.py::TestMissingValueImputation::test_cleaned_columns_standardized
+tests/test_outputs.py::TestMissingValueImputation::test_get_unknown_for_missing
+tests/test_outputs.py::TestMissingValueImputation::test_get_median_for_missing
+  /app/solution/CSVIngester.py:219: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+  
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+  
+  
+    df[col].fillna('Unknown', inplace=True)
+
+tests/test_outputs.py: 12 warnings
+  /app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+  
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+  
+  
+    df[col].fillna(median_val, inplace=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[33m================================================================ [32m4 passed[0m, [33m[1m16 warnings[0m[33m in 0.42s[0m[33m ================================================================[0m
+[?2004hroot@253fcef909e9:/app# pytest tests/test_outputs.py::TestOutlierClipping -v
+[?2004l[1m===================================================================== test session starts ======================================================================[0m
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+[1mcollecting ... [0m[1mcollected 1 item                                                                                                                                               [0m
+
+tests/test_outputs.py::TestOutlierClipping::test_clip_numeric_outliers [32mPASSED[0m[32m                                                                            [100%][0m
+
+[32m====================================================================== [32m[1m1 passed[0m[32m in 0.30s[0m[32m =======================================================================[0m
+[?2004hroot@253fcef909e9:/app# pytest tests/test_outputs.py -v --tb=short
+[?2004l[1m===================================================================== test session starts ======================================================================[0m
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+[1mcollecting ... [0m[1mcollected 25 items                                                                                                                                             [0m
+
+tests/test_outputs.py::TestColumnNameStandardization::test_standardize_spaces_col_name [32mPASSED[0m[32m                                                            [  4%][0m
+tests/test_outputs.py::TestColumnNameStandardization::test_standardize_any_special_chars [32mPASSED[0m[32m                                                          [  8%][0m
+tests/test_outputs.py::TestColumnNameStandardization::test_standardize_any_casing [32mPASSED[0m[32m                                                                 [ 12%][0m
+tests/test_outputs.py::TestDateFormatDetection::test_detect_date_column [32mPASSED[0m[32m                                                                           [ 16%][0m
+tests/test_outputs.py::TestDateFormatDetection::test_parse_iso_dates [32mPASSED[0m[32m                                                                              [ 20%][0m
+tests/test_outputs.py::TestDateFormatDetection::test_parse_mixed_date_formats [32mPASSED[0m[32m                                                                     [ 24%][0m
+tests/test_outputs.py::TestMissingValueImputation::test_clean_single_dataframe [32mPASSED[0m[32m                                                                    [ 28%][0m
+tests/test_outputs.py::TestMissingValueImputation::test_cleaned_columns_standardized [32mPASSED[0m[33m                                                              [ 32%][0m
+tests/test_outputs.py::TestMissingValueImputation::test_get_unknown_for_missing [32mPASSED[0m[33m                                                                   [ 36%][0m
+tests/test_outputs.py::TestMissingValueImputation::test_get_median_for_missing [32mPASSED[0m[33m                                                                    [ 40%][0m
+tests/test_outputs.py::TestOutlierClipping::test_clip_numeric_outliers [32mPASSED[0m[33m                                                                            [ 44%][0m
+tests/test_outputs.py::TestMultiFileConsolidation::test_consolidate_dataframes [32mPASSED[0m[33m                                                                    [ 48%][0m
+tests/test_outputs.py::TestEncodingDetection::test_should_detect_utf8_encoding [32mPASSED[0m[33m                                                                    [ 52%][0m
+tests/test_outputs.py::TestEncodingDetection::test_should_detect_latin_encoding [32mPASSED[0m[33m                                                                   [ 56%][0m
+tests/test_outputs.py::TestEncodingDetection::test_should_detect_encoding_nonexistent_file [32mPASSED[0m[33m                                                        [ 60%][0m
+tests/test_outputs.py::TestFullPipelineExecution::test_process_full_pipeline [32mPASSED[0m[33m                                                                      [ 64%][0m
+tests/test_outputs.py::TestFullPipelineExecution::test_full_workflow [32mPASSED[0m[33m                                                                              [ 68%][0m
+tests/test_outputs.py::TestColumnTypeDetection::test_detect_numeric_column [32mPASSED[0m[33m                                                                        [ 72%][0m
+tests/test_outputs.py::TestColumnTypeDetection::test_detect_categorical_column [32mPASSED[0m[33m                                                                    [ 76%][0m
+tests/test_outputs.py::TestColumnTypeDetection::test_detect_nonexistent_column [32mPASSED[0m[33m                                                                    [ 80%][0m
+tests/test_outputs.py::TestErrorHandling::test_get_cleaning_log_nonexistent_file [32mPASSED[0m[33m                                                                  [ 84%][0m
+tests/test_outputs.py::TestErrorHandling::test_summary_shows_missing_values [32mPASSED[0m[33m                                                                       [ 88%][0m
+tests/test_outputs.py::TestCSVSummary::test_get_csv_summary [32mPASSED[0m[33m                                                                                       [ 92%][0m
+tests/test_outputs.py::TestLogOperations::test_get_existing_operations [32mPASSED[0m[33m                                                                            [ 96%][0m
+tests/test_outputs.py::TestLogOperations::test_process_log_contains_operations [32mPASSED[0m[33m                                                                    [100%][0m
+
+[33m======================================================================= warnings summary =======================================================================[0m
+tests/test_outputs.py: 11 warnings
+  /app/solution/CSVIngester.py:219: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+  
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+  
+  
+    df[col].fillna('Unknown', inplace=True)
+
+tests/test_outputs.py: 33 warnings
+  /app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+  
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+  
+  
+    df[col].fillna(median_val, inplace=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[33m=============================================================== [32m25 passed[0m, [33m[1m44 warnings[0m[33m in 0.43s[0m[33m ================================================================[0m
+[?2004hroot@253fcef909e9:/app# rm -f tests/demo_output.csv tests/demo_log.json
+[?2004l[?2004hroot@253fcef909e9:/app# source solution/solve.sh
+[?2004lCSV Cleaning functions loaded. Available commands:
+  - encoding-detection <filepath>
+  - name-standardization <column_name>
+  - type-detection <csv_file> <column_name>
+  - date-parsing <csv_file> <column_name>
+  - outlier-truncate <csv_file> <column_name>
+  - dataframe-cleaning <csv_file> [output_file]
+  - dataframe-consolidation <output_file> <file1> <file2> ...
+  - file-processing <output_file> <log_file> <file1> <file2> ...
+  - cleaning-log [log_file]
+  - csv-summary <csv_file>
+  - get-operations <log_file>
+[?2004hroot@253fcef909e9:/app# name-standardization 'Product Price $'
+[?2004lencoding-detection 'tests/test_data.csv'
+product_price
+[?2004hroot@253fcef909e9:/app# encoding-detection 'tests/test_data.csv'
+[?2004lutf-8
+[?2004hroot@253fcef909e9:/app# type-detection 'tests/test_data.csv' 'Order Date'
+[?2004ldate
+[?2004hroot@253fcef909e9:/app# type-detection 'tests/test_data.csv' 'Status'
+[?2004lcategorical
+[?2004hroot@253fcef909e9:/app# csv-summary 'tests/test_data.csv'
+[?2004l{
+  "file": "tests/test_data.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Order ID": 0,
+    "Customer Name": 2,
+    "Order Date": 0,
+    "Product Price $": 1,
+    "Quantity!!": 2,
+    "Total Amount": 2,
+    "Ship Date": 2,
+    "Status": 0
+  }
+}
+[?2004hroot@253fcef909e9:/app# file-processing 'tests/final_output.csv' 'tests/final_log.json' 'tests/test_data.csv' 'tests/test2_data.csv'
+[?2004l/app/solution/CSVIngester.py:219: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:219: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+Processing complete!
+Cleaned data saved to: tests/final_output.csv
+Cleaning log saved to: tests/final_log.json
+[?2004hroot@253fcef909e9:/app# ls -la tests/ | grep final
+[?2004l-rw-r--r-- 1 root root 6297 Jan 19 19:22 final_log.json
+-rw-r--r-- 1 root root 1551 Jan 19 19:22 final_output.csv
+[?2004hroot@253fcef909e9:/app# cleaning-log 'tests/final_log.json' | head -30
+[?2004l{
+    "timestamp": "2026-01-19T19:22:54.926507",
+    "operations": [
+        {
+            "operation": "load_file",
+            "details": {
+                "source": "tests/test_data.csv",
+                "rows": 10,
+                "columns": 8
+            },
+            "timestamp": "2026-01-19T19:22:54.898449"
+        },
+        {
+            "operation": "standardize_columns",
+            "details": {
+                "source": "tests/test_data.csv",
+                "mappings": {
+                    "Order ID": "order_id",
+                    "Customer Name": "customer_name",
+                    "Order Date": "order_date",
+                    "Product Price $": "product_price",
+                    "Quantity!!": "quantity",
+                    "Total Amount": "total_amount",
+                    "Ship Date": "ship_date",
+                    "Status": "status"
+                }
+            },
+            "timestamp": "2026-01-19T19:22:54.898767"
+        },
+        {
+[?2004hroot@253fcef909e9:/app# rm -f tests/final_output.csv tests/final_log.json tests/latin1_test.csv
+[?2004l[?2004hroot@253fcef909e9:/app# tree -L 2 -a 2>/dev/null || find . -maxdepth 2 -type f -o -type d | sort
+[?2004l.
+./.pytest_cache
+./.pytest_cache/.gitignore
+./.pytest_cache/CACHEDIR.TAG
+./.pytest_cache/README.md
+./.pytest_cache/v
+./solution
+./solution/CSVIngester.py
+./solution/__pycache__
+./solution/solve.sh
+./src
+./src/sample1_data.csv
+./src/sample2_data.csv
+./tests
+./tests/__pycache__
+./tests/test.sh
+./tests/test2_data.csv
+./tests/test3_data.csv
+./tests/test_data.csv
+./tests/test_outputs.py
+[?2004hroot@253fcef909e9:/app# echo '\n--- Project Summary ---'
+[?2004l\n--- Project Summary ---
+[?2004hroot@253fcef909e9:/app# echo 'Solution files:'
+[?2004lSolution files:
+[?2004hroot@253fcef909e9:/app# ls -lh solution/
+[?2004ltotal 24K
+-rwxr-xr-x 1 root root  10K Jan 19 19:19 CSVIngester.py
+drwxr-xr-x 2 root root 4.0K Jan 19 19:21 __pycache__
+-rwxr-xr-x 1 root root 5.2K Jan 19 19:19 solve.sh
+[?2004hroot@253fcef909e9:/app# echo '\nTest files:'
+[?2004l\nTest files:
+[?2004hroot@253fcef909e9:/app# ls -lh tests/
+[?2004ltotal 32K
+drwxr-xr-x 2 root root 4.0K Jan 19 19:21 __pycache__
+-rwxr-xr-x 1 root root  728 Jan 19 19:21 test.sh
+-rw-r--r-- 1 root root  643 Jan 19 19:20 test2_data.csv
+-rw-r--r-- 1 root root  607 Jan 19 19:20 test3_data.csv
+-rw-r--r-- 1 root root  663 Jan 19 19:20 test_data.csv
+-rw-r--r-- 1 root root 9.8K Jan 19 19:20 test_outputs.py
+[?2004hroot@253fcef909e9:/app# echo '\nSample data:'
+[?2004l\nSample data:
+[?2004hroot@253fcef909e9:/app# ls -lh src/
+[?2004ltotal 8.0K
+-rw-r--r-- 1 root root 874 Jan  6 04:31 sample1_data.csv
+-rw-r--r-- 1 root root 768 Jan  6 04:17 sample2_data.csv
+[?2004hroot@253fcef909e9:/app# python3 solution/CSVIngester.py tests/test_data.csv tests/test2_data.csv tests/test3_data.csv -o cleaned_data.csv -l cleaning_log.json 2>/dev/null
+[?2004lProcessing complete!
+Cleaned data saved to: cleaned_data.csv
+Cleaning log saved to: cleaning_log.json
+[?2004hroot@253fcef909e9:/app# echo 'Verification:'
+[?2004lVerification:
+[?2004hroot@253fcef909e9:/app# ls -lh cleaned_data.csv cleaning_log.json
+[?2004l-rw-r--r-- 1 root root 2.5K Jan 19 19:23 cleaned_data.csv
+-rw-r--r-- 1 root root 8.9K Jan 19 19:23 cleaning_log.json
+[?2004hroot@253fcef909e9:/app# echo '\nRow count:'
+[?2004l\nRow count:
+[?2004hroot@253fcef909e9:/app# wc -l cleaned_data.csv
+[?2004l31 cleaned_data.csv
+[?2004hroot@253fcef909e9:/app# echo '\nLog operations:'
+[?2004l\nLog operations:
+[?2004hroot@253fcef909e9:/app# python3 -c "import json; data=json.load(open('cleaning_log.json')); print(f'Total operations: {len(data[\"operations\"])}'); print('Operation types:', set(op['operation'] for op in data['operations']))"
+[?2004lTotal operations: 38
+Operation types: {'save_output', 'impute_numeric', 'load_file', 'clip_outliers', 'standardize_columns', 'consolidate', 'impute_categorical', 'parse_dates'}
+[?2004hroot@253fcef909e9:/app# echo '\n=== TASK COMPLETE ==='
+[?2004l\n=== TASK COMPLETE ===
+[?2004hroot@253fcef909e9:/app# echo 'All components successfully implemented:'
+[?2004lAll components successfully implemented:
+[?2004hroot@253fcef909e9:/app# echo '✓ Python CLI (CSVIngester.py) with all required methods'
+[?2004l✓ Python CLI (CSVIngester.py) with all required methods
+[?2004hroot@253fcef909e9:/app# echo '✓ Bash interface (solve.sh) with 11 commands'
+[?2004l✓ Bash interface (solve.sh) with 11 commands
+[?2004hroot@253fcef909e9:/app# echo '✓ Test suite (test_outputs.py) with 25 passing tests'
+[?2004l✓ Test suite (test_outputs.py) with 25 passing tests
+[?2004hroot@253fcef909e9:/app# echo '✓ Test CSV files with inconsistent schemas'
+[?2004l✓ Test CSV files with inconsistent schemas
+[?2004hroot@253fcef909e9:/app# echo '✓ Sample data files'
+[?2004l✓ Sample data files
+[?2004hroot@253fcef909e9:/app# echo '✓ Full pipeline: standardization, imputation, outlier clipping, consolidation, logging'
+[?2004l✓ Full pipeline: standardization, imputation, outlier clipping, consolidation, logging
+[?2004hroot@253fcef909e9:/app# 

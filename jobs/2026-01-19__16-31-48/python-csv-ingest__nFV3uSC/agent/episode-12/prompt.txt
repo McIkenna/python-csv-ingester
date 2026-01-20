@@ -1,0 +1,42 @@
+New Terminal Output:
+
+root@785ec509f842:/app# grep -A 20 'def detect_column_type' solution/CSVIngester.py
+    def detect_column_type(self, series: pd.Series) -> str:
+        try:
+            pd.to_numeric(series.dropna(), errors='raise')
+            return 'numeric'
+        except (ValueError, TypeError):
+            pass
+
+        # Try date detection using pandas' flexible parser
+        non_null = series.dropna()
+        if len(non_null) > 0:
+            date_count = 0
+            date_samples = min(len(non_null), 100)
+
+            for val in non_null.head(date_samples):
+                val_str = str(val).strip()
+                if not val_str:
+                    continue
+
+                try:
+                    parser.parse(str(val), dayfirst=True)
+                    date_count += 1
+root@785ec509f842:/app# grep -A 15 'def date_parser' solution/CSVIngester.py
+    def date_parser(self, series: pd.Series) -> pd.Series:
+        def parse_single(val):
+            try:
+                # Parse each value individually
+                dt = parser.parse(str(val), dayfirst=True)
+                return dt.strftime('%Y-%m-%d')
+            except (ValueError, TypeError):
+                # Return None if parsing fails
+                return None
+
+        # Apply to the entire Series
+        iso_series = series.apply(parse_single)
+
+        return iso_series
+
+    def outlier_truncate(self, series: pd.Series) -> pd.Series:
+root@785ec509f842:/app#

@@ -1,0 +1,71 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@253fcef909e9:/app# pytest tests/test_outputs.py::TestDateFormatDetection -v
+===================================================================== test session starts ======================================================================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+collected 3 items
+
+tests/test_outputs.py::TestDateFormatDetection::test_detect_date_column PASSED                                                                           [ 33%]
+tests/test_outputs.py::TestDateFormatDetection::test_parse_iso_dates PASSED                                                                              [ 66%]
+tests/test_outputs.py::TestDateFormatDetection::test_parse_mixed_date_formats PASSED                                                                     [100%]
+
+====================================================================== 3 passed in 0.52s =======================================================================
+root@253fcef909e9:/app# pytest tests/test_outputs.py::TestMissingValueImputation -v
+===================================================================== test session starts ======================================================================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+collected 4 items
+
+tests/test_outputs.py::TestMissingValueImputation::test_clean_single_dataframe PASSED                                                                    [ 25%]
+tests/test_outputs.py::TestMissingValueImputation::test_cleaned_columns_standardized PASSED                                                              [ 50%]
+tests/test_outputs.py::TestMissingValueImputation::test_get_unknown_for_missing PASSED                                                                   [ 75%]
+tests/test_outputs.py::TestMissingValueImputation::test_get_median_for_missing PASSED                                                                    [100%]
+
+======================================================================= warnings summary =======================================================================
+tests/test_outputs.py::TestMissingValueImputation::test_clean_single_dataframe
+tests/test_outputs.py::TestMissingValueImputation::test_cleaned_columns_standardized
+tests/test_outputs.py::TestMissingValueImputation::test_get_unknown_for_missing
+tests/test_outputs.py::TestMissingValueImputation::test_get_median_for_missing
+  /app/solution/CSVIngester.py:219: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace me
+thod.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a
+ copy.
+
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, t
+o perform the operation inplace on the original object.
+
+
+    df[col].fillna('Unknown', inplace=True)
+
+tests/test_outputs.py: 12 warnings
+  /app/solution/CSVIngester.py:185: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace me
+thod.
+  The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a
+ copy.
+
+  For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, t
+o perform the operation inplace on the original object.
+
+
+    df[col].fillna(median_val, inplace=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================================================ 4 passed, 16 warnings in 0.42s ================================================================
+root@253fcef909e9:/app# pytest tests/test_outputs.py::TestOutlierClipping -v
+===================================================================== test session starts ======================================================================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+collected 1 item
+
+tests/test_outputs.py::TestOutlierClipping::test_clip_numeric_outliers PASSED                                                                            [100%]
+
+====================================================================== 1 passed in 0.30s =======================================================================
+root@253fcef909e9:/app#

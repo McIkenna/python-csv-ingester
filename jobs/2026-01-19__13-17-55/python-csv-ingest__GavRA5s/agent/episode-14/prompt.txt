@@ -1,0 +1,26 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@253fcef909e9:/app# rm -f tests/demo_output.csv tests/demo_log.json
+root@253fcef909e9:/app# source solution/solve.sh
+CSV Cleaning functions loaded. Available commands:
+  - encoding-detection <filepath>
+  - name-standardization <column_name>
+  - type-detection <csv_file> <column_name>
+  - date-parsing <csv_file> <column_name>
+  - outlier-truncate <csv_file> <column_name>
+  - dataframe-cleaning <csv_file> [output_file]
+  - dataframe-consolidation <output_file> <file1> <file2> ...
+  - file-processing <output_file> <log_file> <file1> <file2> ...
+  - cleaning-log [log_file]
+  - csv-summary <csv_file>
+  - get-operations <log_file>
+root@253fcef909e9:/app# name-standardization 'Product Price $'
+encoding-detection 'tests/test_data.csv'
+product_price
+root@253fcef909e9:/app# encoding-detection 'tests/test_data.csv'
+utf-8
+root@253fcef909e9:/app#

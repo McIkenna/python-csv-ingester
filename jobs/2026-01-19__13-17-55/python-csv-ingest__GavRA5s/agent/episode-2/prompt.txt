@@ -1,0 +1,39 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@253fcef909e9:/app# ls -la src/
+total 16
+drwxr-xr-x 2 root root 4096 Jan 19 16:09 .
+drwxr-xr-x 1 root root 4096 Jan 19 16:10 ..
+-rw-r--r-- 1 root root  874 Jan  6 04:31 sample1_data.csv
+-rw-r--r-- 1 root root  768 Jan  6 04:17 sample2_data.csv
+root@253fcef909e9:/app# mkdir -p solution tests
+root@253fcef909e9:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

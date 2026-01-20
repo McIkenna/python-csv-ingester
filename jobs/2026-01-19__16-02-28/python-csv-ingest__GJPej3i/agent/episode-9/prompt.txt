@@ -1,0 +1,149 @@
+New Terminal Output:
+
+root@5c43413d2e06:/app# python3 solution/CSVIngester.py --help
+python3 solution/CSVIngester.py tests/test_data.csv tests/test2_data.csv -o tests/output_test.csv -l tests/output_log.json
+usage: CSVIngester.py [-h] [-o OUTPUT] [-l LOG] input_files [input_files ...]
+
+CSV Ingester - Clean and consolidate multiple CSV files
+
+positional arguments:
+  input_files           Input CSV files to process
+
+options:
+  -h, --help            show this help message and exit
+  -o OUTPUT, --output OUTPUT
+                        Output file for cleaned data (default: cleaned_data.csv)
+  -l LOG, --log LOG     Output file for cleaning log (default: cleaning_log.json)
+root@5c43413d2e06:/app# python3 solution/CSVIngester.py tests/test_data.csv tests/test2_data.csv -o tests/output_test.csv -l tests/output_log.json
+/app/solution/CSVIngester.py:255: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:229: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:255: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:255: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:229: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:229: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:255: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+Processing complete!
+Cleaned data saved to: tests/output_test.csv
+Cleaning log saved to: tests/output_log.json
+root@5c43413d2e06:/app# head -5 tests/output_test.csv
+order_id,customer_name,order_date,product_price,quantity,total_amount,ship_date,status,employee_id,full_name,department,salary,hire_date,performance_score,manag
+er,location
+ORD1000,Unknown,2023-10-01,264.31,7.0,1850.19,2023-10-09,Unknown,,,,,,,,
+ORD1001,John Smith,2023-04-02,171.54,17.0,2916.22,,Shipped,,,,,,,,
+ORD1002,Bob Johnson,2023-12-05,171.54,17.0,3317.41,2023-12-11,Unknown,,,,,,,,
+ORD1003,Alice Williams,2023-08-29,70.22,10.0,702.16,2023-07-09,Pending,,,,,,,,
+root@5c43413d2e06:/app# cat tests/output_log.json | head -50
+{
+  "timestamp": "2026-01-19T22:06:42.015150",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "tests/test_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T22:06:41.998458"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T22:06:41.998553"
+    },
+    {
+      "operation": "impute_categorical",
+      "details": {
+        "column": "customer_name",
+        "method": "constant",
+        "value": "Unknown",
+        "missing_count": 2
+      },
+      "timestamp": "2026-01-19T22:06:42.000223"
+    },
+    {
+      "operation": "parse_dates",
+      "details": {
+        "column": "order_date",
+        "format": "ISO-8601"
+      },
+      "timestamp": "2026-01-19T22:06:42.001866"
+    },
+    {
+      "operation": "impute_numeric",
+      "details": {
+root@5c43413d2e06:/app#

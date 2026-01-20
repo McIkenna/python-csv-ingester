@@ -1,0 +1,56 @@
+New Terminal Output:
+
+root@785ec509f842:/app# ls -la tests/ 2>/dev/null || echo 'tests/ directory does not exist'
+tests/ directory does not exist
+root@785ec509f842:/app# head -50 solution/CSVIngester.py
+
+import argparse
+import json
+from pathlib import Path
+from datetime import datetime
+from typing import List, Dict, Any
+from dateutil import parser
+import re
+import pandas as pd
+import numpy as np
+
+
+
+class CSVIngester:
+    def __init__(self):
+        self.data_cleaning_log = {
+            "timestamp": datetime.now().isoformat(),
+            "operations": []
+        }
+        self.column_mappings = {}
+
+
+    def get_operations_log(self, filepath: Path,) -> List[Dict[str, Any]]:
+        """Return operations from the cleaning log. If no operation_type provided, return all operations."""
+        with open(filepath, 'r') as f:
+            log = json.load(f)
+        return log.get("operations", [])
+
+    def logging_process(self, operation: str, details: Dict[str, Any]):
+        """Log a cleaning operation"""
+        self.data_cleaning_log["operations"].append({
+            "operation": operation,
+            "details": details,
+            "timestamp": datetime.now().isoformat()
+        })
+
+    def encode_process(self, filepath: Path) -> str:
+        """Detect file encoding"""
+        encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+        for enc in encodings:
+            try:
+                with open(filepath, 'r', encoding=enc) as f:
+                    f.read()
+                return enc
+            except UnicodeDecodeError:
+                continue
+        return 'utf-8'
+
+    def standardize_column_name(self, col: str) -> str:
+        """Standardize column names to snake_case"""
+root@785ec509f842:/app#

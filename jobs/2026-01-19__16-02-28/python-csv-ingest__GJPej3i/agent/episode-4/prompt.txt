@@ -1,0 +1,294 @@
+New Terminal Output:
+
+root@5c43413d2e06:/app# cat > solution/CSVIngester.py << 'EOFPYTHON'
+> #!/usr/bin/env python3
+>
+> import argparse
+> import pandas as pd
+> import numpy as np
+> import json
+> import re
+> from datetime import datetime
+> from pathlib import Path
+> from typing import List, Dict, Any, Optional, Tuple
+>
+>
+> class CSVIngester:
+>     """Main class for CSV data ingestion, cleaning, and consolidation."""
+e('%Y-%m-%d')
+            except ValueE>
+>     def __init__(self):
+>         self.operations_log = []
+>
+>     def encode_process(self, filepath: str) -> Optional[str]:
+>         """Auto-detect file encoding (UTF-8, Latin-1)."""
+>         encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+>
+>         if not Path(filepath).exists():
+>             return None
+>
+>         for encoding in encodings:
+>             try:
+>                 with open(filepath, 'r', encoding=encoding) as f:
+>                     f.read()
+>                 return encoding
+>             except (UnicodeDecodeError, UnicodeError):
+>                 continue
+>
+>         return 'utf-8'  # default fallback
+>
+>     def standardize_column_name(self, column_name: str) -> str:
+     upper_bound = col.quantile(0.99)
+
+        original_min =>         """Convert column names to snake_case."""
+>         # Remove special characters and replace with space
+>         name = re.sub(r'[^a-zA-Z0-9\s]', '', column_name)
+>         # Replace multiple spaces with single space
+>         name = re.sub(r'\s+', ' ', name)
+>         # Strip and convert to lowercase
+_bound),
+            'original_min': float(original_min),
+            'o>         name = name.strip().lower()
+>         # Replace spaces with underscores
+>         name = name.replace(' ', '_')
+>         return name
+>
+>     def detect_column_type(self, df: pd.DataFrame, column_name: str) -> Optional[str]:
+>         """Identify column type: numeric, date, or categorical."""
+>         if column_name not in df.columns:
+>             return None
+>
+>         col = df[column_name]
+>
+>         # Try to detect date column
+>         if col.dtype == 'object':
+>             # Sample non-null values
+>             sample = col.dropna().head(20)
+>             if len(sample) > 0:
+>                 date_count = 0
+>                 for val in sample:
+>                     if self._is_date(str(val)):
+>                         date_count += 1
+>
+>                 # If more than 50% look like dates, it's a date column
+>                 if date_count / len(sample) > 0.5:
+>                     return 'date'
+>
+>         # Try to detect numeric column
+>         try:
+>             pd.to_numeric(col, errors='coerce')
+>             # Check if mostly numeric
+>             numeric_count = pd.to_numeric(col, errors='coerce').notna().sum()
+>             if numeric_count / len(col) > 0.5:
+>                 return 'numeric'
+>         except:
+>             pass
+>
+>         # Default to categorical
+>         return 'categorical'
+>
+>     def _is_date(self, value: str) -> bool:
+>         """Helper to check if a string looks like a date."""
+>         date_patterns = [
+>             r'\d{4}-\d{1,2}-\d{1,2}',  # 2023-01-01
+>             r'\d{4}/\d{1,2}/\d{1,2}',  # 2023/01/01
+>             r'\d{4}\.\d{1,2}\.\d{1,2}',  # 2023.01.01
+>             r'\d{1,2}-\d{1,2}-\d{4}',  # 01-01-2023
+>             r'\d{1,2}/\d{1,2}/\d{4}',  # 01/01/2023
+>             r'\d{1,2}\.\d{1,2}\.\d{4}',  # 01.01.2023
+
+            if col_type == 'date':
+                # Parse dates
+   >         ]
+>
+>         for pattern in date_patterns:
+>             if re.match(pattern, value.strip()):
+>                 return True
+>
+>         return False
+>
+>     def date_parser(self, date_str: str) -> Optional[str]:
+>         """Convert various date formats to ISO-8601 (YYYY-MM-DD)."""
+>         if pd.isna(date_str) or date_str == '':
+>             return None
+>
+>         date_str = str(date_str).strip()
+>
+>         # List of date formats to try
+        # Impute missing with median
+                if df[col].isna().any():
+   >         date_formats = [
+>             '%Y-%m-%d',      # 2023-01-01
+>             '%Y/%m/%d',      # 2023/01/01
+>             '%Y.%m.%d',      # 2023.01.01
+>             '%d-%m-%Y',      # 01-01-2023
+>             '%d/%m/%Y',      # 01/01/2023
+>             '%d.%m.%Y',      # 01.01.2023
+>             '%m-%d-%Y',      # 01-01-2023 (US format)
+>             '%m/%d/%Y',      # 01/01/2023 (US format)
+>             '%d-%m-%y',      # 01-01-23
+>             '%d/%m/%y',      # 01/01/23
+>             '%m/%d/%y',      # 01/01/23
+ng_count)
+            >             '%b %d, %Y',     # Jan 01, 2023
+>             '%d %b %Y',      # 01 Jan 2023
+>             '%B %d, %Y',     # January 01, 2023
+>         ]
+>
+>         for fmt in date_formats:
+>             try:
+>                 dt = datetime.strptime(date_str, fmt)
+>                 return dt.strftime('%Y-%m-%d')
+>             except ValueError:
+>                 continue
+>
+>         # Try pandas parsing as 
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+
+ to process'
+    )
+
+    parser.>                 # Parse dates
+>                 df[col] = df[col].apply(self.date_parser)
+>                 self.logging_process('parse_dates', {
+>                     'column': col,
+>                     'format': 'ISO-8601'
+>                 })
+>
+>             elif col_type == 'numeric':
+>                 # Convert to numeric
+>                 df[col] = pd.to_numeric(df[col], errors='coerce')
+>
+>                 # Impute missing with median
+>                 if df[col].isna().any():
+>                     median_val = df[col].median()
+>                     missing_count = df[col].isna().sum()
+>                     df[col].fillna(median_val, inplace=True)
+>
+>                     self.logging_process('impute_numeric', {
+>                         'column': col,
+>                         'method': 'median',
+>                         'value': float(median_val) if pd.notna(median_val) else 0.0,
+>                         'missing_count': int(missing_count)
+>                     })
+>
+>                 # Clip outliers
+>                 lower = df[col].quantile(0.01)
+>                 upper = df[col].quantile(0.99)
+>                 df[col] = df[col].clip(lower=lower, upper=upper)
+>
+>                 self.logging_process('clip_outliers', {
+>                     'column': col,
+>                     'lower_percentile': 1,
+>                     'upper_percentile': 99,
+>                     'lower_bound': float(lower),
+>                     'upper_bound': float(upper)
+>                 })
+>
+>             elif col_type == 'categorical':
+>                 # Impute missing with 'Unknown'
+>                 if df[col].isna().any() or (df[col] == '').any():
+>                     missing_count = df[col].isna().sum() + (df[col] == '').sum()
+>                     df[col].fillna('Unknown', inplace=True)
+>                     df[col] = df[col].replace('', 'Unknown')
+>
+>                     self.logging_process('impute_categorical', {
+>                         'column': col,
+>                         'method': 'constant',
+>                         'value': 'Unknown',
+>                         'missing_count': int(missing_count)
+>                     })
+>
+>         return df
+>
+>     def consolidated_cleaned_dataframes(self, dataframes: List[pd.DataFrame]) -> pd.DataFrame:
+>         """Merge multiple cleaned DataFrames."""
+>         if not dataframes:
+>             return pd.DataFrame()
+>
+>         # Concatenate all dataframes
+>         consolidated = pd.concat(dataframes, ignore_index=True)
+>
+>         self.logging_process('consolidate_dataframes', {
+>             'total_files': len(dataframes),
+>             'total_rows': len(consolidated),
+>             'total_columns': len(consolidated.columns)
+>         })
+>
+>         return consolidated
+>
+>     def file_processor(self, input_files: List[str], output_file: str, log_file: str):
+>         """Full pipeline execution."""
+>         self.operations_log = []  # Reset log
+>
+>         # Process each file
+>         dataframes = []
+>         for filepath in input_files:
+>             df = self.processed_dataframe(filepath)
+>             dataframes.append(df)
+>
+>         # Consolidate
+>         consolidated = self.consolidated_cleaned_dataframes(dataframes)
+>
+>         # Save output
+>         consolidated.to_csv(output_file, index=False)
+>
+>         self.logging_process('save_output', {
+>             'output_file': output_file,
+>             'rows': len(consolidated),
+>             'columns': len(consolidated.columns)
+>         })
+>
+>         # Save log
+>         log_data = {
+>             'timestamp': datetime.now().isoformat(),
+>             'operations': self.operations_log
+>         }
+>
+>         with open(log_file, 'w') as f:
+>             json.dump(log_data, f, indent=2)
+>
+>         return consolidated
+>
+>
+> def main():
+>     parser = argparse.ArgumentParser(
+>         description='CSV Ingester - Clean and consolidate multiple CSV files'
+>     )
+>
+>     parser.add_argument(
+>         'input_files',
+>         nargs='+',
+>         help='Input CSV files to process'
+>     )
+>
+>     parser.add_argument(
+>         '-o', '--output',
+>         default='cleaned_data.csv',
+>         help='Output file for cleaned data (default: cleaned_data.csv)'
+>     )
+>
+>     parser.add_argument(
+>         '-l', '--log',
+>         default='cleaning_log.json',
+>         help='Output file for cleaning log (default: cleaning_log.json)'
+>     )
+>
+>     args = parser.parse_args()
+>
+>     # Process files
+>     ingester = CSVIngester()
+>     ingester.file_processor(args.input_files, args.output, args.log)
+>
+>     print(f"Processing complete!")
+>     print(f"Cleaned data saved to: {args.output}")
+>     print(f"Cleaning log saved to: {args.log}")
+>
+>
+> if __name__ == '__main__':
+>     main()
+> EOFPYTHON
+root@5c43413d2e06:/app# chmod +x solution/CSVIngester.py
+root@5c43413d2e06:/app# echo 'CSVIngester.py created successfully'
+CSVIngester.py created successfully
+root@5c43413d2e06:/app#

@@ -1,0 +1,42 @@
+New Terminal Output:
+
+root@effc21c2e322:/app# ls -la
+total 12
+drwxr-xr-x 1 root root 4096 Jan 19 22:50 .
+drwxr-xr-x 1 root root 4096 Jan 19 22:51 ..
+drwxr-xr-x 2 root root 4096 Jan 19 22:00 src
+root@effc21c2e322:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,74 @@
+New Terminal Output:
+
+root@effc21c2e322:/app# python3 solution/CSVIngester.py src/sample1_data.csv src/sample2_data.csv -o tests/demo_output.csv -l tests/demo_log.json
+/app/solution/CSVIngester.py:295: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:243: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna(median_val, inplace=True)
+/app/solution/CSVIngester.py:295: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+/app/solution/CSVIngester.py:295: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace meth
+od.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a c
+opy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to
+perform the operation inplace on the original object.
+
+
+  df[col].fillna('Unknown', inplace=True)
+✓ Processed 2 file(s)
+✓ Output saved to: tests/demo_output.csv
+✓ Log saved to: tests/demo_log.json
+root@effc21c2e322:/app# ls -lh tests/*.csv tests/*.json 2>/dev/null
+-rw-r--r-- 1 root root 5.3K Jan 19 22:56 tests/demo_log.json
+-rw-r--r-- 1 root root 1.9K Jan 19 22:56 tests/demo_output.csv
+-rw-r--r-- 1 root root  648 Jan 19 22:54 tests/test2_data.csv
+-rw-r--r-- 1 root root  636 Jan 19 22:54 tests/test3_data.csv
+-rw-r--r-- 1 root root  653 Jan 19 22:54 tests/test_data.csv
+root@effc21c2e322:/app# head -20 tests/demo_output.csv
+order_id,customer_name,order_date,product_price,quantity,total_amount,ship_date,status,sku,product_name,stock_qty,unit_cost,last_restock,supplier,category_type
+ORD1000,Unknown,2023-10-01,264.3134984759545,7.0,1850.194489331681,2023-10-09,Unknown,,,,,,,
+ORD1001,Unknown,2023-04-02,171.54224088174146,17.0,2916.2180949896047,,Shipped,,,,,,,
+ORD1002,Bob Johnson,,171.54224088174146,17.0,3317.4124189023737,2023-12-11,Unknown,,,,,,,
+ORD1003,Alice Williams,,70.21586678937072,10.0,702.1586678937072,2023-07-09,Unknown,,,,,,,
+ORD1004,John Smith,2023-01-09,318.7528395915485,8.0,2550.022716732388,,Unknown,,,,,,,
+ORD1005,Alice Williams,2023-02-14,90.523993705531,14.0,1267.335911877434,,Cancelled,,,,,,,
+ORD1006,Alice Williams,,432.0255346209029,2.45,864.0510692418057,,Cancelled,,,,,,,
+ORD1007,Unknown,2023-11-24,68.64064916777441,7.0,499.44282820755103,2023-11-29,Unknown,,,,,,,
+ORD1008,Jane Doe,2023-03-22,477.36989036333176,15.0,6875.881001412972,,Unknown,,,,,,,
+ORD1009,Alice Williams,,111.05535490816476,11.0,1221.6089039898125,2023-08-03,Shipped,,,,,,,
+,,,,,,,,SKU-3000,Monitor,261.0,32.3640947273435,2023-11-11,Unknown,Accessories
+,,,,,,,,SKU-3001,Mouse,431.0,194.71833117751396,2023-09-23,MegaStore,Accessories
+,,,,,,,,SKU-3002,Chair,406.0,1985.7700631562775,2023-10-15,Unknown,Electronics
+,,,,,,,,SKU-3003,Monitor,411.0,1763.1557275063572,2023-11-08,GlobalTech,Accessories
+,,,,,,,,SKU-3004,Mouse,124.0,1402.715113144494,2023-10-28,GlobalTech,Accessories
+,,,,,,,,SKU-3005,Keyboard,375.0,1195.107567789151,2023-08-04,OfficeSupply Inc,Unknown
+,,,,,,,,SKU-3006,Monitor,43.0,1893.1068424782395,2023-12-05,GlobalTech,Electronics
+,,,,,,,,SKU-3007,Mouse,12715.090000000002,399.4540451996029,2023-04-08,TechCorp,Accessories
+,,,,,,,,SKU-3008,Laptop,266.0,1170.1888689891994,2023-11-24,Unknown,Unknown
+root@effc21c2e322:/app#

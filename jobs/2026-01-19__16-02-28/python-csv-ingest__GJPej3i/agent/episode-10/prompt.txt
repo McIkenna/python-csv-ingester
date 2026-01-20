@@ -1,0 +1,32 @@
+New Terminal Output:
+
+root@5c43413d2e06:/app# source solution/solve.sh
+root@5c43413d2e06:/app# encoding-detection tests/test_data.csv
+utf-8
+root@5c43413d2e06:/app# name-standardization "Product Price $"
+product_price
+root@5c43413d2e06:/app# type-detection tests/test_data.csv "Order Date"
+date
+root@5c43413d2e06:/app# csv-summary tests/test_data.csv
+{
+  "file": "tests/test_data.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Customer Name": 2,
+    "Product Price $": 1,
+    "Ship Date": 4,
+    "Status": 2
+  }
+}
+root@5c43413d2e06:/app#

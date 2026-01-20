@@ -1,0 +1,1895 @@
+Hit:1 http://deb.debian.org/debian trixie InRelease
+Hit:2 http://deb.debian.org/debian trixie-updates InRelease
+Hit:3 http://deb.debian.org/debian-security trixie-security InRelease
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+curl is already the newest version (8.14.1-2+deb13u2).
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+no checksums to verify
+installing to /root/.local/bin
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+============================= test session starts ==============================
+platform linux -- Python 3.11.14, pytest-8.4.1, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.3.5
+collected 26 items
+
+../tests/test_outputs.py ..........................                      [100%]
+
+==================================== PASSES ====================================
+_______________________ test_should_detect_utf8_encoding _______________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Current directory: /app
+DEBUG: Directory contents: ['.pytest_cache', 'solution', 'tests', 'src']
+DEBUG: solve_sh_path: solution/solve.sh
+DEBUG: Absolute path: /app/solution/solve.sh
+DEBUG: Running command: solution/solve.sh encoding-detection "/tests/test2_data.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'utf-8
+'
+DEBUG: Stderr: ''
+______________________ test_should_detect_latin_encoding _______________________
+---------------------------- Captured stdout setup -----------------------------
+Created mock Latin-1 data file at: /tests/latin1_data.csv
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh encoding-detection "/tests/latin1_data.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'latin-1
+'
+DEBUG: Stderr: ''
+_________________ test_should_detect_encoding_nonexistent_file _________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh encoding-detection "/tests/nonexistent.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 1
+DEBUG: Stdout: 'Error: File not found - /tests/nonexistent.csv
+'
+DEBUG: Stderr: ''
+_______________________ test_standardize_spaces_col_name _______________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh name-standardization "Order Date"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'order_date
+'
+DEBUG: Stderr: ''
+______________________ test_standardize_any_special_chars ______________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh name-standardization "Price $!!"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'price
+'
+DEBUG: Stderr: ''
+_________________________ test_standardize_any_casing __________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh name-standardization "ProductPrice"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'product_price
+'
+DEBUG: Stderr: ''
+__________________________ test_detect_numeric_column __________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh type-detection "/tests/test_data.csv" "Product Price $"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'numeric
+'
+DEBUG: Stderr: ''
+___________________________ test_detect_date_column ____________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh type-detection "/tests/test2_data.csv" "Last Restock"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'date
+'
+DEBUG: Stderr: ''
+________________________ test_detect_categorical_column ________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh type-detection "/tests/test2_data.csv" "Supplier"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'categorical
+'
+DEBUG: Stderr: ''
+________________________ test_detect_nonexistent_column ________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh type-detection "/tests/test3_data.csv" "NonExistent"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 1
+DEBUG: Stdout: 'Error: Column 'NonExistent' not found in file
+'
+DEBUG: Stderr: ''
+_____________________________ test_parse_iso_dates _____________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh date-parsing "/tests/test_data.csv" "Order Date"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: '["2023-10-01", "2023-02-04", "2023-12-05", "2023-08-29", "2023-09-01", "2023-02-14", "2023-04-20", "2023-11-24", "2023-03-22", "2023-07-25"]
+'
+DEBUG: Stderr: ''
+________________________ test_parse_mixed_date_formats _________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh date-parsing "/tests/test2_data.csv" "Last Restock"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: '["2023-11-11", "2023-09-23", "2023-10-15", "2023-08-11", "2023-10-28", "2023-08-04", "2023-12-05", "2023-04-08", "2023-11-24", "2023-08-22"]
+'
+DEBUG: Stderr: ''
+__________________________ test_clip_numeric_outliers __________________________
+----------------------------- Captured stdout call -----------------------------
+solve_sh_path: solution/solve.sh
+DEBUG: Running command: solution/solve.sh outlier-truncate "/tests/test_data.csv" "Total Amount"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: '{
+  "lower_bound": 499.44282820755103,
+  "upper_bound": 6875.881001412972,
+  "original_min": 479.3940088979312,
+  "original_max": 7227.817454628305,
+  "clipped_min": 499.44282820755103,
+  "clipped_max": 6875.881001412972
+}
+'
+DEBUG: Stderr: ''
+_________________________ test_clean_single_dataframe __________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh dataframe-cleaning "/tests/test_data.csv" "/tests/cleaned_output.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: '{
+  "source_file": "/tests/test_data.csv",
+  "output_file": "/tests/cleaned_output.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "order_id",
+    "customer_name",
+    "order_date",
+    "product_price",
+    "quantity",
+    "total_amount",
+    "ship_date",
+    "status"
+  ]
+}
+'
+DEBUG: Stderr: ''
+______________________ test_cleaned_columns_standardized _______________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh dataframe-cleaning "/tests/test_data.csv" "/tests/cleaned_output.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: '{
+  "source_file": "/tests/test_data.csv",
+  "output_file": "/tests/cleaned_output.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "order_id",
+    "customer_name",
+    "order_date",
+    "product_price",
+    "quantity",
+    "total_amount",
+    "ship_date",
+    "status"
+  ]
+}
+'
+DEBUG: Stderr: ''
+_________________________ test_consolidate_dataframes __________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh dataframe-consolidation "/tests/consolidated_output.csv" "/tests/test_data.csv" "/tests/test2_data.csv" "/tests/test3_data.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: '{
+  "output_file": "/tests/consolidated_output.csv",
+  "input_files_count": 3,
+  "total_rows": 30,
+  "total_columns": 22,
+  "columns": [
+    "Annual_Salary",
+    "Category Type",
+    "Customer Name",
+    "Department Name",
+    "EMP_ID",
+    "Email Address",
+    "Full Name",
+    "Last Restock",
+    "Order Date",
+    "Order ID",
+    "Performance Score",
+    "Product  Name",
+    "Product Price $",
+    "Quantity!!",
+    "SKU#",
+    "Ship Date",
+    "Status",
+    "Supplier",
+    "Total Amount",
+    "Unit Cost ($)",
+    "hire-date",
+    "stock_qty"
+  ]
+}
+'
+DEBUG: Stderr: ''
+__________________________ test_process_full_pipeline __________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh file-processing "/tests/final_output.csv" "/tests/process_log.json" "/tests/test_data.csv" "/tests/test2_data.csv" "/tests/test3_data.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'Processing 3 CSV file(s)...
+  Loading test_data.csv...
+  Loading test2_data.csv...
+  Loading test3_data.csv...
+Consolidating datasets...
+Writing cleaned data to /tests/final_output.csv...
+Writing cleaning log to /tests/process_log.json...
+ Completed
+  Processed: 3 file(s)
+  Output rows: 30
+  Output columns: 22
+{
+  "timestamp": "2026-01-19T22:39:09.163393",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "/tests/test_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T22:39:09.164626"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "/tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T22:39:09.164800"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "customer_name",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T22:39:09.165783"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "order_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:09.166358"
+    },
+    {
+      "operation": "fill_missing_numeric",
+      "details": {
+        "column": "product_price",
+        "fill_value": 171.54224088174146,
+        "missing_count": 1
+      },
+      "timestamp": "2026-01-19T22:39:09.166742"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "product_price",
+        "lower_bound": 68.64064916777441,
+        "upper_bound": 477.36989036333176,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:09.167622"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "quantity",
+        "lower_bound": 2.45,
+        "upper_bound": 17.0,
+        "values_clipped": 1
+      },
+      "timestamp": "2026-01-19T22:39:09.168493"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "total_amount",
+        "lower_bound": 499.44282820755103,
+        "upper_bound": 6875.881001412972,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:09.169199"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "ship_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:09.169606"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "status",
+        "fill_value": "Unknown",
+        "missing_count": 6
+      },
+      "timestamp": "2026-01-19T22:39:09.169837"
+    },
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "/tests/test2_data.csv",
+        "rows": 10,
+        "columns": 7
+      },
+      "timestamp": "2026-01-19T22:39:09.170353"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "/tests/test2_data.csv",
+        "mappings": {
+          "SKU#": "sku",
+          "Product  Name": "product_name",
+          "stock_qty": "stock_qty",
+          "Unit Cost ($)": "unit_cost",
+          "Last Restock": "last_restock",
+          "Supplier": "supplier",
+          "Category Type": "category_type"
+        }
+      },
+      "timestamp": "2026-01-19T22:39:09.170409"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "stock_qty",
+        "lower_bound": 9.33,
+        "upper_bound": 12715.090000000002,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:09.171546"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "unit_cost",
+        "lower_bound": 32.3640947273435,
+        "upper_bound": 1985.7700631562775,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:09.172183"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "last_restock",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:09.172624"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "supplier",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T22:39:09.172882"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "category_type",
+        "fill_value": "Unknown",
+        "missing_count": 2
+      },
+      "timestamp": "2026-01-19T22:39:09.173111"
+    },
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "/tests/test3_data.csv",
+        "rows": 10,
+        "columns": 7
+      },
+      "timestamp": "2026-01-19T22:39:09.173573"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "/tests/test3_data.csv",
+        "mappings": {
+          "EMP_ID": "emp_id",
+          "Full Name": "full_name",
+          "hire-date": "hire_date",
+          "Department Name": "department_name",
+          "Annual_Salary": "annual_salary",
+          "Performance Score": "performance_score",
+          "Email Address": "email_address"
+        }
+      },
+      "timestamp": "2026-01-19T22:39:09.173626"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "full_name",
+        "fill_value": "Unknown",
+        "missing_count": 1
+      },
+      "timestamp": "2026-01-19T22:39:09.174082"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "hire_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:09.174500"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "department_name",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T22:39:09.174736"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "annual_salary",
+        "lower_bound": 46027.87625251987,
+        "upper_bound": 148435.13722494972,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:09.175396"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "performance_score",
+        "lower_bound": 1.09,
+        "upper_bound": 10.0,
+        "values_clipped": 1
+      },
+      "timestamp": "2026-01-19T22:39:09.176056"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "email_address",
+        "fill_value": "Unknown",
+        "missing_count": 1
+      },
+      "timestamp": "2026-01-19T22:39:09.176374"
+    },
+    {
+      "operation": "consolidate",
+      "details": {
+        "total_dataframes": 3,
+        "total_rows": 30,
+        "total_columns": 22
+      },
+      "timestamp": "2026-01-19T22:39:09.180473"
+    }
+  ]
+}
+'
+DEBUG: Stderr: ''
+_____________________ test_process_log_contains_operations _____________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh file-processing "/tests/output.csv" "/tests/log.json" "/tests/test2_data.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'Processing 1 CSV file(s)...
+  Loading test2_data.csv...
+Consolidating datasets...
+Writing cleaned data to /tests/output.csv...
+Writing cleaning log to /tests/log.json...
+ Completed
+  Processed: 1 file(s)
+  Output rows: 10
+  Output columns: 7
+{
+  "timestamp": "2026-01-19T22:39:09.530141",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "/tests/test2_data.csv",
+        "rows": 10,
+        "columns": 7
+      },
+      "timestamp": "2026-01-19T22:39:09.531155"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "/tests/test2_data.csv",
+        "mappings": {
+          "SKU#": "sku",
+          "Product  Name": "product_name",
+          "stock_qty": "stock_qty",
+          "Unit Cost ($)": "unit_cost",
+          "Last Restock": "last_restock",
+          "Supplier": "supplier",
+          "Category Type": "category_type"
+        }
+      },
+      "timestamp": "2026-01-19T22:39:09.531334"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "stock_qty",
+        "lower_bound": 9.33,
+        "upper_bound": 12715.090000000002,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:09.533071"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "unit_cost",
+        "lower_bound": 32.3640947273435,
+        "upper_bound": 1985.7700631562775,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:09.533864"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "last_restock",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:09.534430"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "supplier",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T22:39:09.534736"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "category_type",
+        "fill_value": "Unknown",
+        "missing_count": 2
+      },
+      "timestamp": "2026-01-19T22:39:09.534983"
+    },
+    {
+      "operation": "consolidate",
+      "details": {
+        "total_dataframes": 1,
+        "total_rows": 10,
+        "total_columns": 7
+      },
+      "timestamp": "2026-01-19T22:39:09.535345"
+    }
+  ]
+}
+'
+DEBUG: Stderr: ''
+_________________________ test_get_existing_operations _________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh file-processing "/tests/output.csv" "/tests/log.json" "/tests/test_data.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'Processing 1 CSV file(s)...
+  Loading test_data.csv...
+Consolidating datasets...
+Writing cleaned data to /tests/output.csv...
+Writing cleaning log to /tests/log.json...
+ Completed
+  Processed: 1 file(s)
+  Output rows: 10
+  Output columns: 8
+{
+  "timestamp": "2026-01-19T22:39:09.833225",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "/tests/test_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T22:39:09.834237"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "/tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T22:39:09.834429"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "customer_name",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T22:39:09.835208"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "order_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:09.835759"
+    },
+    {
+      "operation": "fill_missing_numeric",
+      "details": {
+        "column": "product_price",
+        "fill_value": 171.54224088174146,
+        "missing_count": 1
+      },
+      "timestamp": "2026-01-19T22:39:09.836118"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "product_price",
+        "lower_bound": 68.64064916777441,
+        "upper_bound": 477.36989036333176,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:09.836922"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "quantity",
+        "lower_bound": 2.45,
+        "upper_bound": 17.0,
+        "values_clipped": 1
+      },
+      "timestamp": "2026-01-19T22:39:09.837777"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "total_amount",
+        "lower_bound": 499.44282820755103,
+        "upper_bound": 6875.881001412972,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:09.838526"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "ship_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:09.838909"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "status",
+        "fill_value": "Unknown",
+        "missing_count": 6
+      },
+      "timestamp": "2026-01-19T22:39:09.839144"
+    },
+    {
+      "operation": "consolidate",
+      "details": {
+        "total_dataframes": 1,
+        "total_rows": 10,
+        "total_columns": 8
+      },
+      "timestamp": "2026-01-19T22:39:09.839510"
+    }
+  ]
+}
+'
+DEBUG: Stderr: ''
+DEBUG: Running command: solution/solve.sh get-operations "/tests/log.json"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: '[
+  {
+    "operation": "load_file",
+    "details": {
+      "source": "/tests/test_data.csv",
+      "rows": 10,
+      "columns": 8
+    },
+    "timestamp": "2026-01-19T22:39:09.834237"
+  },
+  {
+    "operation": "standardize_columns",
+    "details": {
+      "source": "/tests/test_data.csv",
+      "mappings": {
+        "Order ID": "order_id",
+        "Customer Name": "customer_name",
+        "Order Date": "order_date",
+        "Product Price $": "product_price",
+        "Quantity!!": "quantity",
+        "Total Amount": "total_amount",
+        "Ship Date": "ship_date",
+        "Status": "status"
+      }
+    },
+    "timestamp": "2026-01-19T22:39:09.834429"
+  },
+  {
+    "operation": "fill_missing_categorical",
+    "details": {
+      "column": "customer_name",
+      "fill_value": "Unknown",
+      "missing_count": 3
+    },
+    "timestamp": "2026-01-19T22:39:09.835208"
+  },
+  {
+    "operation": "format_dates",
+    "details": {
+      "column": "order_date",
+      "format": "ISO-8601 (YYYY-MM-DD)"
+    },
+    "timestamp": "2026-01-19T22:39:09.835759"
+  },
+  {
+    "operation": "fill_missing_numeric",
+    "details": {
+      "column": "product_price",
+      "fill_value": 171.54224088174146,
+      "missing_count": 1
+    },
+    "timestamp": "2026-01-19T22:39:09.836118"
+  },
+  {
+    "operation": "outlier_truncate",
+    "details": {
+      "column": "product_price",
+      "lower_bound": 68.64064916777441,
+      "upper_bound": 477.36989036333176,
+      "values_clipped": 2
+    },
+    "timestamp": "2026-01-19T22:39:09.836922"
+  },
+  {
+    "operation": "outlier_truncate",
+    "details": {
+      "column": "quantity",
+      "lower_bound": 2.45,
+      "upper_bound": 17.0,
+      "values_clipped": 1
+    },
+    "timestamp": "2026-01-19T22:39:09.837777"
+  },
+  {
+    "operation": "outlier_truncate",
+    "details": {
+      "column": "total_amount",
+      "lower_bound": 499.44282820755103,
+      "upper_bound": 6875.881001412972,
+      "values_clipped": 2
+    },
+    "timestamp": "2026-01-19T22:39:09.838526"
+  },
+  {
+    "operation": "format_dates",
+    "details": {
+      "column": "ship_date",
+      "format": "ISO-8601 (YYYY-MM-DD)"
+    },
+    "timestamp": "2026-01-19T22:39:09.838909"
+  },
+  {
+    "operation": "fill_missing_categorical",
+    "details": {
+      "column": "status",
+      "fill_value": "Unknown",
+      "missing_count": 6
+    },
+    "timestamp": "2026-01-19T22:39:09.839144"
+  },
+  {
+    "operation": "consolidate",
+    "details": {
+      "total_dataframes": 1,
+      "total_rows": 10,
+      "total_columns": 8
+    },
+    "timestamp": "2026-01-19T22:39:09.839510"
+  }
+]
+'
+DEBUG: Stderr: ''
+_________________________ test_get_median_for_missing __________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh file-processing "/tests/output.csv" "/tests/log.json" "/tests/test_data.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'Processing 1 CSV file(s)...
+  Loading test_data.csv...
+Consolidating datasets...
+Writing cleaned data to /tests/output.csv...
+Writing cleaning log to /tests/log.json...
+ Completed
+  Processed: 1 file(s)
+  Output rows: 10
+  Output columns: 8
+{
+  "timestamp": "2026-01-19T22:39:10.445894",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "/tests/test_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T22:39:10.446998"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "/tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T22:39:10.447170"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "customer_name",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T22:39:10.448074"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "order_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:10.448627"
+    },
+    {
+      "operation": "fill_missing_numeric",
+      "details": {
+        "column": "product_price",
+        "fill_value": 171.54224088174146,
+        "missing_count": 1
+      },
+      "timestamp": "2026-01-19T22:39:10.449011"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "product_price",
+        "lower_bound": 68.64064916777441,
+        "upper_bound": 477.36989036333176,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:10.449989"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "quantity",
+        "lower_bound": 2.45,
+        "upper_bound": 17.0,
+        "values_clipped": 1
+      },
+      "timestamp": "2026-01-19T22:39:10.450896"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "total_amount",
+        "lower_bound": 499.44282820755103,
+        "upper_bound": 6875.881001412972,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:10.451634"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "ship_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:10.452036"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "status",
+        "fill_value": "Unknown",
+        "missing_count": 6
+      },
+      "timestamp": "2026-01-19T22:39:10.452289"
+    },
+    {
+      "operation": "consolidate",
+      "details": {
+        "total_dataframes": 1,
+        "total_rows": 10,
+        "total_columns": 8
+      },
+      "timestamp": "2026-01-19T22:39:10.452628"
+    }
+  ]
+}
+'
+DEBUG: Stderr: ''
+_________________________ test_get_unknown_for_missing _________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh file-processing "/tests/output.csv" "/tests/log.json" "/tests/test2_data.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'Processing 1 CSV file(s)...
+  Loading test2_data.csv...
+Consolidating datasets...
+Writing cleaned data to /tests/output.csv...
+Writing cleaning log to /tests/log.json...
+ Completed
+  Processed: 1 file(s)
+  Output rows: 10
+  Output columns: 7
+{
+  "timestamp": "2026-01-19T22:39:10.739088",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "/tests/test2_data.csv",
+        "rows": 10,
+        "columns": 7
+      },
+      "timestamp": "2026-01-19T22:39:10.740080"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "/tests/test2_data.csv",
+        "mappings": {
+          "SKU#": "sku",
+          "Product  Name": "product_name",
+          "stock_qty": "stock_qty",
+          "Unit Cost ($)": "unit_cost",
+          "Last Restock": "last_restock",
+          "Supplier": "supplier",
+          "Category Type": "category_type"
+        }
+      },
+      "timestamp": "2026-01-19T22:39:10.740263"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "stock_qty",
+        "lower_bound": 9.33,
+        "upper_bound": 12715.090000000002,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:10.742042"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "unit_cost",
+        "lower_bound": 32.3640947273435,
+        "upper_bound": 1985.7700631562775,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:10.742805"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "last_restock",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:10.743347"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "supplier",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T22:39:10.743654"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "category_type",
+        "fill_value": "Unknown",
+        "missing_count": 2
+      },
+      "timestamp": "2026-01-19T22:39:10.743897"
+    },
+    {
+      "operation": "consolidate",
+      "details": {
+        "total_dataframes": 1,
+        "total_rows": 10,
+        "total_columns": 7
+      },
+      "timestamp": "2026-01-19T22:39:10.744269"
+    }
+  ]
+}
+'
+DEBUG: Stderr: ''
+____________________________ test_get_cleaning_log _____________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh file-processing "/tests/output.csv" "/tests/log.json" "/tests/test_data.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'Processing 1 CSV file(s)...
+  Loading test_data.csv...
+Consolidating datasets...
+Writing cleaned data to /tests/output.csv...
+Writing cleaning log to /tests/log.json...
+ Completed
+  Processed: 1 file(s)
+  Output rows: 10
+  Output columns: 8
+{
+  "timestamp": "2026-01-19T22:39:11.039569",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "/tests/test_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T22:39:11.040662"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "/tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T22:39:11.040839"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "customer_name",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T22:39:11.041705"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "order_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:11.042266"
+    },
+    {
+      "operation": "fill_missing_numeric",
+      "details": {
+        "column": "product_price",
+        "fill_value": 171.54224088174146,
+        "missing_count": 1
+      },
+      "timestamp": "2026-01-19T22:39:11.042641"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "product_price",
+        "lower_bound": 68.64064916777441,
+        "upper_bound": 477.36989036333176,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:11.043457"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "quantity",
+        "lower_bound": 2.45,
+        "upper_bound": 17.0,
+        "values_clipped": 1
+      },
+      "timestamp": "2026-01-19T22:39:11.044318"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "total_amount",
+        "lower_bound": 499.44282820755103,
+        "upper_bound": 6875.881001412972,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:11.045051"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "ship_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:11.045483"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "status",
+        "fill_value": "Unknown",
+        "missing_count": 6
+      },
+      "timestamp": "2026-01-19T22:39:11.045725"
+    },
+    {
+      "operation": "consolidate",
+      "details": {
+        "total_dataframes": 1,
+        "total_rows": 10,
+        "total_columns": 8
+      },
+      "timestamp": "2026-01-19T22:39:11.046101"
+    }
+  ]
+}
+'
+DEBUG: Stderr: ''
+DEBUG: Running command: solution/solve.sh cleaning-log "/tests/log.json"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: '{
+  "timestamp": "2026-01-19T22:39:11.039569",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "/tests/test_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T22:39:11.040662"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "/tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T22:39:11.040839"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "customer_name",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T22:39:11.041705"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "order_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:11.042266"
+    },
+    {
+      "operation": "fill_missing_numeric",
+      "details": {
+        "column": "product_price",
+        "fill_value": 171.54224088174146,
+        "missing_count": 1
+      },
+      "timestamp": "2026-01-19T22:39:11.042641"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "product_price",
+        "lower_bound": 68.64064916777441,
+        "upper_bound": 477.36989036333176,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:11.043457"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "quantity",
+        "lower_bound": 2.45,
+        "upper_bound": 17.0,
+        "values_clipped": 1
+      },
+      "timestamp": "2026-01-19T22:39:11.044318"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "total_amount",
+        "lower_bound": 499.44282820755103,
+        "upper_bound": 6875.881001412972,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:11.045051"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "ship_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:11.045483"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "status",
+        "fill_value": "Unknown",
+        "missing_count": 6
+      },
+      "timestamp": "2026-01-19T22:39:11.045725"
+    },
+    {
+      "operation": "consolidate",
+      "details": {
+        "total_dataframes": 1,
+        "total_rows": 10,
+        "total_columns": 8
+      },
+      "timestamp": "2026-01-19T22:39:11.046101"
+    }
+  ]
+}
+'
+DEBUG: Stderr: ''
+____________________ test_get_cleaning_log_nonexistent_file ____________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh cleaning-log "/tests/nonexistent_log.json"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: '{"error": "Log file not found: /tests/nonexistent_log.json"}
+'
+DEBUG: Stderr: ''
+_____________________________ test_get_csv_summary _____________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh csv-summary "/tests/test_data.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: '{
+  "file": "/tests/test_data.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "dtypes": {
+    "Order ID": "object",
+    "Customer Name": "object",
+    "Order Date": "object",
+    "Product Price $": "float64",
+    "Quantity!!": "int64",
+    "Total Amount": "float64",
+    "Ship Date": "object",
+    "Status": "object"
+  },
+  "missing_values": {
+    "Order ID": 0,
+    "Customer Name": 3,
+    "Order Date": 0,
+    "Product Price $": 1,
+    "Quantity!!": 0,
+    "Total Amount": 0,
+    "Ship Date": 4,
+    "Status": 6
+  },
+  "memory_usage": "3.17 KB"
+}
+'
+DEBUG: Stderr: ''
+______________________ test_summary_shows_missing_values _______________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh csv-summary "/tests/test2_data.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: '{
+  "file": "/tests/test2_data.csv",
+  "rows": 10,
+  "columns": 7,
+  "column_names": [
+    "SKU#",
+    "Product  Name",
+    "stock_qty",
+    "Unit Cost ($)",
+    "Last Restock",
+    "Supplier",
+    "Category Type"
+  ],
+  "dtypes": {
+    "SKU#": "object",
+    "Product  Name": "object",
+    "stock_qty": "int64",
+    "Unit Cost ($)": "float64",
+    "Last Restock": "object",
+    "Supplier": "object",
+    "Category Type": "object"
+  },
+  "missing_values": {
+    "SKU#": 0,
+    "Product  Name": 0,
+    "stock_qty": 0,
+    "Unit Cost ($)": 0,
+    "Last Restock": 0,
+    "Supplier": 3,
+    "Category Type": 2
+  },
+  "memory_usage": "3.34 KB"
+}
+'
+DEBUG: Stderr: ''
+______________________________ test_full_workflow ______________________________
+----------------------------- Captured stdout call -----------------------------
+DEBUG: Running command: solution/solve.sh csv-summary "/tests/test_data.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: '{
+  "file": "/tests/test_data.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "dtypes": {
+    "Order ID": "object",
+    "Customer Name": "object",
+    "Order Date": "object",
+    "Product Price $": "float64",
+    "Quantity!!": "int64",
+    "Total Amount": "float64",
+    "Ship Date": "object",
+    "Status": "object"
+  },
+  "missing_values": {
+    "Order ID": 0,
+    "Customer Name": 3,
+    "Order Date": 0,
+    "Product Price $": 1,
+    "Quantity!!": 0,
+    "Total Amount": 0,
+    "Ship Date": 4,
+    "Status": 6
+  },
+  "memory_usage": "3.17 KB"
+}
+'
+DEBUG: Stderr: ''
+DEBUG: Running command: solution/solve.sh type-detection "/tests/test_data.csv" "Product Price $"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'numeric
+'
+DEBUG: Stderr: ''
+DEBUG: Running command: solution/solve.sh file-processing "/tests/final.csv" "/tests/final_log.json" "/tests/test_data.csv" "/tests/test2_data.csv" "/tests/test3_data.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: 'Processing 3 CSV file(s)...
+  Loading test_data.csv...
+  Loading test2_data.csv...
+  Loading test3_data.csv...
+Consolidating datasets...
+Writing cleaned data to /tests/final.csv...
+Writing cleaning log to /tests/final_log.json...
+ Completed
+  Processed: 3 file(s)
+  Output rows: 30
+  Output columns: 22
+{
+  "timestamp": "2026-01-19T22:39:12.850365",
+  "operations": [
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "/tests/test_data.csv",
+        "rows": 10,
+        "columns": 8
+      },
+      "timestamp": "2026-01-19T22:39:12.853605"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "/tests/test_data.csv",
+        "mappings": {
+          "Order ID": "order_id",
+          "Customer Name": "customer_name",
+          "Order Date": "order_date",
+          "Product Price $": "product_price",
+          "Quantity!!": "quantity",
+          "Total Amount": "total_amount",
+          "Ship Date": "ship_date",
+          "Status": "status"
+        }
+      },
+      "timestamp": "2026-01-19T22:39:12.854047"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "customer_name",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T22:39:12.860833"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "order_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:12.866290"
+    },
+    {
+      "operation": "fill_missing_numeric",
+      "details": {
+        "column": "product_price",
+        "fill_value": 171.54224088174146,
+        "missing_count": 1
+      },
+      "timestamp": "2026-01-19T22:39:12.872926"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "product_price",
+        "lower_bound": 68.64064916777441,
+        "upper_bound": 477.36989036333176,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:12.876600"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "quantity",
+        "lower_bound": 2.45,
+        "upper_bound": 17.0,
+        "values_clipped": 1
+      },
+      "timestamp": "2026-01-19T22:39:12.880673"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "total_amount",
+        "lower_bound": 499.44282820755103,
+        "upper_bound": 6875.881001412972,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:12.885544"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "ship_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:12.887762"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "status",
+        "fill_value": "Unknown",
+        "missing_count": 6
+      },
+      "timestamp": "2026-01-19T22:39:12.888843"
+    },
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "/tests/test2_data.csv",
+        "rows": 10,
+        "columns": 7
+      },
+      "timestamp": "2026-01-19T22:39:12.892463"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "/tests/test2_data.csv",
+        "mappings": {
+          "SKU#": "sku",
+          "Product  Name": "product_name",
+          "stock_qty": "stock_qty",
+          "Unit Cost ($)": "unit_cost",
+          "Last Restock": "last_restock",
+          "Supplier": "supplier",
+          "Category Type": "category_type"
+        }
+      },
+      "timestamp": "2026-01-19T22:39:12.892629"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "stock_qty",
+        "lower_bound": 9.33,
+        "upper_bound": 12715.090000000002,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:12.895547"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "unit_cost",
+        "lower_bound": 32.3640947273435,
+        "upper_bound": 1985.7700631562775,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:12.896973"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "last_restock",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:12.897876"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "supplier",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T22:39:12.898237"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "category_type",
+        "fill_value": "Unknown",
+        "missing_count": 2
+      },
+      "timestamp": "2026-01-19T22:39:12.898619"
+    },
+    {
+      "operation": "load_file",
+      "details": {
+        "source": "/tests/test3_data.csv",
+        "rows": 10,
+        "columns": 7
+      },
+      "timestamp": "2026-01-19T22:39:12.899612"
+    },
+    {
+      "operation": "standardize_columns",
+      "details": {
+        "source": "/tests/test3_data.csv",
+        "mappings": {
+          "EMP_ID": "emp_id",
+          "Full Name": "full_name",
+          "hire-date": "hire_date",
+          "Department Name": "department_name",
+          "Annual_Salary": "annual_salary",
+          "Performance Score": "performance_score",
+          "Email Address": "email_address"
+        }
+      },
+      "timestamp": "2026-01-19T22:39:12.899907"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "full_name",
+        "fill_value": "Unknown",
+        "missing_count": 1
+      },
+      "timestamp": "2026-01-19T22:39:12.902527"
+    },
+    {
+      "operation": "format_dates",
+      "details": {
+        "column": "hire_date",
+        "format": "ISO-8601 (YYYY-MM-DD)"
+      },
+      "timestamp": "2026-01-19T22:39:12.903230"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "department_name",
+        "fill_value": "Unknown",
+        "missing_count": 3
+      },
+      "timestamp": "2026-01-19T22:39:12.903800"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "annual_salary",
+        "lower_bound": 46027.87625251987,
+        "upper_bound": 148435.13722494972,
+        "values_clipped": 2
+      },
+      "timestamp": "2026-01-19T22:39:12.905904"
+    },
+    {
+      "operation": "outlier_truncate",
+      "details": {
+        "column": "performance_score",
+        "lower_bound": 1.09,
+        "upper_bound": 10.0,
+        "values_clipped": 1
+      },
+      "timestamp": "2026-01-19T22:39:12.908901"
+    },
+    {
+      "operation": "fill_missing_categorical",
+      "details": {
+        "column": "email_address",
+        "fill_value": "Unknown",
+        "missing_count": 1
+      },
+      "timestamp": "2026-01-19T22:39:12.913025"
+    },
+    {
+      "operation": "consolidate",
+      "details": {
+        "total_dataframes": 3,
+        "total_rows": 30,
+        "total_columns": 22
+      },
+      "timestamp": "2026-01-19T22:39:12.939004"
+    }
+  ]
+}
+'
+DEBUG: Stderr: ''
+DEBUG: Running command: solution/solve.sh csv-summary "/tests/final.csv"
+DEBUG: File exists: True
+DEBUG: File executable: True
+DEBUG: Return code: 0
+DEBUG: Stdout: '{
+  "file": "/tests/final.csv",
+  "rows": 30,
+  "columns": 22,
+  "column_names": [
+    "annual_salary",
+    "category_type",
+    "customer_name",
+    "department_name",
+    "email_address",
+    "emp_id",
+    "full_name",
+    "hire_date",
+    "last_restock",
+    "order_date",
+    "order_id",
+    "performance_score",
+    "product_name",
+    "product_price",
+    "quantity",
+    "ship_date",
+    "sku",
+    "status",
+    "stock_qty",
+    "supplier",
+    "total_amount",
+    "unit_cost"
+  ],
+  "dtypes": {
+    "annual_salary": "float64",
+    "category_type": "object",
+    "customer_name": "object",
+    "department_name": "object",
+    "email_address": "object",
+    "emp_id": "object",
+    "full_name": "object",
+    "hire_date": "object",
+    "last_restock": "object",
+    "order_date": "object",
+    "order_id": "object",
+    "performance_score": "float64",
+    "product_name": "object",
+    "product_price": "float64",
+    "quantity": "float64",
+    "ship_date": "object",
+    "sku": "object",
+    "status": "object",
+    "stock_qty": "float64",
+    "supplier": "object",
+    "total_amount": "float64",
+    "unit_cost": "float64"
+  },
+  "missing_values": {
+    "annual_salary": 20,
+    "category_type": 20,
+    "customer_name": 20,
+    "department_name": 20,
+    "email_address": 20,
+    "emp_id": 20,
+    "full_name": 20,
+    "hire_date": 21,
+    "last_restock": 20,
+    "order_date": 20,
+    "order_id": 20,
+    "performance_score": 20,
+    "product_name": 20,
+    "product_price": 20,
+    "quantity": 20,
+    "ship_date": 24,
+    "sku": 20,
+    "status": 20,
+    "stock_qty": 20,
+    "supplier": 20,
+    "total_amount": 20,
+    "unit_cost": 20
+  },
+  "memory_usage": "20.72 KB"
+}
+'
+DEBUG: Stderr: ''
+=========================== short test summary info ============================
+PASSED ../tests/test_outputs.py::test_should_detect_utf8_encoding
+PASSED ../tests/test_outputs.py::test_should_detect_latin_encoding
+PASSED ../tests/test_outputs.py::test_should_detect_encoding_nonexistent_file
+PASSED ../tests/test_outputs.py::test_standardize_spaces_col_name
+PASSED ../tests/test_outputs.py::test_standardize_any_special_chars
+PASSED ../tests/test_outputs.py::test_standardize_any_casing
+PASSED ../tests/test_outputs.py::test_detect_numeric_column
+PASSED ../tests/test_outputs.py::test_detect_date_column
+PASSED ../tests/test_outputs.py::test_detect_categorical_column
+PASSED ../tests/test_outputs.py::test_detect_nonexistent_column
+PASSED ../tests/test_outputs.py::test_parse_iso_dates
+PASSED ../tests/test_outputs.py::test_parse_mixed_date_formats
+PASSED ../tests/test_outputs.py::test_clip_numeric_outliers
+PASSED ../tests/test_outputs.py::test_clean_single_dataframe
+PASSED ../tests/test_outputs.py::test_cleaned_columns_standardized
+PASSED ../tests/test_outputs.py::test_consolidate_dataframes
+PASSED ../tests/test_outputs.py::test_process_full_pipeline
+PASSED ../tests/test_outputs.py::test_process_log_contains_operations
+PASSED ../tests/test_outputs.py::test_get_existing_operations
+PASSED ../tests/test_outputs.py::test_get_median_for_missing
+PASSED ../tests/test_outputs.py::test_get_unknown_for_missing
+PASSED ../tests/test_outputs.py::test_get_cleaning_log
+PASSED ../tests/test_outputs.py::test_get_cleaning_log_nonexistent_file
+PASSED ../tests/test_outputs.py::test_get_csv_summary
+PASSED ../tests/test_outputs.py::test_summary_shows_missing_values
+PASSED ../tests/test_outputs.py::test_full_workflow
+============================= 26 passed in 10.10s ==============================

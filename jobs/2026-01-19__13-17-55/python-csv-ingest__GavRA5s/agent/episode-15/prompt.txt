@@ -1,0 +1,37 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@253fcef909e9:/app# type-detection 'tests/test_data.csv' 'Order Date'
+date
+root@253fcef909e9:/app# type-detection 'tests/test_data.csv' 'Status'
+categorical
+root@253fcef909e9:/app# csv-summary 'tests/test_data.csv'
+{
+  "file": "tests/test_data.csv",
+  "rows": 10,
+  "columns": 8,
+  "column_names": [
+    "Order ID",
+    "Customer Name",
+    "Order Date",
+    "Product Price $",
+    "Quantity!!",
+    "Total Amount",
+    "Ship Date",
+    "Status"
+  ],
+  "missing_values": {
+    "Order ID": 0,
+    "Customer Name": 2,
+    "Order Date": 0,
+    "Product Price $": 1,
+    "Quantity!!": 2,
+    "Total Amount": 2,
+    "Ship Date": 2,
+    "Status": 0
+  }
+}
+root@253fcef909e9:/app#

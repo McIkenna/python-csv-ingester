@@ -1,0 +1,20 @@
+New Terminal Output:
+
+root@785ec509f842:/app# python3 -c "import sys; sys.path.insert(0, 'solution'); from CSVIngester import CSVIngester; ing = CSVIngester(); print('Methods:', [m f
+or m in dir(ing) if not m.startswith('_')])"
+cat solution/CSVIngester.py | grep -E '^    def ' | head -20
+Methods: ['column_mappings', 'consolidated_cleaned_dataframes', 'data_cleaning_log', 'date_parser', 'detect_column_type', 'encode_process', 'file_processor', 'g
+et_operations_log', 'logging_process', 'outlier_truncate', 'processed_dataframe', 'standardize_column_name']
+root@785ec509f842:/app# cat solution/CSVIngester.py | grep -E '^    def ' | head -20
+    def __init__(self):
+    def get_operations_log(self, filepath: Path,) -> List[Dict[str, Any]]:
+    def logging_process(self, operation: str, details: Dict[str, Any]):
+    def encode_process(self, filepath: Path) -> str:
+    def standardize_column_name(self, col: str) -> str:
+    def detect_column_type(self, series: pd.Series) -> str:
+    def date_parser(self, series: pd.Series) -> pd.Series:
+    def outlier_truncate(self, series: pd.Series) -> pd.Series:
+    def processed_dataframe(self, df: pd.DataFrame, source_file: str) -> pd.DataFrame:
+    def consolidated_cleaned_dataframes(self, dfs: List[pd.DataFrame]) -> pd.DataFrame:
+    def file_processor(self, input_files: List[str], output_file: str, log_file: str):
+root@785ec509f842:/app#

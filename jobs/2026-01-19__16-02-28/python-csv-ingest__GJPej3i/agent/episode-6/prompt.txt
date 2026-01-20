@@ -1,0 +1,42 @@
+New Terminal Output:
+
+root@5c43413d2e06:/app# cat > tests/test_data.csv << 'EOFCSV'
+> Order ID,Customer Name,Order Date,Product Price $,Quantity!!,Total Amount,Ship Date,Status
+> ORD1000,,01-10-2023,264.31,7,1850.19,09-10-2023,
+> ORD1001,John Smith,2023-04-02,171.54,17,2916.22,,Shipped
+> ORD1002,Bob Johnson,05.12.2023,,17,3317.41,2023-12-11,
+> ORD1003,Alice Williams,29.08.2023,70.22,10,702.16,09/07/2023,Pending
+> ORD1004,John Smith,2023/01/09,318.75,8,2550.02,,Cancelled
+> ORD1005,Alice Williams,14-02-2023,90.52,14,1267.34,,Cancelled
+> ORD1006,Alice Williams,20.04.2023,432.03,2,864.05,21.04.2023,Cancelled
+> ORD1007,,11/24/2023,68.48,7,479.39,2023/11/29,Active
+> ORD1008,Jane Doe,03/22/2023,9999.99,15,7227.82,,Shipped
+> ORD1009,Alice Williams,25.07.2023,111.06,11,1221.61,03-08-2023,Shipped
+> EOFCSV
+root@5c43413d2e06:/app# cat > tests/test2_data.csv << 'EOFCSV'
+> Employee  ID,Full Name,Department,Salary ($),Hire Date,Performance Score,Manager,Location
+> EMP2000,Sarah Connor,Engineering,95000.50,2022-01-15,8.5,John Doe,New York
+> EMP2001,,Marketing,,2021-06-20,7.2,Jane Smith,
+> EMP2002,Mike Johnson,Sales,78000.00,15.03.2020,9.1,,San Francisco
+> EMP2003,Lisa Anderson,Engineering,105000.00,2019/11/30,8.8,John Doe,New York
+> EMP2004,Tom Wilson,,82000.50,01-07-2021,6.5,Jane Smith,Chicago
+> EMP2005,Emma Davis,Marketing,71000.00,2023-02-28,,John Doe,Boston
+> EMP2006,Chris Brown,Sales,,20.09.2022,8.0,Mike Lee,San Francisco
+> EMP2007,Anna White,Engineering,250000.00,2018/05/12,9.5,John Doe,
+> EMP2008,,HR,65000.00,11/15/2023,7.8,,New York
+> EMP2009,David Lee,Sales,89000.00,03-04-2020,8.2,Mike Lee,Chicago
+> EOFCSV
+root@5c43413d2e06:/app# cat > tests/test3_data.csv << 'EOFCSV'
+> Product#,Item Name,Stock Level,Unit Price,Last Updated,Supplier Name,Category
+> PRD5000,Laptop,150,899.99,2024-01-10,TechCorp,Electronics
+> PRD5001,Mouse,500,25.50,15-01-2024,,Accessories
+> PRD5002,,250,1299.00,2024.01.20,GlobalSupply,Electronics
+> PRD5003,Keyboard,300,,01/25/2024,TechCorp,Accessories
+> PRD5004,Monitor,75,349.99,2024-01-30,DisplayTech,
+> PRD5005,Webcam,,129.99,05.02.2024,TechCorp,Accessories
+> PRD5006,Headset,400,79.99,2024/02/10,,Audio
+> PRD5007,Desk Lamp,200,45.00,15-02-2024,OfficePlus,Office
+> PRD5008,Chair,50,15000.00,2024.02.20,FurnitureCo,Office
+> PRD5009,Desk,30,299.99,25/02/2024,FurnitureCo,Office
+> EOFCSV
+root@5c43413d2e06:/app#
